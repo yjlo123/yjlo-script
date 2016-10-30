@@ -1,0 +1,159 @@
+p {
+	font-size:		1em;
+	margin:			1ex 0;
+}
+p.buttons {
+	text-align:		center;
+	line-height:	2.5em;
+}
+button:focus {
+	outline: none;
+}
+
+.top-button {
+	background-color: #4CAF50;
+	color: white;
+	padding: 8px;
+	min-width: 120px;
+	font-size: 16px;
+	border: 1px solid #2E7D32;
+	cursor: pointer;
+	margin-left: 50px;
+}
+.top-button:hover {
+	background-color: #2E7D32;
+}
+
+.hidden {
+	display:		none;
+}
+
+/*
+	*	Rules for simulated drop-down/pop-up lists
+	*/
+ul {
+	/* rules common to BOTH inner and outer UL */
+	z-index:	100000;
+	margin:		1ex 0;
+	padding:	0;
+	list-style:	none;
+	cursor:		pointer;
+	border:		1px solid Black;
+	/* rules for outer UL only */
+	width:		15ex;
+	position:	relative;
+}
+ul li {
+	background-color: #EEE;
+	padding: 0.15em 1em 0.15em 5px;
+}
+ul ul {
+	display:	none;
+	position:	absolute;
+	width:		100%;
+	left:		-1px;
+	/* Pop-Up */
+	bottom:		0;
+	margin:		0;
+	margin-bottom: 1.55em;
+}
+.ui-layout-north{
+	overflow: auto;
+}
+.ui-layout-north ul ul {
+	/* Drop-Down */
+	bottom:		auto;
+	margin:		0;
+	margin-top:	1.45em;
+}
+ul ul li		{ padding: 3px 1em 3px 5px; }
+ul ul li:hover	{ background-color: #FF9; }
+ul li:hover ul	{ display:	block; background-color: #EEE; }
+	
+	
+#program-result{
+	font-size:15px; 
+	font-family: Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
+}
+
+#editor-area{
+	padding:0;
+	font-size:15px; 
+	font-family: Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
+}
+	
+.tool-label{
+	font-size:16px;
+	padding: 8px;
+	float: left;
+}
+	
+	
+.dropbtn {
+	background-color: #E0E0E0;
+	color: #424242;
+	padding: 8px;
+	min-width: 160px;
+	font-size: 16px;
+	border: 1px solid #9E9E9E;
+	cursor: pointer;
+}
+
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-content {
+	display: none;
+	position: absolute;
+	right: 0;
+	background-color: #f9f9f9;
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.dropdown-content a {
+	color: black;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
+}
+
+.dropdown-content a:hover {
+	background-color: #f1f1f1
+}
+
+.dropdown:hover .dropdown-content {
+	display: block;
+}
+
+.dropdown:hover .dropbtn {
+	background-color: #BDBDBD;
+}
+
+.tooltip {
+	position: relative;
+	display: inline-block;
+	border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+	visibility: hidden;
+	width: 120px;
+	background-color: rgba(0,0,0,0.4);
+	color: #fff;
+	text-align: center;
+	border-radius: 6px;
+	padding: 5px 0;
+
+	/* Position the tooltip */
+	position: absolute;
+	z-index: 1;
+	top: 2px;
+	left: 105%; 
+}
+
+.tooltip:hover .tooltiptext {
+	visibility: visible;
+}
