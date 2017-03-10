@@ -104,7 +104,7 @@ var make_parse = function () {
 				advance();
 				v = if_stmt();
 				break;
-			case "rtn":
+			case "return":
 				advance();
 				v = return_stmt();
 				break;
