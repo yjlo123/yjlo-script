@@ -27,6 +27,10 @@ var myCodeMirror = CodeMirror(document.getElementById("editor-area"), {
 
 myCodeMirror.setSize("100%", "100%");
 
+$(document).ready(function() {
+	registerEventListeners();
+});
+
 function exec(){
 	setup_global_environment();
 	var source = myCodeMirror.getValue();
@@ -45,27 +49,28 @@ function run() {
 			$("#program-result").append('<p class="output-error">'+err.message.replace(/\n/g, "<br />")+'</p>');
 		}
 	}
-};
+}
 
+function registerEventListeners(){
+	$( ".parser-option" ).click(function() {
+		var index = $( ".parser-option" ).index( this );
+		$("#current-parser").text($(this).text());
+		if(index === 0){
+			// yjlo parser
+			current_parser = make_parse();
+		}else{
+			current_parser = null;
+			console.log("Default Jison parser.")
+		}
+	});
 
-$( ".parser-option" ).click(function() {
-	var index = $( ".parser-option" ).index( this );
-	$("#current-parser").text($(this).text());
-	if(index === 0){
-		// yjlo parser
-		current_parser = make_parse();
-	}else{
-		current_parser = null;
-		console.log("Default Jison parser.")
-	}
-});
-
-$( ".example-option" ).click(function() {
-	var index = $( ".example-option" ).index( this );
-	$("#current-example").text($(this).text());
-	myCodeMirror.getDoc().setValue(samplecodes[index]);
-	$("#program-result").empty();
-});
+	$( ".example-option" ).click(function() {
+		var index = $( ".example-option" ).index( this );
+		$("#current-example").text($(this).text());
+		myCodeMirror.getDoc().setValue(samplecodes[index]);
+		$("#program-result").empty();
+	});
+}
 
 Mousetrap.bind(['ctrl+enter'], function(e) {
 	run();

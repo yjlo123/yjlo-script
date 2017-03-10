@@ -10,6 +10,33 @@ var make_parse = function () {
 		return {};
 	};
 
+	var isConstantToken = function (t) {
+		return t.type === "string" || t.type === "number";
+	}
+
+	var isVarNameToken = function (t) {
+		return t.type === "name";
+	}
+
+	var idOperatorToken = function (t) {
+		return t.type === 'operator';
+	}
+
+	var precedence = function(operator){
+		switch(operator){
+		case "^":
+			return 3;
+		case "*":
+		case "/":
+			return 2;
+		case "+":
+		case "-":
+			return 1;
+		default:
+			return 0;
+		}
+	}
+
 	var advance = function (value) {
 		if (token_nr >= tokens.length) {
 			token = {};
@@ -22,70 +49,116 @@ var make_parse = function () {
 		}
 		token_nr = token_nr + 1;
 		token = tokens[token_nr];
-		//next_token = token_nr < tokens.length ? tokens[token_nr] : null;
+		next_token = (token_nr + 1) < tokens.length ? tokens[token_nr + 1] : null;
 		return token;
 	};
 
 	var expression = function () {
 		//print("++++++ "+token.value);
 		print("parsing expression: "+token.value);
-		var operator = {};
-		var apply_node = null;
-		
+
 		var left_node;
-		var right_node = null;
-		t = token;
-		advance();
+		var expression_nodes_infix = [];
+		var bracket_count = 0;
 		
-		if(token.value === "("){
-			// function call
-			left_node = func_call(t);
-		}else if (token.value === "="){
-			// assignment
-			left_node = assign(t);
-		}else if(t.type === "string" || t.type === "number"){
-			// constant
-			left_node = t.value;
-		}else if(t.type === "name"){
-			// variable
-			left_node= new_node();
-			left_node.tag = "variable";
-			left_node.name = t.value;
-		}
-		
-		//print("-------------"+token.value);
-		// TODO while
-		if(token.value !== "," && token.value !== ";" && token.value !== ")"){
-			operator.tag = "variable";
-			operator.name = token.value;
-			//print("=========operator "+operator.name);
+		while (token.value !== "," && token.value !== ";") {
+			if(token.value === ")" && bracket_count === 0){
+				// end of current expression
+				break;
+			}
+
+			if(token.value === '(')bracket_count += 1;
+			if(token.value === ')') bracket_count -= 1;
+
+			if(isVarNameToken(token) && next_token.value === '('){
+				// function call in expression
+				var func_token = token;
+				advance();
+				expression_nodes_infix.push(func_call(func_token));
+				continue;
+			} else if(isConstantToken(token)) {
+				// constant
+				left_node = new_node();
+				left_node.tag = "constant";
+				left_node.value = token.value;
+			} else if(isVarNameToken(token)) {
+				// variable
+				left_node = new_node();
+				left_node.tag = "variable";
+				left_node.type = "variable";
+				left_node.name = token.value;
+			} else if(idOperatorToken(token)) {
+				// operator
+				left_node = new_node();
+				left_node.tag = "variable";
+				left_node.type = "operator";
+				left_node.name = token.value;
+			} else {
+				throw new Error("Expected expression. But " + token.value + " encountered.");
+			}
+			expression_nodes_infix.push(left_node);
 			advance();
-			apply_node = {};
-			var operands = [];
-			operands.push(left_node);
-			operands.push(expression());
-			apply_node.tag = "application";
-			apply_node.operator = operator;
-			apply_node.operands = array_to_list(operands);
 		}
 
-		if(apply_node){
-			return apply_node;
+		// push the rest closing brackets
+		while (bracket_count > 0) {
+			expression_nodes_infix.push(token);
+			advance(')');
+			bracket_count -= 1;
 		}
-		//print(JSON.stringify(left_node,null,4));
-		return left_node;
-		
-		// var left;
-		// var t = token;
-		// advance();
-		// left = t.nud();
-		// while (rbp < token.lbp) {
-		// 	t = token;
-		// 	advance();
-		// 	left = t.led(left);
-		// }
-		// return left;
+
+		// convert infix order to post fix order
+		var expression_nodes_postfix = [];
+		var temp_stack = [];
+		for (var i = 0; i < expression_nodes_infix.length; i++) {
+			var thisNode = expression_nodes_infix[i];
+			if(thisNode.name === '('){
+				temp_stack.push(thisNode);
+			} else if (thisNode.type === 'variable' || thisNode.tag === 'application') {
+				expression_nodes_postfix.push(thisNode);
+			} else if (thisNode.tag === 'constant') {
+				expression_nodes_postfix.push(thisNode.value);
+			} else if (thisNode.name === ')'){
+				while (temp_stack[temp_stack.length-1].name !== '(') {
+					expression_nodes_postfix.push(temp_stack.pop());
+				}
+				temp_stack.pop(); // pop '('
+			} else {
+				while (temp_stack.length > 0 
+						&& precedence(thisNode.name) <= precedence(temp_stack[temp_stack.length-1].name)) {
+							expression_nodes_postfix.push(temp_stack.pop());
+				}
+				temp_stack.push(thisNode);
+			}
+		}
+		while (temp_stack.length > 0){
+			expression_nodes_postfix.push(temp_stack.pop());
+		}
+
+		if (expression_nodes_postfix.length == 1) {
+			return expression_nodes_postfix[0];
+		}
+
+		// build syntax tree
+		var tree_stack = [];
+		for (var i = 0; i < expression_nodes_postfix.length; i++) {
+			if (expression_nodes_postfix[i].type === 'operator'){
+				var apply_node = {};
+				var operands = [];
+				operands.unshift(tree_stack.pop());
+				operands.unshift(tree_stack.pop());
+				apply_node.tag = "application";
+				apply_node.operator = expression_nodes_postfix[i];
+				apply_node.operands = array_to_list(operands);
+				tree_stack.push(apply_node);
+			}else{
+				tree_stack.push(expression_nodes_postfix[i]);
+			}
+		}
+
+		return tree_stack[0];
 	};
+
 
 	var statement = function () {
 		var n = token, v;
@@ -109,7 +182,13 @@ var make_parse = function () {
 				v = return_stmt();
 				break;
 			default:
-				v = expression();
+				if(next_token.value === '='){
+					var prev_token = token;
+					advance();
+					v = assign(prev_token);
+				}else{
+					v = expression();
+				}
 				advance(";");
 		}
 		//print("] ---- end of statement.  ");
