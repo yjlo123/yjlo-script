@@ -122,19 +122,23 @@ function print() {
 	var output = "";
 	
 	for (var i = 0; i < arguments.length; i++){
+		var arg = arguments[i];
 		if (arguments[i] && is_list(arguments[i])){
+			// print list
 			output += "[";
-			var current = arguments[i];
-			while (!is_empty(current)){
-				output += (head(current)+", ");
-				current = tail(current);
+			while (!is_empty(arg)){
+				output += (head(arg)+", ");
+				arg = tail(arg);
 			}
 			if(output.length !== 1){
 				output = output.slice(0, -2);
 			}
 			output += "]";
 		}else{
-			output += arguments[i];
+			if (arg && arg.tag === 'primitive' && typeof(arg.implementation) === 'boolean'){
+				arg = arg.implementation.toString();
+			}
+			output += arg;
 		}
 	}
 	

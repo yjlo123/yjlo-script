@@ -61,7 +61,7 @@ var make_parse = function () {
 		var expression_nodes_infix = [];
 		var bracket_count = 0;
 		
-		while (token.value !== "," && token.value !== ";") {
+		while (token && token.value !== "," && token.value !== ";") {
 			if(token.value === ")" && bracket_count === 0){
 				// end of current expression
 				break;
@@ -69,8 +69,7 @@ var make_parse = function () {
 
 			if(token.value === '(')bracket_count += 1;
 			if(token.value === ')') bracket_count -= 1;
-
-			if(isVarNameToken(token) && next_token.value === '('){
+			if(isVarNameToken(token) && next_token && next_token.value === '('){
 				// function call in expression
 				var func_token = token;
 				advance();
@@ -182,7 +181,7 @@ var make_parse = function () {
 				v = return_stmt();
 				break;
 			default:
-				if(next_token.value === '='){
+				if(next_token && next_token.value === '='){
 					var prev_token = token;
 					advance();
 					v = assign(prev_token);
@@ -738,10 +737,14 @@ var make_parse = function () {
 
 	return function (source) {
 		tokens = source.tokens('=<>!+-*&|/%^', '=<>&|');
+		if(!tokens || tokens.length == 0){
+			throw Error("Empty source code.");
+		}
 		//print(tokens);
 		print("start parsing.");
 		token_nr = 0;
 		token = tokens[token_nr];
+		next_token = tokens[token_nr+1];
 		//advance();
 		var s = statements();
 		//advance("(end)");

@@ -133,7 +133,8 @@ function is_true(x) {
 	return ! is_false(x);
 }
 function is_false(x) {
-	return x === false || x === 0 || x === "" || x === undefined || x === NaN;
+	return x === false || x === 0 || x === "" 
+	|| x === undefined || x === NaN || x === null || x.implementation === false;
 }
 	 
 function evaluate_if_statement(stmt,env) {
@@ -315,6 +316,8 @@ var primitive_functions = {
 		error: error,
 		
 		int: to_int,
+		true: true,
+		false: false,
 		
 		"+": function(x,y) { return x + y; },
 		"-": function(x,y) { return x - y; },
