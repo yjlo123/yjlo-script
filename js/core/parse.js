@@ -25,12 +25,25 @@ var make_parse = function () {
 	var precedence = function(operator){
 		switch(operator){
 		case "^":
-			return 3;
+			return 7;
 		case "*":
 		case "/":
-			return 2;
+		case "%":
+			return 6;
 		case "+":
 		case "-":
+			return 5;
+		case "<":
+		case "<=":
+		case ">":
+		case ">=":
+			return 4;
+		case "==":
+		case "!=":
+			return 3;
+		case "&&":
+			return 2;
+		case "||":
 			return 1;
 		default:
 			return 0;
