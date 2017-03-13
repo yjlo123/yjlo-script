@@ -24,7 +24,7 @@ var make_parse = function () {
 
 	var precedence = function(operator){
 		switch(operator){
-		case "^":
+		case "**": // power
 			return 7;
 		case "*":
 		case "/":
@@ -755,7 +755,7 @@ var make_parse = function () {
 	}
 
 	return function (source) {
-		tokens = source.tokens('=<>!+-*&|/%^', '=<>&|');
+		tokens = source.tokens('=<>!+-*&|/%^*', '=<>&|*');
 		if(!tokens || tokens.length == 0){
 			throw Error("Empty source code.");
 		}

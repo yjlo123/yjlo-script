@@ -329,6 +329,8 @@ var primitive_functions = {
 		true: true,
 		false: false,
 		
+		"_-": function(x) { return -x; }, // negative
+		"**": function(x,y) { return Math.pow(x,y)}, // power 
 		"+": function(x,y) { return x + y; },
 		"-": function(x,y) { return x - y; },
 		"*": function(x,y) { return x * y; },
