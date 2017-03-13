@@ -338,6 +338,8 @@ var primitive_functions = {
 		"!=": function(x,y) { return x !== y; },
 		"<": function(x,y) { return x < y; },
 		"<=": function(x,y) { return x <= y; },
+		">": function(x,y) { return x > y; },
+		">=": function(x,y) { return x >= y; },
 		"!": function(x) { return ! x; },
 		"&&": function(x,y) { return x && y; },
 		"||": function(x,y) { return x || y; }
