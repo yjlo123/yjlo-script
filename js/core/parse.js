@@ -242,18 +242,6 @@ var make_parse = function () {
 		advance("(");
 		if (token.value !== ")") {
 			while (true) {
-				/*
-				if (token.type !== "name" && token.type !== "string") {
-					throw new Error("Expected a parameter name.");
-				}*/
-				//TODO  expression
-				/*
-				var o = token.value;
-				if(token.type !== 'string' && token.type !== 'number'){
-					o = new_node();
-					o.tag = "variable";
-					o.name = token.value;
-				}*/
 				var o = expression();
 				operands.push(o);
 				//advance();

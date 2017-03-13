@@ -140,20 +140,20 @@ function is_false(x) {
 	|| x === undefined || x === NaN || x === null || x.implementation === false;
 }
 	 
-function evaluate_if_statement(stmt,env) {
-	if (is_true(evaluate(if_predicate(stmt),env)))
-		return evaluate(if_consequent(stmt),env);
+function evaluate_if_statement(stmt, env) {
+	if (is_true(evaluate(if_predicate(stmt), env)))
+		return evaluate(if_consequent(stmt), extend_environment([], [], env));
 	else{
 		if(if_alternative(stmt)){
-			return evaluate(if_alternative(stmt),env);
+			return evaluate(if_alternative(stmt), extend_environment([], [], env));
 		}
 	}
 }
 
-function evaluate_while_statement(stmt,env) {
-	if (is_true(evaluate(if_predicate(stmt),env))){
-		evaluate(if_consequent(stmt),env);
-		return evaluate_while_statement(stmt,env);
+function evaluate_while_statement(stmt, env) {
+	if (is_true(evaluate(if_predicate(stmt), env))){
+		evaluate(if_consequent(stmt), extend_environment([], [], env));
+		return evaluate_while_statement(stmt, env);
 	}
 }
 	 
@@ -279,7 +279,7 @@ function is_return_statement(stmt) {
 function return_statement_expression(stmt) {
 	return stmt.expression;
 }
-		
+	
 function make_return_value(content) {
 	return { tag: "return_value", content: content };
 }
@@ -393,11 +393,11 @@ function evaluate(stmt,env) {
 		return evaluate_sequence(stmt,env);
 	else if (is_application(stmt))
 		return apply(evaluate(operator(stmt),env),
-						 list_of_values(operands(stmt),env));
+					 list_of_values(operands(stmt),env));
 	else if (is_return_statement(stmt))
 		return make_return_value(
 					 evaluate(return_statement_expression(stmt),
-								 env));
+							  env));
 	else throw new Error("Unknown expression type - - evaluate: "+stmt);
 }
 
