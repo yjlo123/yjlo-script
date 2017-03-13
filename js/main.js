@@ -2,6 +2,7 @@ var debug = false;
 var current_parser = make_parse();
 	
 var hello_world = 'var a = 2;\n\nfunc double(n){\n\treturn n * 2;\n}\n\nfunc hello(n){\n\tprint("Hello World! " + n);\n}\n\n// Recursive function\nfunc repeat(f, n){\n\tif(n){\n\t\tf(n);\n\t\trepeat(f, n-1);\n\t}else{\n\t\tprint("Done!");\n\t}\n}\n\nrepeat(hello, double(a));';
+var leap_year = 'func isLeapYear(year){\n\treturn ((year % 4 == 0) && (year % 100 != 0))\n\t\t\t|| (year % 400 == 0);\n}\n\nprint(isLeapYear(2020));';
 var fabonacci_code = '/*\n\tThe Fibonacci sequence is a series of numbers\n\twhere a number is found by adding up the two\n\tnumbers before it.\n\t1, 1, 2, 3, 5, 8, 13, 21, 34, and so forth.\n*/\n\nfunc fib(n) {\n\tif (n < 2) {\n\t\treturn n;\n\t} else {\n\t\treturn fib(n - 1) + fib(n - 2);\n\t}\n}\n\n// The naive version\n// Don\'t try numbers larger than 25\nprint("Fib(9) = " + fib(9));';
 var find_factors = '/*\n\tFind factors of a Positive Integer\n*/\n\nfunc factor(n, b, i){\n\tif (i <= b){\n\t\tvar a = n % i;\n\t\tif(a == 0){\n\t\t\tprint(i);\n\t\t}\n\t\tfactor(n, b, i+1);\n\t}\n}\n\nfunc print_factors(n){\n\tfactor(n, n/2, 1);\n\tprint(n);\n}\n\nprint_factors(63);';
 var decimal_binary = '/*\n\tConvert decimal number to binary\n*/\nfunc decimal_to_binary(n, res){\n\tif (n == 0){\n\t\treturn res;\n\t}\n\tvar remainder = n % 2;\n\tres = remainder + res;\n\treturn decimal_to_binary(int(n/2), res);\n}\n\nfunc print_binary(n){\n\tvar result = decimal_to_binary(n, "");\n\tprint(n + " in binary is:");\n\tif (result){\n\t\tprint(result);\n\t}else{\n\t\tprint("0");\n\t}\n}\n\nprint_binary(4356);';
@@ -9,6 +10,7 @@ var insertion_sort = '/*\n\tInsertion sort\n*/\n\nvar arr = list(5,3,40,7,5,9,0,
 var list_manipulation = 'func init_list(n){\n\tif (n == 0){\n\t\treturn list();\n\t} else {\n\t\treturn pair(null, init_list(n-1));\n\t}\n}\n\nfunc set(lst, n, v){\n\tif (is_empty(lst)){\n\t\treturn lst;\n\t}\n\tif (n == 0){\n\t\treturn pair(v, tail(lst));\n\t} else {\n\t\treturn pair(head(lst), set(tail(lst), n-1, v));\n\t}\n}\n\nfunc get(lst, n){\n\tif (is_empty(lst)){\n\t\treturn null;\n\t}\n\tif (n == 0){\n\t\treturn head(lst);\n\t} else {\n\t\treturn get(tail(lst), n-1);\n\t}\n}\n\nfunc length(lst){\n\tfunc count(l, c){\n\t\tif (is_empty(l)){\n\t\t\treturn c;\n\t\t}\n\t\treturn count(tail(l), c+1);\n\t}\n\treturn count(lst, 0);\n}\n\nvar my_list = init_list(6);\nmy_list = set(set(set(my_list, 0, 5), 3, 7), 4, 2);\n\nprint("my_list = ", my_list);\nprint("length = ", length(my_list));\nprint("-------------------------------");\nprint("my_list[1]  = ", get(my_list, 1));\nprint("my_list[3]  = ", get(my_list, 3));\nprint("my_list[10] = ", get(my_list, 10));';
 
 var samplecodes = [hello_world,
+					leap_year,
 					fabonacci_code,
 					find_factors,
 					decimal_binary,
@@ -21,7 +23,7 @@ var myCodeMirror = CodeMirror(document.getElementById("editor-area"), {
 	smartIndent: true,
 	indentUnit: 4,
 	indentWithTabs: true,
-	mode:	"javascript",
+	mode: "javascript",
 	theme: "lesser-dark"
 });
 
