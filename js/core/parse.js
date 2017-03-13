@@ -25,6 +25,8 @@ var make_parse = function () {
 	var precedence = function(operator){
 		switch(operator){
 		case "**": // power
+			return 8;
+		case "_-": // negative
 			return 7;
 		case "*":
 		case "/":
@@ -131,11 +133,22 @@ var make_parse = function () {
 			} else if (thisNode.tag === 'constant') {
 				expression_nodes_postfix.push(thisNode.value);
 			} else if (thisNode.name === ')'){
-				while (temp_stack[temp_stack.length-1].name !== '(') {
+				while (temp_stack.length > 0 && temp_stack[temp_stack.length-1].name !== '(') {
 					expression_nodes_postfix.push(temp_stack.pop());
 				}
-				temp_stack.pop(); // pop '('
+				if (temp_stack.length > 0){
+					temp_stack.pop(); // pop '('
+				}else{
+					throw new Error("Unmatched bracket");
+				}
 			} else {
+				// operators
+				/* prefix all unary operators with '_' ! */
+				if (thisNode.name === '-'
+					&& (temp_stack.length === 0 || temp_stack[temp_stack.length-1].name === '(')){
+						// negative operator
+						thisNode.name = '_-';
+					}
 				while (temp_stack.length > 0 
 						&& precedence(thisNode.name) <= precedence(temp_stack[temp_stack.length-1].name)) {
 							expression_nodes_postfix.push(temp_stack.pop());
@@ -158,7 +171,10 @@ var make_parse = function () {
 				var apply_node = {};
 				var operands = [];
 				operands.unshift(tree_stack.pop());
-				operands.unshift(tree_stack.pop());
+				if (expression_nodes_postfix[i].name.charAt(0) !== '_'){
+					// not a unary operator
+					operands.unshift(tree_stack.pop());
+				}
 				apply_node.tag = "application";
 				apply_node.operator = expression_nodes_postfix[i];
 				apply_node.operands = array_to_list(operands);
