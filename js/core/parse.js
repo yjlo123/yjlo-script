@@ -145,7 +145,7 @@ var make_parse = function () {
 				// operators
 				/* prefix all unary operators with '_' ! */
 				if (thisNode.name === '-'
-					&& (temp_stack.length === 0 || temp_stack[temp_stack.length-1].name === '(')){
+					&& (expression_nodes_postfix.length === 0 || (temp_stack.length > 0 && temp_stack[temp_stack.length-1].name === '('))){
 						// negative operator
 						thisNode.name = '_-';
 					}
