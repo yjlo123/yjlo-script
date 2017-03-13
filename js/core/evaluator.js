@@ -128,7 +128,10 @@ function if_consequent(stmt) {
 function if_alternative(stmt) {
 	return stmt.alternative;
 }
-		
+function is_while_statement(stmt) {
+	return is_tagged_object(stmt,"while");
+}
+
 function is_true(x) {
 	return ! is_false(x);
 }
@@ -144,6 +147,13 @@ function evaluate_if_statement(stmt,env) {
 		if(if_alternative(stmt)){
 			return evaluate(if_alternative(stmt),env);
 		}
+	}
+}
+
+function evaluate_while_statement(stmt,env) {
+	if (is_true(evaluate(if_predicate(stmt),env))){
+		evaluate(if_consequent(stmt),env);
+		return evaluate_while_statement(stmt,env);
 	}
 }
 	 
@@ -287,8 +297,8 @@ function apply(fun,arguments) {
 		var result =
 			evaluate(function_value_body(fun),
 						extend_environment(function_value_parameters(fun),
-												 arguments,
-												 function_value_environment(fun)));
+											arguments,
+											function_value_environment(fun)));
 		if (is_return_value(result)) 
 			return return_value_content(result);
 		else return undefined;
@@ -373,6 +383,8 @@ function evaluate(stmt,env) {
 		return evaluate_var_definition(stmt,env);
 	else if (is_if_statement(stmt))
 		return evaluate_if_statement(stmt,env);
+	else if (is_while_statement(stmt))
+		return evaluate_while_statement(stmt,env);
 	else if (is_function_definition(stmt))
 		return evaluate_function_definition(stmt,env);
 	else if (is_sequence(stmt))

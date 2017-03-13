@@ -189,6 +189,10 @@ var make_parse = function () {
 				advance();
 				v = if_stmt();
 				break;
+			case "while":
+				advance();
+				v = while_stmt();
+				break;
 			case "return":
 				advance();
 				v = return_stmt();
@@ -688,6 +692,20 @@ var make_parse = function () {
 		return n;
 	}
 	
+/*===================== WHILE ======================= */
+	var while_stmt = function(){
+		print("parsing while.");
+		var n = new_node();
+		n.tag = "while";
+		advance("(");
+		n.predicate = expression();
+		advance(")");
+		advance("{");
+		n.consequent = statements();
+		advance("}");
+		return n;
+	}
+
 	stmt("if", function () {
 		advance("(");
 		this.first = expression(0);
