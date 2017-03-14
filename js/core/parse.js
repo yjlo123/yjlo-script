@@ -211,6 +211,10 @@ var make_parse = function () {
 				advance();
 				v = while_stmt();
 				break;
+			case "do":
+				advance();
+				v = do_while_stmt();
+				break;
 			case "return":
 				advance();
 				v = return_stmt();
@@ -240,11 +244,9 @@ var make_parse = function () {
 							break;
 						default:
 							v = expression();
+							advance(";");
 					}
-				}else{
-					v = expression();
 				}
-				advance(";");
 		}
 		//print("] ---- end of statement.  ");
 		return v;
@@ -330,7 +332,7 @@ var make_parse = function () {
 			advance("=");
 			t.value = expression();
 		}
-		
+		advance(";");
 		return t;
 	};
 
@@ -427,6 +429,20 @@ var make_parse = function () {
 		n.predicate = expression();
 		advance(")");
 		n.consequent = block();
+		return n;
+	};
+
+/*===================== DO WHILE ======================= */
+	var do_while_stmt = function() {
+		print("parsing do.");
+		var n = new_node();
+		n.tag = "do";
+		n.consequent = block();
+		advance("while");
+		advance("(");
+		n.predicate = expression();
+		advance(")");
+		advance(";");
 		return n;
 	};
 

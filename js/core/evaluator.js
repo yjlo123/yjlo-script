@@ -131,6 +131,9 @@ function if_alternative(stmt) {
 function is_while_statement(stmt) {
 	return is_tagged_object(stmt,"while");
 }
+function is_do_while_statement(stmt) {
+	return is_tagged_object(stmt,"do");
+}
 
 function is_true(x) {
 	return ! is_false(x);
@@ -160,7 +163,18 @@ function evaluate_while_statement(stmt, env) {
 		return evaluate_while_statement(stmt, env);
 	}
 }
-	 
+
+function evaluate_do_while_statement(stmt, env) {
+	var result = evaluate(if_consequent(stmt), extend_environment([], [], env));
+		if (is_return_value(result)){
+			return result;
+		}
+	if (is_true(evaluate(if_predicate(stmt), env))){
+		return evaluate_do_while_statement(stmt, env);
+	}
+}
+
+
 function is_function_definition(stmt) {
 	return is_tagged_object(stmt,"function_definition");
 }
@@ -170,7 +184,7 @@ function function_definition_parameters(stmt) {
 function function_definition_body(stmt) {
 	return stmt.body;
 }
-		
+
 function evaluate_function_definition(stmt,env) {
 	return make_function_value(
 				 function_definition_parameters(stmt),
@@ -396,6 +410,8 @@ function evaluate(stmt,env) {
 		return evaluate_if_statement(stmt,env);
 	else if (is_while_statement(stmt))
 		return evaluate_while_statement(stmt,env);
+	else if (is_do_while_statement(stmt))
+		return evaluate_do_while_statement(stmt,env);
 	else if (is_function_definition(stmt))
 		return evaluate_function_definition(stmt,env);
 	else if (is_sequence(stmt))
