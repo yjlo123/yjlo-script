@@ -329,7 +329,10 @@ var primitive_functions = {
 		runtime: runtime,
 		error: error,
 		
-		int: to_int,
+		floor: _floor,
+		ceil: _ceil,
+		trunc: _trunc,
+		sqrt: _sqrt,
 		true: true,
 		false: false,
 		

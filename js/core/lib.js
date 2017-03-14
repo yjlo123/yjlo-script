@@ -108,10 +108,21 @@ function error(x) {
 
 
 
-function to_int(n){
+function _floor(n){
+	return Math.floor(n);
+}
+
+function _ceil(n){
+	return Math.ceil(n);
+}
+
+function _trunc(n){
 	return Math.trunc(n);
 }
 
+function _sqrt(n){
+	return Math.sqrt(n);
+}
 
 /*  UI Output */
 function print() {
