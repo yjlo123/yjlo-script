@@ -6,21 +6,29 @@ var make_parse = function () {
 	var tokens;
 	var token_nr;
 
-	var new_node = function () {
+	var new_node = function() {
 		return {};
+	};
+
+	var new_var_node = function(name, type) {
+		var node = new_node();
+		node.tag = "variable";
+		node.name = name;
+		node.type = type;
+		return node;
 	};
 
 	var isConstantToken = function (t) {
 		return t.type === "string" || t.type === "number";
-	}
+	};
 
 	var isVarNameToken = function (t) {
 		return t.type === "name";
-	}
+	};
 
 	var idOperatorToken = function (t) {
 		return t.type === 'operator';
-	}
+	};
 
 	var precedence = function(operator){
 		switch(operator){
@@ -97,16 +105,10 @@ var make_parse = function () {
 				left_node.value = token.value;
 			} else if(isVarNameToken(token)) {
 				// variable
-				left_node = new_node();
-				left_node.tag = "variable";
-				left_node.type = "variable";
-				left_node.name = token.value;
+				left_node = new_var_node(token.value, "variable");
 			} else if(idOperatorToken(token)) {
 				// operator
-				left_node = new_node();
-				left_node.tag = "variable";
-				left_node.type = "operator";
-				left_node.name = token.value;
+				left_node = new_var_node(token.value, "operator");
 			} else {
 				throw new Error("Expected expression. But " + token.value + " encountered.");
 			}
@@ -215,12 +217,24 @@ var make_parse = function () {
 				break;
 			default:
 				if(next_token){
-					if(next_token.value === '='){
-						var prev_token = token;
-						advance();
-						v = assign(prev_token);
-					}else{
-						v = expression();
+					// Assignment statement
+					var prev_token = token;
+					var next_operator = next_token.value;
+					switch (next_operator){
+						case "=":
+							advance();
+							v = assign(prev_token);
+							break;
+						case "+=":
+						case "-=":
+						case "*=":
+						case "/=":
+						case "%=":
+							advance();
+							v = assign(prev_token, next_operator.charAt(0));
+							break;
+						default:
+							v = expression();
 					}
 				}else{
 					v = expression();
@@ -255,9 +269,7 @@ var make_parse = function () {
 	var func_call = function(t){
 		print("parsing func call. "+t.value);
 		var a = new_node();
-		var operator = new_node();
-		operator.tag = "variable";
-		operator.name = t.value;
+		var operator = new_var_node(t.value);
 		var operands = [];
 		advance("(");
 		if (token.value !== ")") {
@@ -276,7 +288,7 @@ var make_parse = function () {
 		a.operator = operator;
 		a.operands = array_to_list(operands);
 		return a;
-	}
+	};
 	
 	
 /*===================== RETURN ======================= */
@@ -288,23 +300,35 @@ var make_parse = function () {
 		//advance(); // return expression
 		advance(";");
 		return n;
-	}
+	};
 
 /*===================== ASSIGN ======================= */
-	var assign = function(n){
+	var assign = function(var_token, operator){
 		print("parsing assign. " + token.value);
 		var t = new_node();
 
-		if (n.type !== "name") {
+		if (var_token.type !== "name") {
 			throw new Error("Expected a new variable name.");
 		}
 		t.tag = "assignment";
-		t.variable = n.value;
-		advance("=");
-		t.value = expression();
-
+		t.variable = var_token.value;
+		if (operator){
+			// Compound Assignment
+			advance(operator + "=");
+			var apply_node = {};
+			apply_node.tag = "application";
+			apply_node.operator = new_var_node(operator, "operator");
+			apply_node.operands = array_to_list([
+										new_var_node(var_token.value, "variable"),
+										expression()]);
+			t.value = apply_node;
+		}else{
+			advance("=");
+			t.value = expression();
+		}
+		
 		return t;
-	}
+	};
 
 /*===================== FUNC ======================= */
 	var func = function(){
@@ -341,7 +365,7 @@ var make_parse = function () {
 		t.value = funcbody;
 		
 		return t;
-	}
+	};
 
 /*===================== VAR DEF ======================= */
 	var var_def = function(){
@@ -370,7 +394,7 @@ var make_parse = function () {
 		}
 		advance(";");
 		return a.length === 0 ? null : a.length === 1 ? a[0] : a;
-	}
+	};
 
 /*===================== IF ======================= */
 	var if_stmt = function(){
@@ -393,7 +417,7 @@ var make_parse = function () {
 			n.alternative = null;
 		}
 		return n;
-	}
+	};
 	
 /*===================== WHILE ======================= */
 	var while_stmt = function(){
@@ -407,7 +431,7 @@ var make_parse = function () {
 		n.consequent = statements();
 		advance("}");
 		return n;
-	}
+	};
 
 
 
