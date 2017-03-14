@@ -214,10 +214,14 @@ var make_parse = function () {
 				v = return_stmt();
 				break;
 			default:
-				if(next_token && next_token.value === '='){
-					var prev_token = token;
-					advance();
-					v = assign(prev_token);
+				if(next_token){
+					if(next_token.value === '='){
+						var prev_token = token;
+						advance();
+						v = assign(prev_token);
+					}else{
+						v = expression();
+					}
 				}else{
 					v = expression();
 				}
@@ -275,7 +279,7 @@ var make_parse = function () {
 	}
 	
 	
-	/*===================== RETURN ======================= */
+/*===================== RETURN ======================= */
 	var return_stmt = function(){
 		print("parsing return. "+token.value);
 		var n = new_node();
@@ -285,6 +289,135 @@ var make_parse = function () {
 		advance(";");
 		return n;
 	}
+
+/*===================== ASSIGN ======================= */
+	var assign = function(n){
+		print("parsing assign. " + token.value);
+		var t = new_node();
+
+		if (n.type !== "name") {
+			throw new Error("Expected a new variable name.");
+		}
+		t.tag = "assignment";
+		t.variable = n.value;
+		advance("=");
+		t.value = expression();
+
+		return t;
+	}
+
+/*===================== FUNC ======================= */
+	var func = function(){
+		print("parsing function. "+token.value);
+		var args = [];
+		var funcbody = {};
+		var t = new_node();
+
+		if (token.type === "name") {
+			t.variable = token.value;
+			t.tag = "var_definition";
+		}
+		advance(); // func name
+		advance("(");
+		if (token.value !== ")") {
+			while (true) {
+				if (token.type !== "name") {
+					throw new Error("Expected a parameter name.");
+				}
+				args.push(token.value);
+				advance();
+				if (token.value !== ",") {
+					break;
+				}
+				advance(",");
+			}
+		}
+		advance(")");
+		funcbody.parameters = array_to_list(args);
+		advance("{");
+		funcbody.body = statements();
+		advance("}");
+		funcbody.tag = "function_definition";
+		t.value = funcbody;
+		
+		return t;
+	}
+
+/*===================== VAR DEF ======================= */
+	var var_def = function(){
+		print("parsing var def. " + token.value);
+		var a = [], n, t;
+		while (true) {
+			n = token;
+			if (n.type !== "name") {
+				throw new Error("Expected a new variable name.");
+			}
+			advance();
+			if (token.value === "=") {
+				t = new_node();
+				advance();
+				t.variable = n.value;
+				t.value = expression();
+				
+				t.tag = "var_definition";
+				a.push(t);
+				//advance();
+			}
+			if (token.value !== ",") {
+				break;
+			}
+			advance(",");
+		}
+		advance(";");
+		return a.length === 0 ? null : a.length === 1 ? a[0] : a;
+	}
+
+/*===================== IF ======================= */
+	var if_stmt = function(){
+		print("parsing if.");
+		var n = new_node();
+		n.tag = "if";
+		advance("(");
+		n.predicate = expression();
+		advance(")");
+		advance("{");
+		n.consequent = statements();
+		advance("}");
+		if (token.value === "else") {
+			advance("else");
+			//n.alternative = token.value === "if" ? if_stmt() : statements();
+			advance("{");
+			n.alternative = statements();
+			advance("}");
+		} else {
+			n.alternative = null;
+		}
+		return n;
+	}
+	
+/*===================== WHILE ======================= */
+	var while_stmt = function(){
+		print("parsing while.");
+		var n = new_node();
+		n.tag = "while";
+		advance("(");
+		n.predicate = expression();
+		advance(")");
+		advance("{");
+		n.consequent = statements();
+		advance("}");
+		return n;
+	}
+
+
+
+
+
+
+
+
+
+/* code for reference */
 
 	var block = function () {
 		var t = token;
@@ -350,26 +483,6 @@ var make_parse = function () {
 		};
 		return s;
 	};
-	
-/*===================== ASSIGN ======================= */
-	var assign = function(n){
-		print("parsing assign. " + token.value);
-		var t = new_node();
-
-		if (n.type !== "name") {
-			throw new Error("Expected a new variable name.");
-		}
-		t.tag = "assignment";
-		t.variable = n.value;
-		advance("=");
-		t.value = expression();
-		
-		//advance();
-		//print("-------"+token.value);
-		//advance(";");
-		// assign is expression, statement advance ";"
-		return t;
-	}
 
 	var assignment = function (id) {
 		return infixr(id, 10, function (left) {
@@ -516,44 +629,6 @@ var make_parse = function () {
 		return e;
 	});
 
-
-/*===================== FUNC ======================= */
-	var func = function(){
-		print("parsing function. "+token.value);
-		var args = [];
-		var funcbody = {};
-		var t = new_node();
-
-		if (token.type === "name") {
-			t.variable = token.value;
-			t.tag = "var_definition";
-		}
-		advance(); // func name
-		advance("(");
-		if (token.value !== ")") {
-			while (true) {
-				if (token.type !== "name") {
-					throw new Error("Expected a parameter name.");
-				}
-				args.push(token.value);
-				advance();
-				if (token.value !== ",") {
-					break;
-				}
-				advance(",");
-			}
-		}
-		advance(")");
-		funcbody.parameters = array_to_list(args);
-		advance("{");
-		funcbody.body = statements();
-		advance("}");
-		funcbody.tag = "function_definition";
-		t.value = funcbody;
-		
-		return t;
-	}
-
 	stmt("func", function () {
 		print(" parsing function");
 		var args = [];
@@ -643,72 +718,6 @@ var make_parse = function () {
 		scope.pop();
 		return a;
 	});
-	
-/*===================== VAR DEF ======================= */
-	var var_def = function(){
-		print("parsing var def. " + token.value);
-		var a = [], n, t;
-		while (true) {
-			n = token;
-			if (n.type !== "name") {
-				throw new Error("Expected a new variable name.");
-			}
-			advance();
-			if (token.value === "=") {
-				t = new_node();
-				advance();
-				t.variable = n.value;
-				t.value = expression();
-				
-				t.tag = "var_definition";
-				a.push(t);
-				//advance();
-			}
-			if (token.value !== ",") {
-				break;
-			}
-			advance(",");
-		}
-		advance(";");
-		return a.length === 0 ? null : a.length === 1 ? a[0] : a;
-	}
-
-/*===================== IF ======================= */
-	var if_stmt = function(){
-		print("parsing if.");
-		var n = new_node();
-		n.tag = "if";
-		advance("(");
-		n.predicate = expression();
-		advance(")");
-		advance("{");
-		n.consequent = statements();
-		advance("}");
-		if (token.value === "else") {
-			advance("else");
-			//n.alternative = token.value === "if" ? if_stmt() : statements();
-			advance("{");
-			n.alternative = statements();
-			advance("}");
-		} else {
-			n.alternative = null;
-		}
-		return n;
-	}
-	
-/*===================== WHILE ======================= */
-	var while_stmt = function(){
-		print("parsing while.");
-		var n = new_node();
-		n.tag = "while";
-		advance("(");
-		n.predicate = expression();
-		advance(")");
-		advance("{");
-		n.consequent = statements();
-		advance("}");
-		return n;
-	}
 
 	stmt("if", function () {
 		advance("(");
@@ -755,6 +764,8 @@ var make_parse = function () {
 		this.arity = "statement";
 		return this;
 	});
+
+/* helper functions */
 
 	function print(msg){
 		if(debug){
