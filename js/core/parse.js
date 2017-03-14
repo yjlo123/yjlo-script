@@ -30,7 +30,7 @@ var make_parse = function () {
 		return t.type === 'operator';
 	};
 
-	var precedence = function(operator){
+	var precedence = function(operator) {
 		switch(operator){
 		case "**": // power
 			return 8;
@@ -252,26 +252,25 @@ var make_parse = function () {
 
 	var statements = function () {
 		print("parsing statements.");
-		var a = [], s;
+		var stmts = [], stmt;
 		//print("------statement list check "+token.value);
 		while (true) {
 			if (token_nr === tokens.length || token.value === '}') {
 				print("end of statement list");
 				break;
 			}
-			s = statement();
+			stmt = statement();
 			
-			if (s) {
-				a.push(s);
+			if (stmt) {
+				stmts.push(stmt);
 			}
 		}
-		//return a.length === 0 ? null : a.length === 1 ? a[0] : a;
-		return a.length === 0? null : array_to_list(a);
+		return stmts.length === 0? null : array_to_list(stmts);
 	};
 
 
 /*===================== FUNC CALL ======================= */
-	var func_call = function(t){
+	var func_call = function(t) {
 		print("parsing func call. "+t.value);
 		var a = new_node();
 		var operator = new_var_node(t.value);
@@ -297,7 +296,7 @@ var make_parse = function () {
 	
 	
 /*===================== RETURN ======================= */
-	var return_stmt = function(){
+	var return_stmt = function() {
 		print("parsing return. "+token.value);
 		var n = new_node();
 		n.tag = "return_statement";
@@ -308,7 +307,7 @@ var make_parse = function () {
 	};
 
 /*===================== ASSIGN ======================= */
-	var assign = function(var_token, operator, value){
+	var assign = function(var_token, operator, value) {
 		print("parsing assign. " + token.value);
 		var t = new_node();
 
@@ -336,7 +335,7 @@ var make_parse = function () {
 	};
 
 /*===================== FUNC ======================= */
-	var func = function(){
+	var func = function() {
 		print("parsing function. "+token.value);
 		var args = [];
 		var funcbody = {};
@@ -373,7 +372,7 @@ var make_parse = function () {
 	};
 
 /*===================== VAR DEF ======================= */
-	var var_def = function(){
+	var var_def = function() {
 		print("parsing var def. " + token.value);
 		var a = [], n, t;
 		while (true) {
@@ -402,22 +401,17 @@ var make_parse = function () {
 	};
 
 /*===================== IF ======================= */
-	var if_stmt = function(){
+	var if_stmt = function() {
 		print("parsing if.");
 		var n = new_node();
 		n.tag = "if";
 		advance("(");
 		n.predicate = expression();
 		advance(")");
-		advance("{");
-		n.consequent = statements();
-		advance("}");
+		n.consequent = block();
 		if (token.value === "else") {
 			advance("else");
-			//n.alternative = token.value === "if" ? if_stmt() : statements();
-			advance("{");
-			n.alternative = statements();
-			advance("}");
+			n.alternative = block();
 		} else {
 			n.alternative = null;
 		}
@@ -425,20 +419,30 @@ var make_parse = function () {
 	};
 	
 /*===================== WHILE ======================= */
-	var while_stmt = function(){
+	var while_stmt = function() {
 		print("parsing while.");
 		var n = new_node();
 		n.tag = "while";
 		advance("(");
 		n.predicate = expression();
 		advance(")");
-		advance("{");
-		n.consequent = statements();
-		advance("}");
+		n.consequent = block();
 		return n;
 	};
 
-
+/*===================== BLOCK ======================= */
+	var block = function() {
+		var block_stmts = null;
+		if (token.value !== '{'){
+			// single statement block
+			block_stmts = array_to_list([statement()]);
+		} else {
+			advance("{");
+			block_stmts = statements();
+			advance("}");
+		}
+		return block_stmts;
+	};
 
 
 
@@ -448,7 +452,7 @@ var make_parse = function () {
 
 /* code for reference */
 
-	var block = function () {
+	var _block = function () {
 		var t = token;
 		advance("{");
 		return t.std();
