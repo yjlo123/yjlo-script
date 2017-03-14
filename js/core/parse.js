@@ -38,6 +38,7 @@ var make_parse = function () {
 			return 7;
 		case "*":
 		case "/":
+		case "/.":
 		case "%":
 			return 6;
 		case "+":
@@ -295,8 +296,7 @@ var make_parse = function () {
 		a.operands = array_to_list(operands);
 		return a;
 	};
-	
-	
+
 /*===================== RETURN ======================= */
 	var return_stmt = function() {
 		print("parsing return. "+token.value);
@@ -419,7 +419,7 @@ var make_parse = function () {
 		}
 		return n;
 	};
-	
+
 /*===================== WHILE ======================= */
 	var while_stmt = function() {
 		print("parsing while.");
@@ -831,7 +831,7 @@ var make_parse = function () {
 	}
 
 	return function (source) {
-		tokens = source.tokens('=<>!+-*&|/%^*', '=<>&|*+-');
+		tokens = source.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
 		if(!tokens || tokens.length == 0){
 			throw Error("Empty source code.");
 		}
