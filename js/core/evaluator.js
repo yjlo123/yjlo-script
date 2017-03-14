@@ -152,7 +152,11 @@ function evaluate_if_statement(stmt, env) {
 
 function evaluate_while_statement(stmt, env) {
 	if (is_true(evaluate(if_predicate(stmt), env))){
-		evaluate(if_consequent(stmt), extend_environment([], [], env));
+		var result = evaluate(if_consequent(stmt), extend_environment([], [], env));
+		if (is_return_value(result)){
+			// encounter return statement in while loop
+			return result;
+		}
 		return evaluate_while_statement(stmt, env);
 	}
 }
@@ -398,8 +402,7 @@ function evaluate(stmt,env) {
 					 list_of_values(operands(stmt),env));
 	else if (is_return_statement(stmt))
 		return make_return_value(
-					 evaluate(return_statement_expression(stmt),
-							  env));
+					 evaluate(return_statement_expression(stmt), env));
 	else throw new Error("Unknown expression type - - evaluate: "+stmt);
 }
 
