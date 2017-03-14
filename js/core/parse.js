@@ -231,7 +231,12 @@ var make_parse = function () {
 						case "/=":
 						case "%=":
 							advance();
-							v = assign(prev_token, next_operator.charAt(0));
+							v = assign(prev_token, next_operator);
+							break;
+						case "++":
+						case "--":
+							advance();
+							v = assign(prev_token, next_operator, 1);
 							break;
 						default:
 							v = expression();
@@ -303,7 +308,7 @@ var make_parse = function () {
 	};
 
 /*===================== ASSIGN ======================= */
-	var assign = function(var_token, operator){
+	var assign = function(var_token, operator, value){
 		print("parsing assign. " + token.value);
 		var t = new_node();
 
@@ -314,13 +319,13 @@ var make_parse = function () {
 		t.variable = var_token.value;
 		if (operator){
 			// Compound Assignment
-			advance(operator + "=");
+			advance(operator);
 			var apply_node = {};
 			apply_node.tag = "application";
-			apply_node.operator = new_var_node(operator, "operator");
+			apply_node.operator = new_var_node(operator.charAt(0), "operator");
 			apply_node.operands = array_to_list([
 										new_var_node(var_token.value, "variable"),
-										expression()]);
+										value || expression()]);
 			t.value = apply_node;
 		}else{
 			advance("=");
@@ -806,7 +811,7 @@ var make_parse = function () {
 	}
 
 	return function (source) {
-		tokens = source.tokens('=<>!+-*&|/%^*', '=<>&|*');
+		tokens = source.tokens('=<>!+-*&|/%^*', '=<>&|*+-');
 		if(!tokens || tokens.length == 0){
 			throw Error("Empty source code.");
 		}
