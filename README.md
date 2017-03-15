@@ -1,7 +1,7 @@
 # YJLO Script
 ## Introduction
 
-**YJLO Script** is a simple JavaScript-like programming language written in JavaScript. It is a scripting language with some convenient features borrowed from other languages such as Python and Swift.
+**YJLO Script** is a simple programming language written in JavaScript. It is a scripting language with some convenient features borrowed from other languages such as Python and Swift.
 
 ## Syntax
 **YJLO Script** has similar syntax as JavaScript with support for higher order functional programming. Semicolon separator at the end of each statement is mandatory.
@@ -21,7 +21,7 @@ isValid
 ```
 
 ### Scope
-Unlike JavaScript (ES5 and older versions), **YJLO Script** is block-scoped. Every pair of braces `{ }` defines a new scope. Local variables declared in a scope are visible to its own scope as well as all sub-scopes, but invisible to its parent-scopes.
+Unlike JavaScript (ES5 and older versions), **YJLO Script** is block-scoped. Every pair of braces `{}` defines a new scope. Local variables declared in a scope are visible to its own scope as well as all sub-scopes, but invisible to its parent-scopes.
 ```swift
 var a = 1;
 func bar(){
@@ -86,7 +86,11 @@ var c = a + 2;		// c <- (10 + 2)
 ### Increment and Decrement Operators
 - Increment `++`
 - Decrement `--`
-
+```swift
+var a = 5;
+a++;		// same as a = a + 1;
+print(a);	// output 6
+```
 ### Compound Assignment Operators
 - Add and assign `+=`
 - Subtract and assign `-=`
@@ -95,7 +99,11 @@ var c = a + 2;		// c <- (10 + 2)
 - Divide (float) and assign `/.=`
 - Remainder and assign `%=`
 - Power and assign `**=`
-
+```swift
+var a = 5;
+a *= 2;		// same as a = a * 2;
+print(a);	// output 10
+```
 >#### **Caveat** 
 >All assignment operations, including increment/decrement operations and compound assignment operations, do not return any value. For example, `i++` can only be an assignment statement instead of a part of an expression.
 
@@ -172,9 +180,9 @@ if value > 0 {
 If there is only one statement in the `if` or `else` clause, the braces `{}` can be omitted.
 ```swift
 if (value > 0)
-	// single statement for if
+	// single statement
 else
-	// single statement for else
+	// another single statement
 ```
 
 >#### **Caveat** 
@@ -217,7 +225,7 @@ for ([variable name] in ([start value], [end value]) by [increment value]) {
 ```
 For example:
 ```swift
-for (i in (3,8) by 2) {
+for (i in (3, 8) by 2) {
 	print(i);
 }
 
@@ -225,14 +233,14 @@ for (i in (3,8) by 2) {
 ```
 The `by [increment value]` part can be omitted, and the default increment is `1` if `[start value]` is less than `[end value]`, otherwise is `-1`.
 ```swift
-for i in (3,8) {
+for i in (3, 8) {
 	print(i);
 }
 
 // output 3, 4, 5, 6, 7
 ```
 ```swift
-for i in (5,0) {
+for i in (5, 0) {
 	print(i);
 }
 
