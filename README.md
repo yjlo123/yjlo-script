@@ -1,4 +1,4 @@
-# yjlo-script
+# YJLO Script
 ## Introduction
 
 **YJLO Script** is a simple JavaScript-like programming language written in JavaScript. It is a scripting language with some convenient features borrowed from other languages such as Python and Swift.
@@ -138,7 +138,7 @@ A function without a return statement returns `undefined` by default.
 ## Control Flow
 Executing different pieces of code based on certain conditions.
 ### If Statement
-Executing a set of statements only if that condition is true:
+Executing a set of statements only if a specified condition is true:
 ```swift
 if (value > 0) {
 	// do something
@@ -202,10 +202,56 @@ print(i);
 ```
 
 ### For Loop
-[TODO]
+**YJLO Script** provides a convenient `for loop statement` to loop through a block of code a number of times.  
+The format is:
+```
+for ([variable name] in ([start value], [end value]) by [incement value]) { 
+	/* Clause */ 
+}
+```
+For example:
+```swift
+for i in (3,8) by 2 {
+	print(i);
+}
 
-Same as `if` statements, the `()` around the condition for `while` and `do-while` statements can be omitted.  
+// output 3, 5, 7
+```
+The `by [increment value]` part can be omitted, and the default increment is `1` if `[start value]` is less than `[end value]`, otherwise is `-1`.
+```swift
+for i in (3,8) {
+	print(i);
+}
+
+// output 3, 4, 5, 6, 7
+```
+```swift
+for i in (5,0) {
+	print(i);
+}
+
+// output 5, 4, 3, 2, 1
+```
+`[start value]` can be omitted, and the default value is 0.
+```swift
+for i in (5) {
+	print(i);
+}
+
+// output 0, 1, 2, 3, 4
+```
+`[start value]`, `[end value]`, and `[increment value]` can be any valid expression that is evaluated to an integer value.
+```swift
+var a = 3;
+for i in (a, a**2) by a-1 {
+	print(i);
+}
+
+// output 3, 5, 7
+```
+
+Same as `if` statements, the `()` around the condition in `while`, `do-while` and `for` statements can be omitted.  
 `{}` can be omitted if there is only one statement in the clause.  
 
 >#### **Caveat** 
->Do not omit both `()` and `{}` at the same time in `while` statements.
+>Do not omit both `()` and `{}` at the same time in `while` or `for` statements.
