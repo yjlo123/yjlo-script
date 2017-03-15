@@ -66,7 +66,7 @@ variable_name = expression;
 ```swift
 var a = 10;		// a <- 10
 var b = a;		// b <- 10
-var c = a + 2;	// c <- (10 + 2)
+var c = a + 2;		// c <- (10 + 2)
 ```
 
 ### Comparison Operators
@@ -93,8 +93,10 @@ var c = a + 2;	// c <- (10 + 2)
 - Add and assign `+=`
 - Subtract and assign `-=`
 - Multiply and assign `*=`
-- Divide and assign `/=`
+- Divide (integer) and assign `/=`
+- Divide (float) and assign `/.=`
 - Remainder and assign `%=`
+- Power and assign `**=`
 
 ## Type
 [TODO]

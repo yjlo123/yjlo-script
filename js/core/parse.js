@@ -234,7 +234,9 @@ var make_parse = function () {
 						case "-=":
 						case "*=":
 						case "/=":
+						case "/.=":
 						case "%=":
+						case "**=":
 							advance();
 							v = assign(prev_token, next_operator);
 							break;
@@ -323,7 +325,7 @@ var make_parse = function () {
 			advance(operator);
 			var apply_node = {};
 			apply_node.tag = "application";
-			apply_node.operator = new_var_node(operator.charAt(0), "operator");
+			apply_node.operator = new_var_node(operator.slice(0, -1), "operator");
 			apply_node.operands = array_to_list([
 										new_var_node(var_token.value, "variable"),
 										value || expression()]);
