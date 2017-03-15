@@ -213,6 +213,10 @@ var make_parse = function () {
 				advance();
 				v = do_while_stmt();
 				break;
+			case "for":
+				advance();
+				v = for_stmt();
+				break;
 			case "return":
 				advance();
 				v = return_stmt();
@@ -307,11 +311,10 @@ var make_parse = function () {
 /*===================== ASSIGN ======================= */
 	var assign = function(var_token, operator, value) {
 		print("parsing assign. " + token.value);
-		var t = new_node();
-
 		if (var_token.type !== "name") {
 			throw new Error("Expected a new variable name.");
 		}
+		var t = new_node();
 		t.tag = "assignment";
 		t.variable = var_token.value;
 		if (operator){
@@ -433,6 +436,53 @@ var make_parse = function () {
 		n.predicate = condition();
 		advance(";");
 		return n;
+	};
+
+/*===================== FOR ======================= */
+	var for_stmt = function() {
+		print("parsing for.");
+		var bracket = token.value === '(';
+		if (bracket) { advance('('); }
+		var n = new_node();
+		n.tag = "for";
+		// variable
+		if (token.type !== "name") {
+			throw new Error("Expected a variable name after for.");
+		}
+		n.variable = new_var_node(token.value, "variable");
+		advance();
+		// range
+		n.range = parse_range();
+		// increment
+		n.increment = parse_increment();
+		if (bracket) { advance(')'); }
+		n.consequent = block();
+		return n;
+	};
+
+	var parse_range = function() {
+		var range = {};
+		advance("in");
+		advance('(');
+		var first_value = expression();
+		if(token.value === ')') {
+			range.from = 0;
+			range.to = first_value;
+		} else {
+			range.from = first_value;
+			advance(',');
+			range.to = expression();
+		}
+		advance(')');
+		return range;
+	};
+
+	var parse_increment = function() {
+		if (token.value !== "by"){
+			return null;
+		}
+		advance("by");
+		return expression();
 	};
 
 /*===================== BLOCK ======================= */

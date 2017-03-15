@@ -204,7 +204,7 @@ print(i);
 ### For Loop
 [TODO]
 
-Same as `if` statement, the `()` around the condition in `while`, `do-while` or `for` can be omitted.  
+Same as `if` statements, the `()` around the condition for `while` and `do-while` statements can be omitted.  
 `{}` can be omitted if there is only one statement in the clause.  
 
 >#### **Caveat** 

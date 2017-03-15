@@ -128,11 +128,28 @@ function if_consequent(stmt) {
 function if_alternative(stmt) {
 	return stmt.alternative;
 }
+
+function for_variable(stmt) {
+	return stmt.variable;
+}
+function for_range(stmt) {
+	return stmt.range;
+}
+function for_increment(stmt) {
+	return stmt.increment;
+}
+function for_consequent(stmt) {
+	return stmt.consequent;
+}
+
 function is_while_statement(stmt) {
 	return is_tagged_object(stmt,"while");
 }
 function is_do_while_statement(stmt) {
 	return is_tagged_object(stmt,"do");
+}
+function is_for_statement(stmt) {
+	return is_tagged_object(stmt,"for");
 }
 
 function is_true(x) {
@@ -171,6 +188,37 @@ function evaluate_do_while_statement(stmt, env) {
 		}
 	if (is_true(evaluate(if_predicate(stmt), env))){
 		return evaluate_do_while_statement(stmt, env);
+	}
+}
+
+function evaluate_for_statement(stmt, env) {
+	var extented_env = extend_environment([], [], env);
+	var range_from_value = evaluate(for_range(stmt).from, env);
+	define_variable(for_variable(stmt).name,
+						range_from_value,
+						extented_env);
+	evaluate_for_stmtement_clause(stmt, extented_env, extend_environment([], [], extented_env));
+}
+
+function evaluate_for_stmtement_clause(stmt, for_env, clause_env) {
+	var variable_value = evaluate(for_variable(stmt), for_env);
+	var range_from_value = evaluate(for_range(stmt).from, for_env);
+	var range_to_value = evaluate(for_range(stmt).to, for_env);
+	var increment = for_increment(stmt) || (range_from_value<range_to_value?1:-1);
+	var increment_value = evaluate(increment, for_env);
+
+	if ((increment_value > 0 && variable_value < range_to_value)
+		|| (increment_value < 0 && variable_value > range_to_value)){
+		var result = evaluate(for_consequent(stmt), clause_env);
+		if (is_return_value(result)){
+			// encounter return statement in for loop
+			return result;
+		}
+		// increment
+		set_variable_value(for_variable(stmt).name,
+						variable_value + increment_value,
+						for_env);
+		return evaluate_for_stmtement_clause(stmt, for_env, clause_env);
 	}
 }
 
@@ -413,6 +461,8 @@ function evaluate(stmt,env) {
 		return evaluate_while_statement(stmt,env);
 	else if (is_do_while_statement(stmt))
 		return evaluate_do_while_statement(stmt,env);
+	else if (is_for_statement(stmt))
+		return evaluate_for_statement(stmt,env);
 	else if (is_function_definition(stmt))
 		return evaluate_function_definition(stmt,env);
 	else if (is_sequence(stmt))
