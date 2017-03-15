@@ -96,6 +96,9 @@ var c = a + 2;		// c <- (10 + 2)
 - Remainder and assign `%=`
 - Power and assign `**=`
 
+>#### **Caveat** 
+>All assignment operations, including increment/decrement operations and compound assignment operations, do not return any value. For example, `i++` can only be an assignment statement instead of a part of an expression.
+
 ## Type
 [TODO]
 
@@ -175,35 +178,38 @@ else
 ```
 
 >#### **Caveat** 
->Do not omit both `()` and `{}` at the same time.
+>Do not omit both `()` and `{}` at the same time.  
+>Omitting `{}` is not recommended.
 
 ## Loop
 ### While Loop
 ```swift
 var i = 0;
-
 while i < 10 {
 	i++;
 }
-
-print(i);
 ```
-
+```swift
+var i = 0;
+while (i < 10) i++;
+```
 
 ### Do-while Loop
 ```swift
 var i = 10;
-
 do {
 	i -= 2;
-} while i > 0;
-
-print(i);
+} while (i > 0);
+```
+```swift
+var i = 10;
+do i -= 2;
+while i > 0;
 ```
 
 ### For Loop
-**YJLO Script** provides a convenient `for loop statement` to loop through a block of code a number of times.  
-The format is:
+**YJLO Script** provides a convenient `for statement` to loop through a block of code a number of times.  
+The `for statement` format is:
 ```
 for ([variable name] in ([start value], [end value]) by [increment value]) { 
 	/* Clause */ 
@@ -211,7 +217,7 @@ for ([variable name] in ([start value], [end value]) by [increment value]) {
 ```
 For example:
 ```swift
-for i in (3,8) by 2 {
+for (i in (3,8) by 2) {
 	print(i);
 }
 
@@ -250,8 +256,16 @@ for i in (a, a**2) by a-1 {
 // output 3, 5, 7
 ```
 
-Same as `if` statements, the `()` around the condition in `while`, `do-while` and `for` statements can be omitted.  
+Similar to `if` statements, the `()` around the condition in `while`, `do-while` statements, or the `()` around the `[varialbe][range][increment]` in `for` statements can be omitted.  
 `{}` can be omitted if there is only one statement in the clause.  
 
+```swift
+for (i in (9, 4) by -2)
+	print(i);
+
+// output 9, 7, 5
+```
+
 >#### **Caveat** 
->Do not omit both `()` and `{}` at the same time in `while` or `for` statements.
+>Do not omit both `()` and `{}` at the same time in `while` or `for` statements.  
+>Omitting `{}` is not recommended.
