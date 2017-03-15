@@ -1,6 +1,4 @@
 # yjlo-script
-YJLO Script language implemented in JavaScript
-
 ## Introduction
 
 **YJLO Script** is a simple JavaScript-like programming language written in JavaScript. It is a scripting language with some convenient features borrowed from other languages such as Python and Swift.
