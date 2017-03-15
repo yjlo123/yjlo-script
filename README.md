@@ -205,7 +205,7 @@ print(i);
 **YJLO Script** provides a convenient `for loop statement` to loop through a block of code a number of times.  
 The format is:
 ```
-for ([variable name] in ([start value], [end value]) by [incement value]) { 
+for ([variable name] in ([start value], [end value]) by [increment value]) { 
 	/* Clause */ 
 }
 ```
