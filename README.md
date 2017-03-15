@@ -152,23 +152,43 @@ if (value > 0) {
 	// do something else
 }
 ```
+
 Complex if statement:  
 [TODO]
 
 ### Switch Statement
 [TODO]
 
+The brackets `()` around the condition expression after `if` or `switch` can be omitted.
+```swift
+if value > 0 {
+	// do something
+}
+```
+
+If there is only one statement in the `if` or `else` clause, the braces `{}` can be omitted.
+```swift
+if (value > 0)
+	// single statement for if
+else
+	// single statement for else
+```
+
+>#### **Caveat** 
+>Do not omit both `()` and `{}` at the same time.
+
 ## Loop
 ### While Loop
 ```swift
 var i = 0;
 
-while (i < 10) {
+while i < 10 {
 	i++;
 }
 
 print(i);
 ```
+
 
 ### Do-while Loop
 ```swift
@@ -176,10 +196,16 @@ var i = 10;
 
 do {
 	i -= 2;
-} while (i > 0);
+} while i > 0;
 
 print(i);
 ```
 
 ### For Loop
 [TODO]
+
+Same as `if` statement, the `()` around the condition in `while`, `do-while` or `for` can be omitted.  
+`{}` can be omitted if there is only one statement in the clause.  
+
+>#### **Caveat** 
+>Do not omit both `()` and `{}` at the same time in `while` statements.

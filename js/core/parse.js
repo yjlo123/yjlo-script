@@ -1,6 +1,4 @@
 var make_parse = function () {
-	var scope;
-	var symbol_table = {};
 	var token;
 	var next_token;
 	var tokens;
@@ -84,7 +82,7 @@ var make_parse = function () {
 		var expression_nodes_infix = [];
 		var bracket_count = 0;
 		
-		while (token && token.value !== "," && token.value !== ";") {
+		while (token && token.value !== "," && token.value !== ";" && token.value !== "{") {
 			if(token.value === ")" && bracket_count === 0){
 				// end of current expression
 				break;
@@ -404,9 +402,7 @@ var make_parse = function () {
 		print("parsing if.");
 		var n = new_node();
 		n.tag = "if";
-		advance("(");
-		n.predicate = expression();
-		advance(")");
+		n.predicate = condition();
 		n.consequent = block();
 		if (token.value === "else") {
 			advance("else");
@@ -422,9 +418,7 @@ var make_parse = function () {
 		print("parsing while.");
 		var n = new_node();
 		n.tag = "while";
-		advance("(");
-		n.predicate = expression();
-		advance(")");
+		n.predicate = condition();
 		n.consequent = block();
 		return n;
 	};
@@ -436,9 +430,7 @@ var make_parse = function () {
 		n.tag = "do";
 		n.consequent = block();
 		advance("while");
-		advance("(");
-		n.predicate = expression();
-		advance(")");
+		n.predicate = condition();
 		advance(";");
 		return n;
 	};
@@ -455,6 +447,19 @@ var make_parse = function () {
 			advance("}");
 		}
 		return block_stmts;
+	};
+
+/*===================== CONDITION ======================= */
+	var condition = function() {
+		var condition_expression = null;
+		if (token.value !== '('){
+			condition_expression = expression();
+		} else {
+			advance("(");
+			condition_expression = expression();
+			advance(")");
+		}
+		return condition_expression;
 	};
 
 /* helper functions */
