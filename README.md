@@ -218,7 +218,7 @@ while i > 0;
 ### For Loop
 **YJLO Script** provides a convenient `for statement` to loop through a block of code a number of times.  
 The `for statement` format is:
-```
+```swift
 for ([variable name] in ([start value], [end value]) by [increment value]) { 
 	/* Clause */ 
 }

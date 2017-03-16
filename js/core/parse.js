@@ -122,7 +122,7 @@ var make_parse = function () {
 			advance(')');
 			bracket_count -= 1;
 		}
-		console.log(expression_nodes_infix)
+
 		// convert infix order to post fix order
 		var expression_nodes_postfix = [];
 		var temp_stack = [];
@@ -194,7 +194,6 @@ var make_parse = function () {
 
 		return tree_stack[0];
 	};
-
 
 	var statement = function () {
 		var n = token, v;
