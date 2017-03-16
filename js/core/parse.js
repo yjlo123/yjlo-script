@@ -103,7 +103,8 @@ var make_parse = function () {
 				left_node.value = token.value;
 			} else if(isVarNameToken(token)) {
 				// variable
-				left_node = new_var_node(token.value, "variable");
+				var is_boolean = (token.value=="true") || (token.value=="false");
+				left_node = new_var_node(token.value, is_boolean ? "boolean" : "variable");
 			} else if(idOperatorToken(token)) {
 				// operator
 				left_node = new_var_node(token.value, "operator");
@@ -131,6 +132,8 @@ var make_parse = function () {
 				temp_stack.push(thisNode);
 			} else if (thisNode.type === 'variable' || thisNode.tag === 'application') {
 				expression_nodes_postfix.push(thisNode);
+			} else if (thisNode.type === 'boolean' ) {
+				expression_nodes_postfix.push(thisNode.name==="true" ? true : false);
 			} else if (thisNode.tag === 'constant') {
 				expression_nodes_postfix.push(thisNode.value);
 			} else if (thisNode.name === ')'){
