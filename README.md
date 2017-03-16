@@ -111,7 +111,7 @@ print(a);	// output 10
 [TODO]
 
 ## Function
-Functions can be passed as function parameters or returned by a function. Functions are only visible after its definition.
+Functions can be passed as function parameters or returned by a function. A functions is only visible after its definition.
 ```swift
 func foo() {
 	var a = 5;
@@ -254,7 +254,7 @@ for i in (5) {
 
 // output 0, 1, 2, 3, 4
 ```
-`[start value]`, `[end value]`, and `[increment value]` can be any valid expression that is evaluated to an integer value.
+`[start value]`, `[end value]`, and `[increment value]` can be any valid expression that is evaluated to a number.
 ```swift
 var a = 3;
 for i in (a, a**2) by a-1 {

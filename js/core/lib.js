@@ -108,20 +108,26 @@ function error(x) {
 
 
 
-function _floor(n){
+function _floor(n) {
 	return Math.floor(n);
 }
 
-function _ceil(n){
+function _ceil(n) {
 	return Math.ceil(n);
 }
 
-function _trunc(n){
+function _trunc(n) {
 	return Math.trunc(n);
 }
 
-function _sqrt(n){
+function _sqrt(n) {
 	return Math.sqrt(n);
+}
+
+function _round(n, d) {
+	if (!d) return Math.round(n);
+	var precision = Math.pow(10, d);
+	return Math.round(n * precision) / precision;
 }
 
 /*  UI Output */

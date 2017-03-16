@@ -197,19 +197,19 @@ function evaluate_for_statement(stmt, env) {
 	define_variable(for_variable(stmt).name,
 						range_from_value,
 						extented_env);
-	evaluate_for_stmtement_clause(stmt, extented_env, extend_environment([], [], extented_env));
+	return evaluate_for_stmtement_clause(stmt, extented_env);
 }
 
-function evaluate_for_stmtement_clause(stmt, for_env, clause_env) {
-	var variable_value = evaluate(for_variable(stmt), for_env);
-	var range_from_value = evaluate(for_range(stmt).from, for_env);
-	var range_to_value = evaluate(for_range(stmt).to, for_env);
+function evaluate_for_stmtement_clause(stmt, env) {
+	var variable_value = evaluate(for_variable(stmt), env);
+	var range_from_value = evaluate(for_range(stmt).from, env);
+	var range_to_value = evaluate(for_range(stmt).to, env);
 	var increment = for_increment(stmt) || (range_from_value < range_to_value ? 1 : -1);
-	var increment_value = evaluate(increment, for_env);
+	var increment_value = evaluate(increment, env);
 
 	if ((increment_value > 0 && variable_value < range_to_value)
 		|| (increment_value < 0 && variable_value > range_to_value)){
-		var result = evaluate(for_consequent(stmt), clause_env);
+		var result = evaluate(for_consequent(stmt), env);
 		if (is_return_value(result)){
 			// encounter return statement in for loop
 			return result;
@@ -217,8 +217,8 @@ function evaluate_for_stmtement_clause(stmt, for_env, clause_env) {
 		// increment
 		set_variable_value(for_variable(stmt).name,
 						variable_value + increment_value,
-						for_env);
-		return evaluate_for_stmtement_clause(stmt, for_env, clause_env);
+						env);
+		return evaluate_for_stmtement_clause(stmt, env);
 	}
 }
 
@@ -390,11 +390,13 @@ var primitive_functions = {
 		newline: newline,
 		runtime: runtime,
 		error: error,
-		
+
 		floor: _floor,
 		ceil: _ceil,
 		trunc: _trunc,
 		sqrt: _sqrt,
+		round: _round,
+
 		true: true,
 		false: false,
 		
