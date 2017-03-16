@@ -414,7 +414,7 @@ var primitive_functions = {
 		"<=": function(x,y) { return x <= y; },
 		">": function(x,y) { return x > y; },
 		">=": function(x,y) { return x >= y; },
-		"!": function(x) { return ! x; },
+		"_!": function(x) { return ! x; }, // not
 		"&&": function(x,y) { return x && y; },
 		"||": function(x,y) { return x || y; }
 };

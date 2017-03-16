@@ -33,6 +33,7 @@ var make_parse = function () {
 		case "**": // power
 			return 8;
 		case "_-": // negative
+		case "_!": // not
 			return 7;
 		case "*":
 		case "/":
@@ -149,10 +150,13 @@ var make_parse = function () {
 				// operators
 				/* prefix all unary operators with '_' ! */
 				if (thisNode.name === '-'
-					&& (expression_nodes_postfix.length === 0 || (prevNode && prevNode.name === '('))){
+					&& (expression_nodes_postfix.length === 0 || (prevNode && prevNode.name === '('))) {
 						// negative operator
 						thisNode.name = '_-';
 					}
+				if (thisNode.name === '!') {
+					thisNode.name = '_!';
+				}
 				while (temp_stack.length > 0 
 						&& precedence(thisNode.name) <= precedence(temp_stack[temp_stack.length-1].name)) {
 							expression_nodes_postfix.push(temp_stack.pop());

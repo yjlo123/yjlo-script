@@ -76,7 +76,7 @@ var c = a + 2;		// c <- (10 + 2)
 - Greater than or equal `>=`
 
 ### Logical Operators
-- Logical NOT `!`	[TODO]
+- Logical NOT `!`
 - Logical AND `&&`
 - Logical OR `||`
 
