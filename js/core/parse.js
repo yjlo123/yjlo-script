@@ -120,11 +120,12 @@ var make_parse = function () {
 			advance(')');
 			bracket_count -= 1;
 		}
-
+		console.log(expression_nodes_infix)
 		// convert infix order to post fix order
 		var expression_nodes_postfix = [];
 		var temp_stack = [];
 		for (var i = 0; i < expression_nodes_infix.length; i++) {
+			var prevNode = i>0?expression_nodes_infix[i-1]:null;
 			var thisNode = expression_nodes_infix[i];
 			if(thisNode.name === '('){
 				temp_stack.push(thisNode);
@@ -145,7 +146,7 @@ var make_parse = function () {
 				// operators
 				/* prefix all unary operators with '_' ! */
 				if (thisNode.name === '-'
-					&& (expression_nodes_postfix.length === 0 || (temp_stack.length > 0 && temp_stack[temp_stack.length-1].name === '('))){
+					&& (expression_nodes_postfix.length === 0 || (prevNode && prevNode.name === '('))){
 						// negative operator
 						thisNode.name = '_-';
 					}
