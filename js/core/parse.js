@@ -24,7 +24,7 @@ var make_parse = function () {
 		return t.type === "name";
 	};
 
-	var idOperatorToken = function (t) {
+	var isOperatorToken = function (t) {
 		return t.type === 'operator';
 	};
 
@@ -82,7 +82,17 @@ var make_parse = function () {
 		var left_node;
 		var expression_nodes_infix = [];
 		var bracket_count = 0;
-		
+
+		if (token && token.value === "func"){
+			// function expression, should be anonymous
+			advance("func");
+			if (isVarNameToken(token)){
+				// ignore given name
+				advance();
+			}
+			return func();
+		}
+
 		while (token && token.value !== "," && token.value !== ";" && token.value !== "{") {
 			if(token.value === ")" && bracket_count === 0){
 				// end of current expression
@@ -106,7 +116,7 @@ var make_parse = function () {
 				// variable
 				var is_boolean = (token.value=="true") || (token.value=="false");
 				left_node = new_var_node(token.value, is_boolean ? "boolean" : "variable");
-			} else if(idOperatorToken(token)) {
+			} else if(isOperatorToken(token)) {
 				// operator
 				left_node = new_var_node(token.value, "operator");
 			} else {
@@ -123,7 +133,7 @@ var make_parse = function () {
 			bracket_count -= 1;
 		}
 
-		// convert infix order to post fix order
+		// convert in-fix order to post-fix order
 		var expression_nodes_postfix = [];
 		var temp_stack = [];
 		for (var i = 0; i < expression_nodes_infix.length; i++) {
@@ -198,8 +208,10 @@ var make_parse = function () {
 	var statement = function () {
 		var n = token, v;
 
-		//print("[ ---- parsing statement.  " + n.value);
 		switch (n.value){
+			case ";":
+				advance();
+				break;
 			case "var":
 				advance();
 				v = var_def();
@@ -259,7 +271,6 @@ var make_parse = function () {
 					}
 				}
 		}
-		//print("] ---- end of statement.  ");
 		return v;
 	};
 
@@ -279,7 +290,6 @@ var make_parse = function () {
 		}
 		return stmts.length === 0? null : array_to_list(stmts);
 	};
-
 
 /*===================== FUNC CALL ======================= */
 	var func_call = function(t) {
@@ -349,11 +359,16 @@ var make_parse = function () {
 		var funcbody = {};
 		var t = new_node();
 
-		if (token.type === "name") {
+		if (isVarNameToken(token)) {
 			t.variable = token.value;
 			t.tag = "var_definition";
+			advance(); // func name
+		} else if (token.value === '(') {
+			// anonymous function
+		} else {
+			throw new Error("Invalid function definition.");
 		}
-		advance(); // func name
+
 		advance("(");
 		if (token.value !== ")") {
 			while (true) {
@@ -374,9 +389,14 @@ var make_parse = function () {
 		funcbody.body = statements();
 		advance("}");
 		funcbody.tag = "function_definition";
-		t.value = funcbody;
-		
-		return t;
+
+		if (t.tag === "var_definition") {
+			t.value = funcbody;
+			return t;
+		} else {
+			// anonymous function
+			return funcbody;
+		}
 	};
 
 /*===================== VAR DEF ======================= */
@@ -537,14 +557,18 @@ var make_parse = function () {
 	return function (source) {
 		tokens = source.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
 		if(!tokens || tokens.length == 0){
-			throw Error("Empty source code.");
+			throw new Error("Empty source code.");
 		}
 		//print(tokens);
 		print("start parsing.");
 		token_nr = 0;
 		token = tokens[token_nr];
 		next_token = tokens[token_nr+1];
-		var s = statements();
-		return s;
+		var syntax_tree = statements();
+		if (syntax_tree) {
+			return syntax_tree;
+		} else {
+			throw new Error("Invalid source code.");
+		}
 	};
 };
