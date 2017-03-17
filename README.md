@@ -143,6 +143,23 @@ func fib(n) {
 print("Fib(9) = " + fib(9));
 ```
 
+### Closure
+A closure is a function having access to the parent scope, even after the parent function has closed.
+```swift
+func counter_closure() {
+	var count = 0;
+	return func() {
+		count += 1;
+		print(count);
+	};
+}
+
+var counter = counter_closure();
+counter();	// output 1
+counter();	// output 2
+counter();	// output 3
+```
+
 ### Returning values
 A function without a return statement returns `undefined` by default.
 
