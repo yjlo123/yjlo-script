@@ -236,6 +236,14 @@ var make_parse = function () {
 				advance();
 				v = for_stmt();
 				break;
+			case "continue":
+				advance();
+				v = continue_stmt();
+				break;
+			case "break":
+				advance();
+				v = break_stmt();
+				break;
 			case "return":
 				advance();
 				v = return_stmt();
@@ -544,6 +552,24 @@ var make_parse = function () {
 			advance(")");
 		}
 		return condition_expression;
+	};
+
+/*===================== CONTINUE ======================= */
+	var continue_stmt = function() {
+		print("parsing continue. "+token.value);
+		var n = new_node();
+		n.tag = "continue";
+		advance(";");
+		return n;
+	};
+
+/*===================== BREAK ======================= */
+	var break_stmt = function() {
+		print("parsing break. "+token.value);
+		var n = new_node();
+		n.tag = "break";
+		advance(";");
+		return n;
 	};
 
 /* helper functions */

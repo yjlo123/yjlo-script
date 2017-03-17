@@ -3,8 +3,9 @@ var the_empty_environment = [];
 var an_empty_frame = {};
 
 function is_tagged_object(stmt,the_tag) {
-	return typeof stmt === "object" &&
-	stmt.tag === the_tag;
+	return stmt 
+			&& typeof stmt === "object" 
+			&& stmt.tag === the_tag;
 }
 		
 function is_self_evaluating(stmt) {
@@ -177,6 +178,10 @@ function evaluate_while_statement(stmt, env) {
 			// encounter return statement in while loop
 			return result;
 		}
+		if (is_break_value(result)){
+			return;
+		}
+
 		return evaluate_while_statement(stmt, env);
 	}
 }
@@ -185,6 +190,9 @@ function evaluate_do_while_statement(stmt, env) {
 	var result = evaluate(if_consequent(stmt), extend_environment([], [], env));
 		if (is_return_value(result)){
 			return result;
+		}
+		if (is_break_value(result)){
+			return;
 		}
 	if (is_true(evaluate(if_predicate(stmt), env))){
 		return evaluate_do_while_statement(stmt, env);
@@ -214,6 +222,9 @@ function evaluate_for_stmtement_clause(stmt, env) {
 			// encounter return statement in for loop
 			return result;
 		}
+		if (is_break_value(result)){
+			return null;
+		}
 		// increment
 		set_variable_value(for_variable(stmt).name,
 						variable_value + increment_value,
@@ -222,6 +233,25 @@ function evaluate_for_stmtement_clause(stmt, env) {
 	}
 }
 
+function is_continue_statement(stmt) {
+	return is_tagged_object(stmt,"continue");
+}
+function make_continue_value() {
+	return { tag: "continue_value"};
+}
+function is_continue_value(value) {
+	return is_tagged_object(value,"continue_value");
+}
+
+function is_break_statement(stmt) {
+	return is_tagged_object(stmt,"break");
+}
+function make_break_value() {
+	return { tag: "break_value"};
+}
+function is_break_value(value) {
+	return is_tagged_object(value,"break_value");
+}
 
 function is_function_definition(stmt) {
 	return is_tagged_object(stmt,"function_definition");
@@ -275,15 +305,15 @@ function evaluate_sequence(stmts,env) {
 	if (is_last_statement(stmts))  
 		return evaluate(first_statement(stmts),env);
 	else {
-		var first_stmt_value = 
-			 evaluate(first_statement(stmts),env);
-		if (is_return_value(first_stmt_value))
-			 return first_stmt_value;
-		else return evaluate_sequence(
-							rest_statements(stmts),env);
+		var first_stmt_value = evaluate(first_statement(stmts),env);
+		if (is_return_value(first_stmt_value)
+			|| is_continue_value(first_stmt_value)
+			|| is_break_value(first_stmt_value))
+			return first_stmt_value;
+		else return evaluate_sequence(rest_statements(stmts),env);
 	}
 }
-		  
+
 function is_application(stmt) {
 	return is_tagged_object(stmt,"application");
 }
@@ -434,20 +464,14 @@ function setup_environment() {
 function evaluate_toplevel(stmt,env) {
 	var value = evaluate(stmt,env);
 	if (is_return_value(value))
-		throw new Error("return not allowed outside of function definition");
+		throw new Error("return not allowed outside of function definition.");
+	if (is_continue_value(value))
+		throw new Error("Invalid continue statement.");
+	if (is_break_value(value))
+		throw new Error("Invalid break statement.");
 	else return value;
 }
 
-var input_prompt = "/// M-Eval input:";
-function prompt_and_parse() {
-	var program_string = prompt(input_prompt);
-	if (program_string === null) {
-		 return {tag: "exit"};
-	} else {
-		 return parser.parse(program_string);
-	}
-}
-	 
 function evaluate(stmt,env) {
 	if (is_self_evaluating(stmt)) 
 		return stmt;
@@ -465,6 +489,10 @@ function evaluate(stmt,env) {
 		return evaluate_do_while_statement(stmt,env);
 	else if (is_for_statement(stmt))
 		return evaluate_for_statement(stmt,env);
+	else if (is_continue_statement(stmt))
+		return make_continue_value(stmt,env);
+	else if (is_break_statement(stmt))
+		return make_break_value(stmt,env);
 	else if (is_function_definition(stmt))
 		return evaluate_function_definition(stmt,env);
 	else if (is_sequence(stmt))
@@ -476,15 +504,6 @@ function evaluate(stmt,env) {
 		return make_return_value(
 					 evaluate(return_statement_expression(stmt), env));
 	else throw new Error("Unknown expression type - - evaluate: "+stmt);
-}
-
-/* Alert result, unused */
-function user_print(object) {
-	if (is_compound_function_value(object))
-		alert("Result: function with "+
-				"parameters: " + format(object.parameters) +
-				" body: " + format(object.body));
-	else alert("Result: "+object);
 }
 
 function parse_program(program_string, program_parser) {
@@ -512,14 +531,10 @@ function driver_loop(program_string, program_parser) {
 	var output = evaluate_toplevel(input_program, the_global_environment);
 	return output;
 }
-"METACIRCULAR EVALUATOR LOADED";
-
-
 
 function add_constant(name, value){
 	an_empty_frame[name] = value;
 }
-
 
 function setup_global_environment(){
 	an_empty_frame = {};
