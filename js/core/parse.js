@@ -436,7 +436,14 @@ var make_parse = function () {
 		n.consequent = block();
 		if (token.value === "else") {
 			advance("else");
-			n.alternative = block();
+			if (token.value === "if"){
+				// else if
+				advance("if");
+				n.alternative = if_stmt();
+			} else {
+				// else
+				n.alternative = block();
+			}
 		} else {
 			n.alternative = null;
 		}

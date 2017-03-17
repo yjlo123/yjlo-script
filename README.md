@@ -164,20 +164,27 @@ if (value > 0) {
 }
 ```
 
-Complex if statement:  
-[TODO]
-
-### Switch Statement
-[TODO]
-
-The brackets `()` around the condition expression after `if` or `switch` can be omitted.
+The brackets `()` around the condition expression after `if` can be omitted:
 ```swift
 if value > 0 {
 	// do something
 }
 ```
 
-If there is only one statement in the `if` or `else` clause, the braces `{}` can be omitted.
+Complex if statement:  
+```swift
+if value > 10 {
+	// do something
+} else if value > 0 {
+	// do something else
+} else if value == 0 {
+	// do something else
+} else {
+	// do something else
+}
+```
+
+If there is only one statement in the `if`, `else if` or `else` clause, the braces `{}` can be omitted:
 ```swift
 if (value > 0)
 	// single statement
@@ -188,6 +195,9 @@ else
 >#### **Caveat** 
 >Do not omit both `()` and `{}` at the same time.  
 >Omitting `{}` is not recommended.
+
+### Switch Statement
+[TODO]
 
 ## Loop
 ### While Loop
