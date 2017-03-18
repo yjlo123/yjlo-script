@@ -27,17 +27,17 @@ var a = 1;
 func bar(){
 	var a = 2;
 	var b = 3;
-	print(a); // output 2
+	print( a );		// output 2
 	if (true) {
-		print(b); // output 3
+		print( b );	// output 3
 		var c = 4;
-		print(c); // output 4
+		print( c );	// output 4
 	}
-	print(c); // Error: Cannot find variable: c
+	print( c );		// Error: Cannot find variable: c
 }
 bar();
-print(a); // output 1
-print(b); // Error: Cannot find variable: b
+print( a );		// output 1
+print( b );		// Error: Cannot find variable: b
 ```
 
 ## Operators
@@ -89,7 +89,7 @@ var c = a + 2;		// c <- (10 + 2)
 ```swift
 var a = 5;
 a++;		// same as a = a + 1;
-print(a);	// output 6
+print( a );	// output 6
 ```
 ### Compound Assignment Operators
 - Add and assign `+=`
@@ -102,7 +102,7 @@ print(a);	// output 6
 ```swift
 var a = 5;
 a *= 2;		// same as a = a * 2;
-print(a);	// output 10
+print( a );	// output 10
 ```
 >#### **Caveat** 
 >All assignment operations, including increment/decrement operations and compound assignment operations, do not return any value. For example, `i++` can only be an assignment statement instead of a part of an expression.
@@ -117,7 +117,7 @@ func foo() {
 	var a = 5;
 	return a + 2 * 3;
 }
-print(foo());	// output 11
+print( foo() );	// output 11
 ```
 ```swift
 func double(a) {
@@ -129,7 +129,7 @@ func apply_and_add1(fun, value){
 }
 
 var myFun = apply_and_add1;
-print(myFun(double, 3));	// output 7
+print( myFun(double, 3) );	// output 7
 ```
 
 ### Returning Values
@@ -143,16 +143,14 @@ func fib(n) {
 	return fib(n - 1) + fib(n - 2);
 }
 
-print("Fib(9) = " + fib(9));
+print( "Fib(9) = " + fib(9) );
 ```
 
 ### Anonymous function
 While using a function body as an expression, the function can be anonymous.
-```
-var sum = func (a, b) {
-				return a+b; 
-			};
-print(sum(2, 3));	// output 5
+```swift
+var sum = func (a, b) { return a+b; };
+print( sum(2, 3) );	// output 5
 ```
 In such case, if a function name is given, the name will be ignored.
 
@@ -163,7 +161,7 @@ func counter_closure() {
 	var count = 0;
 	return func() {
 		count += 1;
-		print(count);
+		print( count );
 	};
 }
 
@@ -184,7 +182,7 @@ func fun() {
 }
 
 print( fun.name );		// output "sum"
-print( fun.sum(3, 4) );	// output 7
+print( fun.sum(3, 4) );		// output 7
 ```
 
 Assigning new values to function members through reference is not allowed.
@@ -287,7 +285,7 @@ for ([variable name] in ([start value], [end value]) by [increment value]) {
 For example:
 ```swift
 for (i in (3, 8) by 2) {
-	print(i);
+	print( i );
 }
 
 // output 3, 5, 7
@@ -295,14 +293,14 @@ for (i in (3, 8) by 2) {
 The `by [increment value]` part can be omitted, and the default increment is `1` if `[start value]` is less than `[end value]`, otherwise is `-1`.
 ```swift
 for i in (3, 8) {
-	print(i);
+	print( i );
 }
 
 // output 3, 4, 5, 6, 7
 ```
 ```swift
 for i in (5, 0) {
-	print(i);
+	print( i );
 }
 
 // output 5, 4, 3, 2, 1
@@ -310,7 +308,7 @@ for i in (5, 0) {
 `[start value]` can be omitted, and the default value is 0.
 ```swift
 for i in (5) {
-	print(i);
+	print( i );
 }
 
 // output 0, 1, 2, 3, 4
@@ -319,7 +317,7 @@ for i in (5) {
 ```swift
 var a = 3;
 for i in (a, a**2) by a-1 {
-	print(i);
+	print( i );
 }
 
 // output 3, 5, 7
@@ -330,7 +328,7 @@ Similar to `if` statements, the `()` around the condition in `while`, `do-while`
 
 ```swift
 for (i in (9, 4) by -2)
-	print(i);
+	print( i );
 
 // output 9, 7, 5
 ```
@@ -348,7 +346,7 @@ while true {
 	if (a > 5) {
 		break;
 	}
-	print(a);
+	print( a );
 }
 
 // output 1, 2, 3, 4, 5
@@ -362,7 +360,7 @@ for a in (10) {
 	if a%2 == 0 {
 		continue;
 	}
-	print(a);
+	print( a );
 }
 
 // output 1, 3, 5, 7, 9
@@ -398,5 +396,5 @@ print( counter.getName() );		// output "My Counter"
 
 counter.increase();
 counter.increase();
-print( counter.getCount() );	// output 2
+print( counter.getCount() );		// output 2
 ```
