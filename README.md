@@ -132,6 +132,9 @@ var myFun = apply_and_add1;
 print(myFun(double, 3));	// output 7
 ```
 
+### Returning Values
+A function without a return statement returns `undefined` by default.
+
 ### Recursion
 Function recursion is supported in **YJLO Script**.
 ```swift
@@ -142,6 +145,16 @@ func fib(n) {
 
 print("Fib(9) = " + fib(9));
 ```
+
+### Anonymous function
+While using a function body as an expression, the function can be anonymous.
+```
+var sum = func (a, b) {
+				return a+b; 
+			};
+print(sum(2, 3));	// output 5
+```
+In such case, if a function name is given, the name will be ignored.
 
 ### Closure
 A closure is a function having access to the parent scope, even after the parent function has closed.
@@ -160,8 +173,29 @@ counter();	// output 2
 counter();	// output 3
 ```
 
-### Returning values
-A function without a return statement returns `undefined` by default.
+### Function Members Reference
+**YJLO Script** supports referencing function members from outside of the function with `dot operator (.)`:
+```swift
+func fun() {
+	var name = "sum";
+	func sum(a, b) {
+		return a+b;
+	}
+}
+
+print( fun.name );		// output "sum"
+print( fun.sum(3, 4) );	// output 7
+```
+
+Assigning new values to function members through reference is not allowed.
+
+A private function memeber, including member fields and member functions, cannot be referenced from outside of the function. Prepending an `underscore (_)` to the member name to makes it private.
+```swift
+func fun(){
+	_value = 10;
+}
+print( fun._value );	// Error
+```
 
 ## Control Flow
 Executing different pieces of code based on certain conditions.
@@ -304,3 +338,65 @@ for (i in (9, 4) by -2)
 >#### **Caveat** 
 >Do not omit both `()` and `{}` at the same time in `while` or `for` statements.  
 >Omitting `{}` is not recommended.
+
+### Break
+The break statement "jumps out" of a loop.
+```swift
+var a = 0;
+while true {
+	a++;
+	if (a > 5) {
+		break;
+	}
+	print(a);
+}
+
+// output 1, 2, 3, 4, 5
+```
+
+### Continue
+The continue statement "jumps over" one iteration in the loop.
+```swift
+for a in (10) {
+	a++;
+	if a%2 == 0 {
+		continue;
+	}
+	print(a);
+}
+
+// output 1, 3, 5, 7, 9
+```
+
+## OOP
+**YJLO Script** supports OOP by using `function closure` and `function member reference`.
+```swift
+func Counter() {
+	/* member fields */
+	var _name = "";
+	var _count = 0;
+	
+	/* initialization */
+	_name = "untitled";
+	
+	return func () {
+		/* member functions */
+		func getName() { return _name; }
+		func setName(name) { _name = name; }
+		func getCount() { return _count; }
+		func increase() { _count++; }
+		func decrease() { _count--; }
+		func reset() { _count = 0; }
+	};
+}
+
+var counter = Counter();		// instantiate a new Counter
+print( counter.getName() );		// output "untitled"
+
+counter.setName("My Counter");
+print( counter.getName() );		// output "My Counter"
+
+counter.increase();
+counter.increase();
+print( counter.getCount() );	// output 2
+```
