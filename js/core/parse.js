@@ -99,7 +99,7 @@ var make_parse = function () {
 				break;
 			}
 
-			if(token.value === '(')bracket_count += 1;
+			if(token.value === '(') bracket_count += 1;
 			if(token.value === ')') bracket_count -= 1;
 			if(isVarNameToken(token) && next_token && next_token.value === '('){
 				// function call in expression
@@ -107,7 +107,13 @@ var make_parse = function () {
 				advance();
 				expression_nodes_infix.push(func_call(func_token));
 				continue;
-			} else if(isConstantToken(token)) {
+			} else if(isVarNameToken(token) && next_token && next_token.value === '.'){
+				// reference
+				var func_token = token;
+				advance();
+				expression_nodes_infix.push(reference(func_token));
+				continue;
+			}else if(isConstantToken(token)) {
 				// constant
 				left_node = new_node();
 				left_node.tag = "constant";
@@ -141,7 +147,9 @@ var make_parse = function () {
 			var thisNode = expression_nodes_infix[i];
 			if(thisNode.name === '('){
 				temp_stack.push(thisNode);
-			} else if (thisNode.type === 'variable' || thisNode.tag === 'application') {
+			} else if (thisNode.type === 'variable' 
+						|| thisNode.tag === 'application'
+						|| thisNode.tag === 'reference') {
 				expression_nodes_postfix.push(thisNode);
 			} else if (thisNode.type === 'boolean' ) {
 				expression_nodes_postfix.push(thisNode.name==="true" ? true : false);
@@ -181,7 +189,7 @@ var make_parse = function () {
 		if (expression_nodes_postfix.length == 1) {
 			return expression_nodes_postfix[0];
 		}
-
+		
 		// build syntax tree
 		var tree_stack = [];
 		for (var i = 0; i < expression_nodes_postfix.length; i++) {
@@ -201,7 +209,6 @@ var make_parse = function () {
 				tree_stack.push(expression_nodes_postfix[i]);
 			}
 		}
-
 		return tree_stack[0];
 	};
 
@@ -300,10 +307,10 @@ var make_parse = function () {
 	};
 
 /*===================== FUNC CALL ======================= */
-	var func_call = function(t) {
+	var func_call = function(t, operator) {
 		print("parsing func call. "+t.value);
 		var a = new_node();
-		var operator = new_var_node(t.value);
+		var operator = operator || new_var_node(t.value);
 		var operands = [];
 		advance("(");
 		if (token.value !== ")") {
@@ -570,6 +577,33 @@ var make_parse = function () {
 		n.tag = "break";
 		advance(";");
 		return n;
+	};
+
+/*===================== REFERENCE ======================= */
+	var reference = function(t) {
+		print("parsing reference. "+t.value);
+		var a = new_node();
+		var operator = new_var_node(t.value);
+
+		advance(".");
+		
+		if (token.type !== "name"){
+			throw new Error("Expect a member name, but encounter '"+token.value+"'");
+		}
+
+		a.tag = "reference";
+		a.operator = operator;
+		a.member = token.value;
+		advance(); // advance member
+		
+		if (token.value === "(") {
+			// member application
+			var apply_node = new_node();
+			apply_node.value = a.tag;
+			return func_call(apply_node, a);
+		}
+		
+		return a;
 	};
 
 /* helper functions */

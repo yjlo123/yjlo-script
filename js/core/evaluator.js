@@ -385,7 +385,7 @@ function is_return_value(value) {
 function return_value_content(value) {
 	return value.content;
 }
-	 
+ 
 function apply(fun,arguments) {
 	if (is_primitive_function(fun))
 		return apply_primitive_function(fun,arguments);
@@ -397,10 +397,26 @@ function apply(fun,arguments) {
 											function_value_environment(fun)));
 		if (is_return_value(result)) 
 			return return_value_content(result);
-		else return undefined;
-	} else throw new Error("Unknown function type - - APPLY: "+fun);
+	} else throw new Error("Unknown function type - APPLY: "+fun);
 }
-	 
+
+function is_reference(stmt) {
+	return is_tagged_object(stmt,"reference");
+}
+function refer(fun, member) {
+	if (member.charAt(0) === "_"){
+		throw new Error("Referencing private members is not allowed.");
+	}
+	if (is_compound_function_value(fun)) {
+		var func_env = extend_environment([],[],function_value_environment(fun));
+		evaluate(function_value_body(fun), func_env);
+		return lookup_variable_value(member,func_env);
+	} else throw new Error("Unknown function type - REFER: "+fun);
+}
+function member(stmt) {
+	return stmt.member;
+}
+
 function list_of_values(exps,env) {
 	if (no_operands(exps)) return [];
 	else return pair(evaluate(first_operand(exps),env),
@@ -500,6 +516,8 @@ function evaluate(stmt,env) {
 	else if (is_application(stmt))
 		return apply(evaluate(operator(stmt),env),
 					 list_of_values(operands(stmt),env));
+	else if (is_reference(stmt))
+		return refer(evaluate(operator(stmt),env),member(stmt));
 	else if (is_return_statement(stmt))
 		return make_return_value(
 					 evaluate(return_statement_expression(stmt), env));
