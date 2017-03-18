@@ -341,14 +341,14 @@ var make_parse = function () {
 	};
 
 /*===================== ASSIGN ======================= */
-	var assign = function(var_token, operator, value) {
+	var assign = function(variable, operator, value) {
 		print("parsing assign. " + token.value);
-		if (var_token.type !== "name") {
+		if (variable.type !== "name") {
 			throw new Error("Expected a new variable name.");
 		}
 		var t = new_node();
 		t.tag = "assignment";
-		t.variable = var_token.value;
+		t.variable = variable.value;
 		if (operator){
 			// Compound Assignment
 			advance(operator);
@@ -356,7 +356,7 @@ var make_parse = function () {
 			apply_node.tag = "application";
 			apply_node.operator = new_var_node(operator.slice(0, -1), "operator");
 			apply_node.operands = array_to_list([
-										new_var_node(var_token.value, "variable"),
+										new_var_node(variable.value, "variable"),
 										value || expression()]);
 			t.value = apply_node;
 		}else{
@@ -601,6 +601,11 @@ var make_parse = function () {
 			var apply_node = new_node();
 			apply_node.value = a.tag;
 			return func_call(apply_node, a);
+		}
+		
+		if (token.value === "=") {
+			// assign member value
+			throw new Error("Please use setters to update member values.");
 		}
 		
 		return a;
