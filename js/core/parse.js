@@ -68,7 +68,7 @@ var make_parse = function () {
 		}
 		
 		if (value && token.value !== value) {
-			throw new Error("Expected '" + value + "'. But "+token.value+" encountered.");
+			throw new Error("Expected '" + value + "'. But '"+token.value+"' found.");
 		}
 		token_nr = token_nr + 1;
 		token = tokens[token_nr];
@@ -126,7 +126,7 @@ var make_parse = function () {
 				// operator
 				left_node = new_var_node(token.value, "operator");
 			} else {
-				throw new Error("Expected expression. But " + token.value + " encountered.");
+				throw new Error("Expected expression. But '" + token.value + "' found.");
 			}
 			expression_nodes_infix.push(left_node);
 			advance();
@@ -344,7 +344,7 @@ var make_parse = function () {
 	var assign = function(variable, operator, value) {
 		print("parsing assign. " + token.value);
 		if (variable.type !== "name") {
-			throw new Error("Expected a new variable name.");
+			throw new Error("Expected a new variable name, but '"+variable.value+"' found.");
 		}
 		var t = new_node();
 		t.tag = "assignment";
@@ -388,7 +388,7 @@ var make_parse = function () {
 		if (token.value !== ")") {
 			while (true) {
 				if (token.type !== "name") {
-					throw new Error("Expected a parameter name.");
+					throw new Error("Expected a parameter name, but '"+token.value+"' found.");
 				}
 				args.push(token.value);
 				advance();
@@ -399,6 +399,19 @@ var make_parse = function () {
 			}
 		}
 		advance(")");
+
+		if (token.value === "extends") {
+			// inheritance
+			advance("extends");
+			if (!isVarNameToken(token)){
+				throw new Error("Expected a function name, but '"+token.value+"' found.");
+			}
+			funcbody.parent = token.value;
+			advance(); // parent name
+		} else {
+			funcbody.parent = null;
+		}
+
 		funcbody.parameters = array_to_list(args);
 		advance("{");
 		funcbody.body = statements();
@@ -421,7 +434,7 @@ var make_parse = function () {
 		while (true) {
 			n = token;
 			if (n.type !== "name") {
-				throw new Error("Expected a new variable name.");
+				throw new Error("Expected a new variable name, but '" + n.value + "' found.");
 			}
 			advance();
 			if (token.value === "=") {
@@ -496,7 +509,7 @@ var make_parse = function () {
 		n.tag = "for";
 		// variable
 		if (token.type !== "name") {
-			throw new Error("Expected a variable name after for.");
+			throw new Error("Expected a variable name after for, but '"+token.value+"' found.");
 		}
 		n.variable = new_var_node(token.value, "variable");
 		advance();
@@ -588,7 +601,7 @@ var make_parse = function () {
 		advance(".");
 		
 		if (token.type !== "name"){
-			throw new Error("Expect a member name, but encounter '"+token.value+"'");
+			throw new Error("Expected a member name, but '"+token.value+"' found.");
 		}
 
 		a.tag = "reference";

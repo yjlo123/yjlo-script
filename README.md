@@ -171,7 +171,7 @@ counter();	// output 2
 counter();	// output 3
 ```
 
-### Function Members Reference
+### Function Member Reference
 **YJLO Script** supports referencing function members from outside of the function with `dot operator (.)`:
 ```swift
 func fun() {
@@ -186,6 +186,9 @@ print( fun.sum(3, 4) );		// output 7
 ```
 
 Assigning new values to function members through reference is not allowed.
+
+>#### **Caveat** 
+>Every time a function member is referenced, the whole function is evaluated.
 
 A private function memeber, including member fields and member functions, cannot be referenced from outside of the function. Prepending an `underscore (_)` to the member name to makes it private.
 ```swift
@@ -373,19 +376,19 @@ func Counter() {
 	/* member fields */
 	var _name = "";
 	var _count = 0;
-	
+
 	/* initialization */
 	_name = "untitled";
-	
-	return func () {
-		/* member functions */
-		func getName() { return _name; }
-		func setName(name) { _name = name; }
-		func getCount() { return _count; }
-		func increase() { _count++; }
-		func decrease() { _count--; }
-		func reset() { _count = 0; }
-	};
+
+	/* member functions */
+	func getName() { return _name; }
+	func setName(name) { _name = name; }
+	func getCount() { return _count; }
+	func increase() { _count++; }
+	func decrease() { _count--; }
+	func reset() { _count = 0; }
+
+	return func () {};
 }
 
 var counter = Counter();		// instantiate a new Counter
@@ -397,4 +400,59 @@ print( counter.getName() );		// output "My Counter"
 counter.increase();
 counter.increase();
 print( counter.getCount() );		// output 2
+```
+### Inheritance
+```swift
+func Shape() {
+	var _name = "Shape";
+	func getType() { return "Shape"; }
+	func setName(name) { _name = name; }
+	func getName() { return _name; }
+	func getArea() { return 0; }
+	return func(){};
+}
+
+
+func Circle() extends Shape {
+	setName("Circle");
+	var _radius = 1;
+	func setRadius(radius) { _radius = radius; }
+	func getArea() { return round(pi * _radius ** 2, 2); }
+	return func(){};
+}
+
+var c = Circle();
+c.setRadius(2);
+print( c.getName() + " area: " + c.getArea() );
+
+func Rectangle() extends Shape {
+	setName("Rectangle");
+	var _width = 0;
+	var _height = 0;
+	func setWidth(width) { _width = width; }
+	func setHeight(height) { _height = height; }
+	func getArea() { return _width * _height; }
+	return func(){};
+}
+
+var r = Rectangle();
+r.setWidth(4);
+r.setHeight(10);
+print( r.getName() + " area: " + r.getArea() );
+
+func Square() extends Rectangle {
+	setName("Square");
+	func setSide(side) { setWidth(side); setHeight(side); }
+	return func(){};
+}
+
+var s = Square();
+s.setSide(5);
+print( s.getName() + " area: " + s.getArea() );
+
+/* output:
+	Circle area: 12.57
+	Rectangle area: 40
+	Square area: 25
+*/
 ```

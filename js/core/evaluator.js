@@ -262,8 +262,21 @@ function function_definition_parameters(stmt) {
 function function_definition_body(stmt) {
 	return stmt.body;
 }
+function function_definition_parent(stmt) {
+	return stmt.parent;
+}
 
 function evaluate_function_definition(stmt,env) {
+	if (function_definition_parent(stmt)) {
+		// extends parent
+		var parent = lookup_variable_value(function_definition_parent(stmt), env);
+		var parent_env = extend_environment([],[],function_value_environment(parent));
+		evaluate(function_value_body(parent), parent_env);
+		return make_function_value(
+				 function_definition_parameters(stmt),
+				 function_definition_body(stmt),
+				 parent_env);
+	}
 	return make_function_value(
 				 function_definition_parameters(stmt),
 				 function_definition_body(stmt),
@@ -409,7 +422,10 @@ function refer(fun, member) {
 	}
 	if (is_compound_function_value(fun)) {
 		var func_env = extend_environment([],[],function_value_environment(fun));
-		evaluate(function_value_body(fun), func_env);
+		if (function_value_body(fun)) {
+			// evaluate function body to update environment
+			evaluate(function_value_body(fun), func_env);
+		}
 		return lookup_variable_value(member,func_env);
 	} else throw new Error("Unknown function type - REFER: "+fun);
 }
