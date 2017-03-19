@@ -4,7 +4,7 @@
 **YJLO Script** is a simple programming language written in JavaScript. It is a scripting language with some convenient features borrowed from other languages such as Python and Swift.
 
 ## Syntax
-**YJLO Script** has similar syntax as JavaScript with support for higher order functional programming. Semicolon separator at the end of each statement is mandatory.
+**YJLO Script** has similar syntax as JavaScript with support for higher order functional programming and object-oriented programming. Semicolon separator at the end of each statement is mandatory.
 
 ### Comments
 **YJLO Script** supports both line comments `//` and block comments `/* ... */`, likes other C-like languages.

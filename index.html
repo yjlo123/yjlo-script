@@ -9,8 +9,6 @@
 		<link type="text/css" rel="stylesheet" href="css/layout.css"/>
 		<link type="text/css" rel="stylesheet" href="css/output.css"/>
 
-		<script type="text/javascript" src="js/jison_parser.js"></script>
-		
 		<!-- Core -->
 		<script type="text/javascript" src="js/core/lib.js"></script>
 		<script type="text/javascript" src="js/core/evaluator.js"></script>
@@ -39,19 +37,15 @@
 	<body>
 		<a class="github-fork-ribbon right-bottom fixed" href="https://github.com/yjlo123/yjlo-script" title="Fork me on GitHub" target="_blank">Fork me on GitHub</a>
 		<div class="ui-layout-north" onmouseover="myLayout.allowOverflow('north')" onmouseout="myLayout.resetOverflow(this)">
-			<div class="tool-label">Parser:</div>
-			<div class="dropdown" style="float:left;">
-				<button class="dropbtn" id="current-parser">YJLO (Beta 2)</button>
-				<div class="dropdown-content" style="left:0;">
-					<a class="parser-option" href="#">YJLO (Beta 2)</a>
-					<a class="parser-option" href="#">CS1101S Jison</a>
-				</div>
-			</div>
-			
-			<button type="button" class="top-button tooltip" onclick="run();">
+			<div class="tool-label">Version: <span id="version"></span></div>
+
+			<a type="button" class="top-button gray tooltip" href="https://github.com/yjlo123/yjlo-script" target="_blank">
+				Documentation
+			</a>
+			<a type="button" class="top-button green tooltip" onclick="run();">
 				Run >>
 				<span class="tooltiptext">Ctrl + Enter</span>
-			</button>
+			</a>
 			<div style="float:right;">
 				<div class="tool-label">Example code:</div>
 				<div class="dropdown">

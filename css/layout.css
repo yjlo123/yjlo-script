@@ -1,76 +1,41 @@
-p {
-	font-size:		1em;
-	margin:			1ex 0;
-}
-p.buttons {
-	text-align:		center;
-	line-height:	2.5em;
-}
 button:focus {
 	outline: none;
 }
 
 .top-button {
-	background-color: #4CAF50;
 	color: white;
 	padding: 8px;
 	min-width: 120px;
 	font-size: 16px;
-	border: 1px solid #2E7D32;
 	cursor: pointer;
 	margin-left: 50px;
+	text-align: center;
+	text-decoration: none;
 }
-.top-button:hover {
+
+.top-button.green {
+	background-color: #4CAF50;
+	border: 1px solid #2E7D32;
+}
+
+.top-button.green:hover {
 	background-color: #2E7D32;
 }
 
-.hidden {
-	display:		none;
+.top-button.gray {
+	background-color: #E0E0E0;
+	border: 1px solid #BDBDBD;
+	color: #111111;
 }
 
-/*
-	*	Rules for simulated drop-down/pop-up lists
-	*/
-ul {
-	/* rules common to BOTH inner and outer UL */
-	z-index:	100000;
-	margin:		1ex 0;
-	padding:	0;
-	list-style:	none;
-	cursor:		pointer;
-	border:		1px solid Black;
-	/* rules for outer UL only */
-	width:		15ex;
-	position:	relative;
+.top-button.gray:hover {
+	background-color: #BDBDBD;
 }
-ul li {
-	background-color: #EEE;
-	padding: 0.15em 1em 0.15em 5px;
+
+.hidden {
+	display: none;
 }
-ul ul {
-	display:	none;
-	position:	absolute;
-	width:		100%;
-	left:		-1px;
-	/* Pop-Up */
-	bottom:		0;
-	margin:		0;
-	margin-bottom: 1.55em;
-}
-.ui-layout-north{
-	overflow: auto;
-}
-.ui-layout-north ul ul {
-	/* Drop-Down */
-	bottom:		auto;
-	margin:		0;
-	margin-top:	1.45em;
-}
-ul ul li		{ padding: 3px 1em 3px 5px; }
-ul ul li:hover	{ background-color: #FF9; }
-ul li:hover ul	{ display:	block; background-color: #EEE; }
-	
-	
+
 #program-result{
 	font-size:15px; 
 	font-family: Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
@@ -87,8 +52,7 @@ ul li:hover ul	{ display:	block; background-color: #EEE; }
 	padding: 8px;
 	float: left;
 }
-	
-	
+
 .dropbtn {
 	background-color: #E0E0E0;
 	color: #424242;
