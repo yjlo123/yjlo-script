@@ -593,10 +593,10 @@ var make_parse = function () {
 	};
 
 /*===================== REFERENCE ======================= */
-	var reference = function(t) {
-		print("parsing reference. "+t.value);
-		var a = new_node();
-		var operator = new_var_node(t.value);
+	var reference = function(t, obj) {
+		print("parsing reference. "+((t && t.value) || ""));
+		var ref_node = new_node();
+		var operator = obj || new_var_node(t.value);
 
 		advance(".");
 		
@@ -604,24 +604,27 @@ var make_parse = function () {
 			throw new Error("Expected a member name, but '"+token.value+"' found.");
 		}
 
-		a.tag = "reference";
-		a.operator = operator;
-		a.member = token.value;
+		ref_node.tag = "reference";
+		ref_node.operator = operator;
+		ref_node.member = token.value;
 		advance(); // advance member
 		
 		if (token.value === "(") {
 			// member application
 			var apply_node = new_node();
-			apply_node.value = a.tag;
-			return func_call(apply_node, a);
+			apply_node.value = apply_node.tag;
+			return func_call(apply_node, ref_node);
 		}
-		
 		if (token.value === "=") {
 			// assign member value
 			throw new Error("Please use setters to update member values.");
 		}
-		
-		return a;
+		if (token.value === ".") {
+			// chain of memeber reference
+			return reference(null, ref_node);
+		}
+
+		return ref_node;
 	};
 
 /* helper functions */
