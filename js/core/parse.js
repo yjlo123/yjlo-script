@@ -642,7 +642,29 @@ var make_parse = function () {
 		return lst;
 	}
 
+	function loadLibraries(libs, compiled, callback) {
+		if (is_empty(libs)) {
+			//alert(compiled);
+			print(compiled);
+			callback(compiled);
+			return;
+		}
+		$.ajax({
+			url: "library/"+head(libs)+".yjlo",
+			dataType: 'text',
+			type: 'GET'
+		}).done(function(data){
+			loadLibraries(tail(libs), compiled+data, callback);
+		}).fail(function(){
+			throw new Error("Importing "+head(libs)+" failed.");
+		});
+	}
+
 	return function (source) {
+		var libs = list(); //list("Stack", "LinkedList");
+		var loaded_libs = [];
+		loadLibraries(libs, "", function(){});
+
 		tokens = source.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
 		if(!tokens || tokens.length == 0){
 			throw new Error("Empty source code.");
