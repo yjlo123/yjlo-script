@@ -40,6 +40,7 @@ $(document).ready(function() {
 });
 
 function exec(){
+	$("#program-result").html('<p class="output-finish">[Processing]</p>');
 	setup_global_environment();
 	var source = myCodeMirror.getValue();
 	driver_loop(source, current_parser, function(){

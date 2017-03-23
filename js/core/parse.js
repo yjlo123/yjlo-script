@@ -680,11 +680,17 @@ var make_parse = function () {
 		token = tokens[token_nr];
 		next_token = tokens[token_nr+1];
 		var syntax_tree = statements();
+		
+		// Finished parsing, clear output
+		// prepare for evaluation output
+		$("#program-result").empty();
+		
 		if (syntax_tree) {
 			return syntax_tree;
 		} else {
 			throw new Error("Invalid source code.");
 		}
+		
 	}
 
 	return function (source, evaluate_callback) {
