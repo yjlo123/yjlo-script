@@ -1,0 +1,223 @@
+/* LinkedList
+ * @Author Liu Siwei (liusiwei.yjlo@gmail.com)
+ * Followed JDK 8 java.util.LinkedList
+ */
+
+func LinkedList() {
+	func _Node(prev, element, next) {
+		var item_ = element;
+		var next_ = next;
+		var prev_ = prev;
+		
+		func setItem(item) { item_ = item; }
+		func setNext(next) { next_ = next; }
+		func setPrev(prev) { prev_ = prev; }
+		
+		return func(){};
+	}
+	
+	var _size = 0;
+	
+	/* Pointer to first node. */
+	var _first = null;
+	
+	/* Pointer to last node. */
+	var _last = null;
+
+	/* Returns the number of elements in this list. */
+	func size() {
+		return _size;
+	}
+	
+	/* Appends the specified element to the end of this list.
+	 * This method is equivalent to addLast */
+	func add(e) {
+		_linkLast(e);
+		return true;
+	}
+	
+	/* Inserts the specified element at the beginning of this list. */
+	func addFirst(e) {
+		_linkFirst(e);
+	}
+	
+	/* Appends the specified element to the end of this list. */
+	func addLast(e) {
+		_linkLast(e);
+	}
+	
+	/* Links e as first element. */
+	func _linkFirst(e) {
+		var f = _first;
+		var newNode = _Node(null, e, f);
+		_first = newNode;
+		if f == null {
+			_last = newNode;
+		} else {
+			f.setPrev(newNode);
+		}
+		_size++;
+	}
+
+	/* Links e as last element. */
+	func _linkLast(e) {
+		var l = _last;
+		var newNode = _Node(l, e, null);
+		_last = newNode;
+		if l == null {
+			_first = newNode;
+		} else {
+			l.setNext(newNode);
+		}
+		_size++;
+	}
+	
+	func clear() {
+		var x = _first;
+		while x != null {
+			var next = x.next_;
+			x.setItem(null);
+			x.setNext(null);
+			x.setPrev(null);
+			x = next;
+		}
+		_first = null;
+		_last = null;
+		_size = 0;
+	}
+	
+	/* Returns the first element in this list. */
+	func getFirst() {
+		var f = _first;
+		if f == null {
+			// TODO throw error
+			return -1;
+		}
+		return f.item_;
+	}
+	
+	/* Returns the last element in this list. */
+	func getLast() {
+		var l = _last;
+		if l == null {
+			// TODO throw error
+			return -1;
+		}
+		return l.item_;
+	}
+	
+	/* Removes and returns the first element from this list. */
+	func removeFirst() {
+		var f = _first;
+		if f == null {
+			// TODO throw error
+			return -1;
+		}
+		return _unlinkFirst(f);
+	}
+	
+	/* Removes and returns the last element from this list. */
+	func removeLast() {
+		var l = _last;
+		if l == null {
+			// TODO throw error
+			return -1;
+		}
+		return _unlinkLast(l);
+	}
+	
+	/* Unlinks non-null first node f. */
+	func _unlinkFirst(f) {
+		// assert f == first && f != null;
+		var element = f.item_;
+		var next = f.next_;
+		f.setItem(null);
+		f.setNext(null);
+		_first = next;
+		if next == null {
+			_last = null;
+		} else {
+			next.setPrev(null);
+		}
+		_size--;
+		return element;
+	}
+	
+	/* Unlinks non-null last node l. */
+	func _unlinkLast(l) {
+		// assert l == last && l != null;
+		var element = l.item_;
+		var prev = l.prev_;
+		l.setItem(null);
+		l.setPrev(null);
+		_last = prev;
+		if prev == null {
+			_first = null;
+		} else {
+			prev.setNext(null);
+		}
+		_size--;
+		return element;
+	}
+	
+	/* Returns the index of the first occurrence
+	 * of the specified element in this list,
+	 * or -1 if this list does not contain the element.*/
+	func indexOf(o) {
+		var index = 0;
+		if o == null {
+			var x = _first;
+			while x != null {
+				if x.item_ == null {
+					return index;
+				}
+				index++;
+				x = x.next_;
+			}
+		} else {
+			
+			var x = _first;
+			while x != null {
+				// if o.equals(x.item_) ...
+				if o == x.item_ {
+					return index;
+				}
+				index++;
+				x = x.next_;
+			}
+		}
+		return -1;
+	}
+	
+	return func(){};
+}
+
+
+/* Test */
+
+var lst = LinkedList();
+print(lst.add(7));
+print(lst.add(6));
+print(lst.add(2));
+print(lst.add(5));
+print("size ", lst.size());
+print(lst.getFirst());
+print(lst.getLast());
+
+lst.removeFirst();
+lst.removeLast();
+print("size ", lst.size());
+print(lst.getFirst());
+print(lst.getLast());
+
+lst.addFirst(100);
+lst.addLast(-100);
+print("size ", lst.size());
+print(lst.getFirst());
+print(lst.getLast());
+
+//lst.clear();
+//print("size " + lst.size());
+
+
+print(lst.indexOf(2));
