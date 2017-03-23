@@ -663,15 +663,19 @@ var make_parse = function () {
 			}
 			return true;
 		}
-		$.ajax({
-			url: "library/"+head(libs)+".yjlo",
-			dataType: 'text',
-			type: 'GET'
-		}).done(function(data){
-			loadLibraries(tail(libs), compiled+" "+data, parse_callback, evaluate_callback);
-		}).fail(function(){
-			throw new Error("Importing "+head(libs)+" failed.");
-		});
+		try {
+			$.ajax({
+				url: "library/"+head(libs)+".yjlo",
+				dataType: 'text',
+				type: 'GET'
+			}).done(function(data){
+				loadLibraries(tail(libs), compiled+" "+data, parse_callback, evaluate_callback);
+			}).fail(function(){
+				throw new Error("Importing "+head(libs)+" failed.");
+			});
+		} catch(err) {
+			$("#program-result").append('<p class="output-error">'+err.message.replace(/\n/g, "<br />")+'</p>');
+		}
 	}
 
 	function startParsing() {
