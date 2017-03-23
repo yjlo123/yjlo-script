@@ -547,16 +547,14 @@ function parse_program(program_string, program_parser) {
 		if(program_parser){
 			return program_parser(program_string);
 		}else{
-			return parser.parse(program_string);
+			alert("No parser available.");
 		}
 	}
 }
 	 
 function driver_loop(program_string, program_parser) {
-	// remove comments
-	var program_string_without_comments = program_string.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
-	
-	var input_program = parse_program(program_string_without_comments, program_parser);
+
+	var input_program = parse_program(program_string, program_parser);
 	if(debug){
 		console.log(JSON.stringify(input_program,null,4));
 	}

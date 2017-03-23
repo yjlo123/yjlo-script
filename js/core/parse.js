@@ -638,13 +638,30 @@ var make_parse = function () {
 		}
 		return lst;
 	}
+	
+	function tokenize(source){
+		
+	}
 
-	return function (source) {
-		tokens = source.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
-		if(!tokens || tokens.length == 0){
-			throw new Error("Empty source code.");
-		}
-		//print(tokens);
+	var lib_text = "";
+	function readTextFile(file) {
+		var rawFile = new XMLHttpRequest();
+		rawFile.responseType = "text";
+		rawFile.onreadystatechange = function() {
+			if (rawFile.readyState == 4 && rawFile.status == 200) {
+				lib_text = rawFile.responseText;
+				alert(lib_text)
+			}
+		};
+		rawFile.open("GET", file, true);
+		rawFile.send();
+	}
+	
+	function removeComments(source) {
+		return source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
+	}
+	
+	function startParsing(tokens) {
 		print("start parsing.");
 		token_nr = 0;
 		token = tokens[token_nr];
@@ -655,5 +672,56 @@ var make_parse = function () {
 		} else {
 			throw new Error("Invalid source code.");
 		}
+	}
+	
+	function importLibsAndParse(lib_list, index, tokens){
+		/*
+		if(lib_list.length == index){
+			// finished importing
+			return startParsing(tokens);
+		}
+		try {
+			var lib = readTextFile("library/"+lib_list[index]+".yjlo");
+			return importLibsAndParse(lib_list, index+1, tokens);
+		} catch (err) {
+			throw new Error("Error importing library - "+lib_list[index]);
+		}*/
+		var jqxhr1 = $.ajax("library/Stack.yjlo");
+		var jqxhr2 = $.ajax("library/Stack.yjlo");
+		
+		$.when(jqxhr1, jqxhr2).done(function(jqxhr1, jqxhr2) {
+		// Handle both XHR objects
+		alert("all complete");
+		});
+	}
+
+	return function (source) {
+		var program_string_without_comments = removeComments(source);
+
+		tokens = program_string_without_comments.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
+		
+		if(!tokens || tokens.length == 0){
+			throw new Error("Empty source code.");
+		}
+		print(tokens);
+		// parse import
+		
+		token_nr = 0;
+		token = tokens[token_nr];
+		var libs = [];
+		while(token.value === "import"){
+			advance();
+			if(token && isVarNameToken(token)){
+				libs.push(tokens[token_nr].value);
+				advance(); // library name
+				advance(";");
+			}else{
+				throw new Error("Invalid library '"+token.value()+"'.");
+			}
+			
+		}
+		//print(libs)
+		
+		return importLibsAndParse(libs, 0, tokens);
 	};
 };
