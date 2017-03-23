@@ -593,10 +593,10 @@ var make_parse = function () {
 	};
 
 /*===================== REFERENCE ======================= */
-	var reference = function(t) {
-		print("parsing reference. "+t.value);
-		var a = new_node();
-		var operator = new_var_node(t.value);
+	var reference = function(t, obj) {
+		print("parsing reference. "+((t && t.value) || ""));
+		var ref_node = new_node();
+		var operator = obj || new_var_node(t.value);
 
 		advance(".");
 		
@@ -604,24 +604,27 @@ var make_parse = function () {
 			throw new Error("Expected a member name, but '"+token.value+"' found.");
 		}
 
-		a.tag = "reference";
-		a.operator = operator;
-		a.member = token.value;
+		ref_node.tag = "reference";
+		ref_node.operator = operator;
+		ref_node.member = token.value;
 		advance(); // advance member
 		
 		if (token.value === "(") {
 			// member application
 			var apply_node = new_node();
-			apply_node.value = a.tag;
-			return func_call(apply_node, a);
+			apply_node.value = apply_node.tag;
+			return func_call(apply_node, ref_node);
 		}
-		
 		if (token.value === "=") {
 			// assign member value
 			throw new Error("Please use setters to update member values.");
 		}
-		
-		return a;
+		if (token.value === ".") {
+			// chain of memeber reference
+			return reference(null, ref_node);
+		}
+
+		return ref_node;
 	};
 
 /* helper functions */
@@ -640,27 +643,27 @@ var make_parse = function () {
 	}
 	
 	function tokenize(source){
-		
+		var program_string_without_comments = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
+		return program_string_without_comments.tokens('=<>!+-*&|/%^*', '=<>&|*+-.')
+	}
+	
+	function loadLibraries(libs, compiled, callback, tokens) {
+		if (is_empty(libs)) {
+			//print(compiled);
+			var tree = callback(tokens);
+			return tree;
+		}
+		$.ajax({
+			url: "library/"+head(libs)+".yjlo",
+			dataType: 'text',
+			type: 'GET'
+		}).done(function(data){
+			loadLibraries(tail(libs), compiled+data, callback, tokens);
+		}).fail(function(){
+			throw new Error("Importing "+head(libs)+" failed.");
+		});
 	}
 
-	var lib_text = "";
-	function readTextFile(file) {
-		var rawFile = new XMLHttpRequest();
-		rawFile.responseType = "text";
-		rawFile.onreadystatechange = function() {
-			if (rawFile.readyState == 4 && rawFile.status == 200) {
-				lib_text = rawFile.responseText;
-				alert(lib_text)
-			}
-		};
-		rawFile.open("GET", file, true);
-		rawFile.send();
-	}
-	
-	function removeComments(source) {
-		return source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
-	}
-	
 	function startParsing(tokens) {
 		print("start parsing.");
 		token_nr = 0;
@@ -673,55 +676,29 @@ var make_parse = function () {
 			throw new Error("Invalid source code.");
 		}
 	}
-	
-	function importLibsAndParse(lib_list, index, tokens){
-		/*
-		if(lib_list.length == index){
-			// finished importing
-			return startParsing(tokens);
-		}
-		try {
-			var lib = readTextFile("library/"+lib_list[index]+".yjlo");
-			return importLibsAndParse(lib_list, index+1, tokens);
-		} catch (err) {
-			throw new Error("Error importing library - "+lib_list[index]);
-		}*/
-		var jqxhr1 = $.ajax("library/Stack.yjlo");
-		var jqxhr2 = $.ajax("library/Stack.yjlo");
-		
-		$.when(jqxhr1, jqxhr2).done(function(jqxhr1, jqxhr2) {
-		// Handle both XHR objects
-		alert("all complete");
-		});
-	}
 
 	return function (source) {
-		var program_string_without_comments = removeComments(source);
-
-		tokens = program_string_without_comments.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
+		tokens = tokenize(source);
 		
 		if(!tokens || tokens.length == 0){
 			throw new Error("Empty source code.");
 		}
-		print(tokens);
-		// parse import
 		
+		/* parse import */
 		token_nr = 0;
 		token = tokens[token_nr];
-		var libs = [];
+		var libs = list(); //list("Stack", "LinkedList");
 		while(token.value === "import"){
 			advance();
 			if(token && isVarNameToken(token)){
-				libs.push(tokens[token_nr].value);
+				libs = pair(token.value, libs);
 				advance(); // library name
 				advance(";");
 			}else{
 				throw new Error("Invalid library '"+token.value()+"'.");
 			}
-			
 		}
-		//print(libs)
-		
-		return importLibsAndParse(libs, 0, tokens);
+		var tree = loadLibraries(libs, "", startParsing, tokens);
+		return tree;
 	};
 };
