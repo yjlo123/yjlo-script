@@ -42,8 +42,10 @@ $(document).ready(function() {
 function exec(){
 	setup_global_environment();
 	var source = myCodeMirror.getValue();
-	driver_loop(source, current_parser);
-	$("#program-result").append('<br/><p class="output-finish">[Finished]</p>');
+	driver_loop(source, current_parser, function(){
+		$("#program-result").append('<br/><p class="output-finish">[Finished]</p>');
+	});
+	
 }
 
 function run() {

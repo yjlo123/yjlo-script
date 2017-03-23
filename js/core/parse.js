@@ -647,24 +647,26 @@ var make_parse = function () {
 		return program_string_without_comments.tokens('=<>!+-*&|/%^*', '=<>&|*+-.')
 	}
 	
-	function loadLibraries(libs, compiled, callback, tokens) {
+	function loadLibraries(libs, compiled, parse_callback, evaluate_callback) {
 		if (is_empty(libs)) {
-			//print(compiled);
-			var tree = callback(tokens);
-			return tree;
+			var lib_tokens = tokenize(compiled);
+			tokens = lib_tokens.concat(tokens);
+			//print(tokens)
+			evaluate_callback(parse_callback());
+			return true;
 		}
 		$.ajax({
 			url: "library/"+head(libs)+".yjlo",
 			dataType: 'text',
 			type: 'GET'
 		}).done(function(data){
-			loadLibraries(tail(libs), compiled+data, callback, tokens);
+			loadLibraries(tail(libs), compiled+" "+data, parse_callback, evaluate_callback);
 		}).fail(function(){
 			throw new Error("Importing "+head(libs)+" failed.");
 		});
 	}
 
-	function startParsing(tokens) {
+	function startParsing() {
 		print("start parsing.");
 		token_nr = 0;
 		token = tokens[token_nr];
@@ -677,7 +679,7 @@ var make_parse = function () {
 		}
 	}
 
-	return function (source) {
+	return function (source, evaluate_callback) {
 		tokens = tokenize(source);
 		
 		if(!tokens || tokens.length == 0){
@@ -698,7 +700,7 @@ var make_parse = function () {
 				throw new Error("Invalid library '"+token.value()+"'.");
 			}
 		}
-		var tree = loadLibraries(libs, "", startParsing, tokens);
-		return tree;
+		tokens = tokens.slice(token_nr);
+		loadLibraries(libs, "", startParsing, evaluate_callback);
 	};
 };

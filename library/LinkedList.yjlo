@@ -191,33 +191,3 @@ func LinkedList() {
 	
 	return func(){};
 }
-
-
-/* Test */
-
-var lst = LinkedList();
-print(lst.add(7));
-print(lst.add(6));
-print(lst.add(2));
-print(lst.add(5));
-print("size ", lst.size());
-print(lst.getFirst());
-print(lst.getLast());
-
-lst.removeFirst();
-lst.removeLast();
-print("size ", lst.size());
-print(lst.getFirst());
-print(lst.getLast());
-
-lst.addFirst(100);
-lst.addLast(-100);
-print("size ", lst.size());
-print(lst.getFirst());
-print(lst.getLast());
-
-//lst.clear();
-//print("size " + lst.size());
-
-
-print(lst.indexOf(2));

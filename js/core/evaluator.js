@@ -540,28 +540,28 @@ function evaluate(stmt,env) {
 	else throw new Error("Unknown expression type - - evaluate: "+stmt);
 }
 
-function parse_program(program_string, program_parser) {
+function parse_program(program_string, program_parser, evaluate_callback) {
 	if (program_string === null) {
 		return {tag: "exit"};
 	} else {
 		if(program_parser){
-			return program_parser(program_string);
+			program_parser(program_string, evaluate_callback);
 		}else{
 			alert("No parser available.");
 		}
 	}
 }
 	 
-function driver_loop(program_string, program_parser) {
+function driver_loop(program_string, program_parser, finish_callback) {
 
-	var input_program = parse_program(program_string, program_parser);
-	if(debug){
-		console.log(JSON.stringify(input_program,null,4));
-	}
-
-	if (is_tagged_object(input_program,"exit")) return "interpreter completed";
-	var output = evaluate_toplevel(input_program, the_global_environment);
-	return output;
+	parse_program(program_string, program_parser, function(syntax_tree){
+		if(debug){
+			console.log(JSON.stringify(syntax_tree,null,4));
+		}
+		if (is_tagged_object(syntax_tree,"exit")) return "interpreter completed";
+		var output = evaluate_toplevel(syntax_tree, the_global_environment);
+		finish_callback();
+	});
 }
 
 function add_constant(name, value){
