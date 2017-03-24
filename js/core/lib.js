@@ -130,6 +130,17 @@ function _round(n, d) {
 	return Math.round(n * precision) / precision;
 }
 
+function _string_to_char_list(str) {
+	if (typeof str !== 'string' && !(str instanceof String)){
+		return list();
+	}
+	var char_list = list();
+	for (var i = str.length-1; i >= 0; i--) {
+		char_list = pair(str.charAt(i), char_list);
+	}
+	return char_list;
+}
+
 /*  UI Output */
 function print() {
 	//window.latestConsole.display(x);

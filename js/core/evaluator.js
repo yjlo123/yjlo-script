@@ -458,6 +458,7 @@ var primitive_functions = {
 		trunc: _trunc,
 		sqrt: _sqrt,
 		round: _round,
+		string_to_char_list: _string_to_char_list,
 
 		true: true,
 		false: false,
