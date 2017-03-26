@@ -1,4 +1,19 @@
+/*
+ * A tokenizer written in YJLO Script
+ * @author Liu Siwei
+ */
+
 func Tokenizer() {
+	
+	var tokens = list();
+	
+	func Token(type_, value_) {
+		var type = type_;
+		var value = value_;
+		
+		return func(){};
+	}
+	
 	func _strToNum(str) {
 		func help(lst, num){
 			if is_empty(lst) { return num;} 
@@ -24,6 +39,7 @@ func Tokenizer() {
 	func tokenize(str) {
 		var result = list();
 		var chars = string_to_char_list(str);
+		var reversed_tokens = list();
 
 		var current = "";
 		while !is_empty(chars) {
@@ -43,12 +59,22 @@ func Tokenizer() {
 					chars = tail(chars);
 					c = head(chars);
 				}
-				print("number ", _strToNum(current));
+				//print("number ", _strToNum(current));
+				reversed_tokens = pair(
+					Token("number", _strToNum(current)), 
+					reversed_tokens);
 			// operator
 			} else {
-				print("char ", c);
+				//print("char ", c);
 				chars = tail(chars);
+				reversed_tokens = pair(Token("operator", c), 
+									   reversed_tokens);
 			}
+		}
+		// reverse tokens
+		while !is_empty(reversed_tokens) {
+			tokens = pair(head(reversed_tokens), tokens);
+			reversed_tokens = tail(reversed_tokens);
 		}
 	}
 	
@@ -58,4 +84,11 @@ func Tokenizer() {
 /*
 var tokenizer = Tokenizer();
 tokenizer.tokenize("12*34-78/(12+4)");
+var tokens = tokenizer.tokens;
+var token = null;
+while !is_empty(tokens) {
+	token = head(tokens);
+	print(token.type, " ", token.value);
+	tokens = tail(tokens);
+}
 */
