@@ -36,6 +36,12 @@ func Stack() {
 	/* Tests if this stack is empty. */
 	func empty() { return size() == 0; }
 	
+	/* Removes all of the elements from this stack. */
+	func clear() {
+		_list = list();
+		_size = 0;
+	}
+	
 	/* Returns a string representation of the stack. */
 	func toString() {
 		func help(lst, str) {
