@@ -1,0 +1,61 @@
+func Tokenizer() {
+	func _strToNum(str) {
+		func help(lst, num){
+			if is_empty(lst) { return num;} 
+
+			var dc = head(lst);
+			var d = 0;
+			if (dc == "1") d = 1;
+			else if (dc == "2") d = 2;
+			else if (dc == "3") d = 3;
+			else if (dc == "4") d = 4;
+			else if (dc == "5") d = 5;
+			else if (dc == "6") d = 6;
+			else if (dc == "7") d = 7;
+			else if (dc == "8") d = 8;
+			else if (dc == "9") d = 9;
+			else d = 0;
+			return help(tail(lst), num*10+d);
+		}
+
+		return help(string_to_char_list(str), 0);
+	}
+
+	func tokenize(str) {
+		var result = list();
+		var chars = string_to_char_list(str);
+
+		var current = "";
+		while !is_empty(chars) {
+			var c = head(chars);
+
+			// Ignore whitespace.
+			if c == " " {
+				chars = tail(chars);
+				continue;
+			// number.
+			} else if c >= '0' && c <= '9' {
+				current = c;
+				chars = tail(chars);
+				c = head(chars);
+				while c >= '0' && c <= '9' {
+					current += c;
+					chars = tail(chars);
+					c = head(chars);
+				}
+				print("number ", _strToNum(current));
+			// operator
+			} else {
+				print("char ", c);
+				chars = tail(chars);
+			}
+		}
+	}
+	
+	return func(){};
+}
+
+/*
+var tokenizer = Tokenizer();
+tokenizer.tokenize("12*34-78/(12+4)");
+*/
