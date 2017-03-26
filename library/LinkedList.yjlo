@@ -4,14 +4,14 @@
  */
 
 func LinkedList() {
-	func _Node(prev, element, next) {
-		var item_ = element;
-		var next_ = next;
-		var prev_ = prev;
+	func _Node(prev_, element_, next_) {
+		var item = element_;
+		var next = next_;
+		var prev = prev_;
 		
-		func setItem(item) { item_ = item; }
-		func setNext(next) { next_ = next; }
-		func setPrev(prev) { prev_ = prev; }
+		func setItem(item_) { item = item_; }
+		func setNext(next_) { next = next_; }
+		func setPrev(prev_) { prev = prev_; }
 		
 		return func(){};
 	}
@@ -75,7 +75,7 @@ func LinkedList() {
 	func clear() {
 		var x = _first;
 		while x != null {
-			var next = x.next_;
+			var next = x.next;
 			x.setItem(null);
 			x.setNext(null);
 			x.setPrev(null);
@@ -91,9 +91,9 @@ func LinkedList() {
 		var f = _first;
 		if f == null {
 			// TODO throw error
-			return -1;
+			return null;
 		}
-		return f.item_;
+		return f.item;
 	}
 	
 	/* Returns the last element in this list. */
@@ -101,9 +101,9 @@ func LinkedList() {
 		var l = _last;
 		if l == null {
 			// TODO throw error
-			return -1;
+			return null;
 		}
-		return l.item_;
+		return l.item;
 	}
 	
 	/* Removes and returns the first element from this list. */
@@ -111,7 +111,7 @@ func LinkedList() {
 		var f = _first;
 		if f == null {
 			// TODO throw error
-			return -1;
+			return null;
 		}
 		return _unlinkFirst(f);
 	}
@@ -121,7 +121,7 @@ func LinkedList() {
 		var l = _last;
 		if l == null {
 			// TODO throw error
-			return -1;
+			return null;
 		}
 		return _unlinkLast(l);
 	}
@@ -129,8 +129,8 @@ func LinkedList() {
 	/* Unlinks non-null first node f. */
 	func _unlinkFirst(f) {
 		// assert f == first && f != null;
-		var element = f.item_;
-		var next = f.next_;
+		var element = f.item;
+		var next = f.next;
 		f.setItem(null);
 		f.setNext(null);
 		_first = next;
@@ -146,8 +146,8 @@ func LinkedList() {
 	/* Unlinks non-null last node l. */
 	func _unlinkLast(l) {
 		// assert l == last && l != null;
-		var element = l.item_;
-		var prev = l.prev_;
+		var element = l.item;
+		var prev = l.prev;
 		l.setItem(null);
 		l.setPrev(null);
 		_last = prev;
@@ -168,22 +168,22 @@ func LinkedList() {
 		if o == null {
 			var x = _first;
 			while x != null {
-				if x.item_ == null {
+				if x.item == null {
 					return index;
 				}
 				index++;
-				x = x.next_;
+				x = x.next;
 			}
 		} else {
 			
 			var x = _first;
 			while x != null {
 				// if o.equals(x.item_) ...
-				if o == x.item_ {
+				if o == x.item {
 					return index;
 				}
 				index++;
-				x = x.next_;
+				x = x.next;
 			}
 		}
 		return -1;
