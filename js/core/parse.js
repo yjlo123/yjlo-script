@@ -231,6 +231,10 @@ var make_parse = function () {
 				advance();
 				v = if_stmt();
 				break;
+			case "switch":
+				advance();
+				v = switch_stmt();
+				break;
 			case "while":
 				advance();
 				v = while_stmt();
@@ -477,6 +481,22 @@ var make_parse = function () {
 		}
 		return n;
 	};
+	
+/*===================== SWITCH ======================= */
+	var switch_stmt = function() {
+		print("parsing switch.");
+		advance("(");
+		advance(); // variable
+		advance(")");
+		advance("{");
+		/* cases */
+		advance("}");
+		var n = new_node();
+		n.tag = "switch";
+		n.variable = null;
+		n.cases = null;
+		return n;
+	}
 
 /*===================== WHILE ======================= */
 	var while_stmt = function() {
