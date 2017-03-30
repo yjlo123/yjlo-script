@@ -479,7 +479,14 @@ var primitive_functions = {
 		">=": function(x,y) { return x >= y; },
 		"_!": function(x) { return ! x; }, // not
 		"&&": function(x,y) { return x && y; },
-		"||": function(x,y) { return x || y; }
+		"||": function(x,y) { return x || y; },
+
+		"&": function(x,y) { return x & y; },
+		"|": function(x,y) { return x | y; },
+		"_~": function(x) { return ~x; }, // NOT
+		"^": function(x,y) { return x ^ y; },
+		"<<": function(x,y) { return x << y; },
+		">>": function(x,y) { return x >> y; }
 };
 	
 function setup_environment() {

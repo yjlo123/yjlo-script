@@ -31,25 +31,34 @@ var make_parse = function () {
 	var precedence = function(operator) {
 		switch(operator){
 		case "**": // power
-			return 8;
+			return 12;
 		case "_-": // negative
 		case "_!": // not
-			return 7;
+			return 11;
 		case "*":
 		case "/":
 		case "/.":
 		case "%":
-			return 6;
+			return 10;
 		case "+":
 		case "-":
-			return 5;
+			return 9;
+		case "<<":
+		case ">>":
+			return 8;
 		case "<":
 		case "<=":
 		case ">":
 		case ">=":
-			return 4;
+			return 7;
 		case "==":
 		case "!=":
+			return 6;
+		case "&":
+			return 5;
+		case "^":
+			return 4;
+		case "|":
 			return 3;
 		case "&&":
 			return 2;
@@ -174,6 +183,9 @@ var make_parse = function () {
 					}
 				if (thisNode.name === '!') {
 					thisNode.name = '_!';
+				}
+				if (thisNode.name === '~') {
+					thisNode.name = '_~';
 				}
 				while (temp_stack.length > 0 
 						&& precedence(thisNode.name) <= precedence(temp_stack[temp_stack.length-1].name)) {
