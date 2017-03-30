@@ -81,7 +81,15 @@ var c = a + 2;		// c <- (10 + 2)
 - Logical OR `||`
 
 ### Bitwise Operators
-[TODO]
+| Operator   | Description | Example| In binary | Result | In binary |
+| ----	| ---- | ---- | ---- | ---- | ---- |
+| &		| AND	| 7 & 2		| 111 & 10		| 2		| 10			|
+| \|	| OR	| 5 \| 3	| 101 \| 11		| 7		| 101			|
+| ~		| NOT	| ~5		| ~[60 0s]0101	| -6	| [60 1s]1010	|
+| ^		| XOR 	| 5 ^ 3		| 101 ^ 11		| 6		| 110			|
+| <<	| Zero fill left shift	| 5 << 1	| 101 << 1			| 10	| 1010			|
+| >>	| Signed right shift	| -5 >> 1	| [60 1s]1011 >> 1	| -3	| [60 1s]1101	|
+| <<< 	| Zero fill right shift	| 5 >>> 1	| 101 >>> 1			| 2		| 10			|
 
 ### Increment and Decrement Operators
 - Increment `++`
