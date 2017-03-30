@@ -34,6 +34,7 @@ var make_parse = function () {
 			return 12;
 		case "_-": // negative
 		case "_!": // not
+		case "_~":
 			return 11;
 		case "*":
 		case "/":
@@ -45,6 +46,7 @@ var make_parse = function () {
 			return 9;
 		case "<<":
 		case ">>":
+		case ">>>":
 			return 8;
 		case "<":
 		case "<=":
@@ -147,7 +149,7 @@ var make_parse = function () {
 			advance(')');
 			bracket_count -= 1;
 		}
-
+		
 		// convert in-fix order to post-fix order
 		var expression_nodes_postfix = [];
 		var temp_stack = [];
@@ -181,11 +183,8 @@ var make_parse = function () {
 						// negative operator
 						thisNode.name = '_-';
 					}
-				if (thisNode.name === '!') {
-					thisNode.name = '_!';
-				}
-				if (thisNode.name === '~') {
-					thisNode.name = '_~';
+				if (thisNode.name === '!' || thisNode.name === '~') {
+					thisNode.name = '_' + thisNode.name;
 				}
 				while (temp_stack.length > 0 
 						&& precedence(thisNode.name) <= precedence(temp_stack[temp_stack.length-1].name)) {
