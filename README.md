@@ -264,8 +264,45 @@ else
 >Omitting `{}` is not recommended.
 
 ### Switch Statement
-[TODO]
+The switch statement evaluates an expression, matching the expression's value to a case clause, and executes statements associated with that case.
 
+```swift
+var char = "z";
+switch char {
+	case "a":
+		print("The first letter of the alphabet");
+	case "z":
+		print("The last letter of the alphabet");
+	default:
+		print("Some other character");
+}
+// Prints "The last letter of the alphabet"
+```
+Similar to Swift programming language, `switch` statements in **YJLO Script** do not fall through the bottom of each case and into the next one by default. Thus, the explicit break statement at the end of each case is not required.
+
+To make a switch with a single case that matches bmultiple values, combine the these values into a compound case, separating the values with commas.
+```swift
+var month = 2;
+var year = 2020;
+var numDays = 0;
+
+switch (month) {
+	case 1, 3, 5, 7, 8, 10, 12:
+		numDays = 31;
+	case 4, 6, 9, 11:
+		numDays = 30;
+	case 2:
+		if (((year % 4 == 0) && 
+			 !(year % 100 == 0))
+			|| (year % 400 == 0))
+			numDays = 29;
+		else
+			numDays = 28;
+	default:
+		print("Invalid month.");
+}
+print("Number of Days = " + numDays);
+```
 ## Loop
 ### While Loop
 ```swift

@@ -130,6 +130,54 @@ function if_alternative(stmt) {
 	return stmt.alternative;
 }
 
+function evaluate_if_statement(stmt, env) {
+	if (is_true(evaluate(if_predicate(stmt), env)))
+		return evaluate(if_consequent(stmt), extend_environment([], [], env));
+	else{
+		if(if_alternative(stmt)){
+			return evaluate(if_alternative(stmt), extend_environment([], [], env));
+		}
+	}
+}
+
+function is_switch_statement(stmt) {
+	return is_tagged_object(stmt,"switch");
+}
+
+function switch_variable(stmt) {
+	return stmt.variable;
+}
+
+function switch_cases(stmt) {
+	return stmt.cases;
+}
+
+function switch_default(stmt) {
+	return stmt.default;
+}
+
+function evaluate_switch_statement(stmt, env) {
+	var cases = switch_cases(stmt);
+	var found_case = false;
+	while ( !is_empty(cases) ){
+		var result = null;
+		if (is_in_list(evaluate(switch_variable(stmt), env), head(cases).value)){
+			found_case = true;
+			result = evaluate(head(cases).stmt, extend_environment([], [], env));
+		}
+		if (is_return_value(result)){
+			return result;
+		}
+		if(is_break_value(result)){
+			return;
+		}
+		cases = tail(cases);
+	}
+	if (!found_case && switch_default(stmt)){
+		evaluate(switch_default(stmt), env);
+	}
+}
+
 function for_variable(stmt) {
 	return stmt.variable;
 }
@@ -159,16 +207,6 @@ function is_true(x) {
 function is_false(x) {
 	return x === false || x === 0 || x === "" 
 	|| x === undefined || x === NaN || x === null || x.implementation === false;
-}
-	 
-function evaluate_if_statement(stmt, env) {
-	if (is_true(evaluate(if_predicate(stmt), env)))
-		return evaluate(if_consequent(stmt), extend_environment([], [], env));
-	else{
-		if(if_alternative(stmt)){
-			return evaluate(if_alternative(stmt), extend_environment([], [], env));
-		}
-	}
 }
 
 function evaluate_while_statement(stmt, env) {
@@ -526,6 +564,8 @@ function evaluate(stmt,env) {
 		return evaluate_var_definition(stmt,env);
 	else if (is_if_statement(stmt))
 		return evaluate_if_statement(stmt,env);
+	else if (is_switch_statement(stmt))
+		return evaluate_switch_statement(stmt,env);
 	else if (is_while_statement(stmt))
 		return evaluate_while_statement(stmt,env);
 	else if (is_do_while_statement(stmt))

@@ -19,6 +19,12 @@ function is_list(xs) {
 	return xs && (is_empty(xs) || (tail(xs) !== undefined && is_list(tail(xs))));
 }
 
+function is_in_list(x, xs) {
+	if (is_empty(xs)) return false;
+	if (x === head(xs)) return true;
+	return is_in_list(x, tail(xs));
+}
+
 function list() {
 	var the_list = [];
 	for (var i = arguments.length - 1; i >= 0; i--)

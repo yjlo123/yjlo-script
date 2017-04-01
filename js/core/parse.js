@@ -314,7 +314,10 @@ var make_parse = function () {
 		print("parsing statements.");
 		var stmts = [], stmt;
 		while (true) {
-			if (token_nr === tokens.length || token.value === '}') {
+			if (token_nr === tokens.length 
+				|| token.value === '}'
+				|| token.value === 'case'
+				|| token.value === 'default') {
 				print("end of statement list");
 				break;
 			}
@@ -502,16 +505,49 @@ var make_parse = function () {
 /*===================== SWITCH ======================= */
 	var switch_stmt = function() {
 		print("parsing switch.");
-		advance("(");
-		advance(); // variable
-		advance(")");
-		advance("{");
-		/* cases */
-		advance("}");
 		var n = new_node();
 		n.tag = "switch";
-		n.variable = null;
-		n.cases = null;
+		// advance("(");
+		n.variable = expression();
+		n.default = null;
+		//advance(); // variable
+		// advance(")");
+		var cases = [];
+		advance("{");
+		/* cases */
+		while (token.value != "}") {
+			if (token.value === "case") {
+				advance("case");
+				var case_node = new_node();
+				var case_value = [];
+				if(!isConstantToken(token)){
+					throw new Error("Expected a constant value, but '"+token.value+"' encountered.");
+				}
+				case_value.push(token.value);
+				advance(); // advance value
+				while (token.value === ",") {
+					advance(",");
+					if(!isConstantToken(token)){
+					throw new Error("Expected a constant value, but '"+token.value+"' encountered.");
+					}
+					case_value.push(token.value);
+					advance(); // advance value
+				}
+				case_node.value = array_to_list(case_value);
+				advance(":");
+				case_node.stmt = statements();
+				cases.push(case_node);
+			} else if (token.value === "default") {
+				advance("default");
+				advance(":");
+				n.default = statements();
+			} else {
+				throw new Error("Expected case/default, but '"+token.value+"' encountered.");
+			}
+			
+		}
+		advance("}");
+		n.cases = array_to_list(cases);
 		return n;
 	}
 
