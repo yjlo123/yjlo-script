@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 var version = "v0.2.1";
 var current_parser = make_parse();
 	
