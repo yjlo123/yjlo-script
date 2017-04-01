@@ -287,6 +287,12 @@ var make_parse = function () {
 						case "/.=":
 						case "%=":
 						case "**=":
+						case "&=":
+						case "|=":
+						case "^=":
+						case "<<=":
+						case ">>=":
+						case ">>>=":
 							advance();
 							v = assign(prev_token, next_operator);
 							break;
