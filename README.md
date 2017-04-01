@@ -107,6 +107,13 @@ print( a );	// output 6
 - Divide (float) and assign `/.=`
 - Remainder and assign `%=`
 - Power and assign `**=`
+- Bitwise AND and assign `&=`
+- Bitwise OR and assign `|=`
+- Bitwise XOR and assign `^=`
+- Left shift and assign `<<=`
+- Right shift and assign `>>=`
+- Zero fill right shift and assign `>>>=`
+
 ```swift
 var a = 5;
 a *= 2;		// same as a = a * 2;
