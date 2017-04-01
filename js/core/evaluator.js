@@ -487,7 +487,9 @@ var primitive_functions = {
 		"^": function(x,y) { return x ^ y; },
 		"<<": function(x,y) { return x << y; },
 		">>": function(x,y) { return x >> y; },
-		">>>": function(x,y) { return x >>> y; }
+		">>>": function(x,y) { return x >>> y; },
+		
+		"throw": function(x) { throw Error(x); }
 };
 	
 function setup_environment() {
