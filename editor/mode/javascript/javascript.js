@@ -35,15 +35,15 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 
 		var jsKeywords = {
 			"if": kw2("if"), "while": A, "with": A, "else": B, "do": B, "try": B, "finally": B,
-			"return": C, "break": C, "continue": C, "new": kw("new"), "delete": C, "throw": C, "debugger": C,
+			"return": C, "break": C, "continue": C, "fallthrough": C, "new": kw("new"), "delete": C, "throw": C, "debugger": C,
 			"var": kw("var"), "const": kw("var"), "let": kw("var"),
 			"func": kw("func"), "catch": kw("catch"),
 			"for": kw("for"), "by": kw("for"), "switch": kw("switch"), "case": kw("case"), "default": kw("default"),
-			"in": kw("for"), "typeof": operator, "instanceof": operator,
+			"in": kw("for"), //"typeof": operator, "instanceof": operator,
 			"true": atom, "false": atom, "null": kw("null"), "undefined": atom, "NaN": atom, "Infinity": atom,
-			"this": kw("this"), "class": kw("class"), "super": kw("atom"),
+			//"this": kw("this"), "class": kw("class"), "super": kw("atom"),
 			"yield": C, "export": kw("export"), "import": kw("import"), "extends": C,
-			"await": C, "async": kw("async"),
+			//"await": C, "async": kw("async"),
 			"print": kw3("print")
 		};
 

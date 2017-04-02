@@ -270,6 +270,10 @@ var make_parse = function () {
 				advance();
 				v = return_stmt();
 				break;
+			case "fallthrough":
+				advance();
+				v = fallthrough_stmt();
+				break;
 			default:
 				if(next_token){
 					// Assignment statement
@@ -665,6 +669,15 @@ var make_parse = function () {
 		return n;
 	};
 
+/*===================== FALLTHROUGH ======================= */
+	var fallthrough_stmt = function() {
+		print("parsing fallthrough. "+token.value);
+		var n = new_node();
+		n.tag = "fallthrough";
+		advance(";");
+		return n;
+	};
+	
 /*===================== REFERENCE ======================= */
 	var reference = function(t, obj) {
 		print("parsing reference. "+((t && t.value) || ""));

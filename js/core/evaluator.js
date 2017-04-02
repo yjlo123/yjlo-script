@@ -159,21 +159,24 @@ function switch_default(stmt) {
 function evaluate_switch_statement(stmt, env) {
 	var cases = switch_cases(stmt);
 	var found_case = false;
-	while ( !is_empty(cases) ){
+	while ( !found_case && !is_empty(cases) ) {
 		var result = null;
 		if (is_in_list(evaluate(switch_variable(stmt), env), head(cases).value)){
 			found_case = true;
 			result = evaluate(head(cases).stmt, extend_environment([], [], env));
 		}
-		if (is_return_value(result)){
+		if (is_return_value(result)) {
 			return result;
 		}
-		if(is_break_value(result)){
+		if (is_break_value(result)) {
 			return;
+		}
+		if (is_fallthrough_value(result)) {
+			found_case = false;
 		}
 		cases = tail(cases);
 	}
-	if (!found_case && switch_default(stmt)){
+	if (!found_case && switch_default(stmt)) {
 		evaluate(switch_default(stmt), env);
 	}
 }
@@ -289,6 +292,16 @@ function make_break_value() {
 }
 function is_break_value(value) {
 	return is_tagged_object(value,"break_value");
+}
+
+function is_fallthrough_statement(stmt) {
+	return is_tagged_object(stmt,"fallthrough");
+}
+function make_fallthrough_value() {
+	return { tag: "fallthrough_value"};
+}
+function is_fallthrough_value(value) {
+	return is_tagged_object(value,"fallthrough_value");
 }
 
 function is_function_definition(stmt) {
@@ -576,6 +589,8 @@ function evaluate(stmt,env) {
 		return make_continue_value(stmt,env);
 	else if (is_break_statement(stmt))
 		return make_break_value(stmt,env);
+	else if (is_fallthrough_statement(stmt))
+		return make_fallthrough_value(stmt,env);
 	else if (is_function_definition(stmt))
 		return evaluate_function_definition(stmt,env);
 	else if (is_sequence(stmt))

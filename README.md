@@ -264,7 +264,7 @@ else
 >Omitting `{}` is not recommended.
 
 ### Switch Statement
-The switch statement evaluates an expression, matching the expression's value to a case clause, and executes statements associated with that case.
+The `switch` statement evaluates an expression, matching the expression's value to a case clause, and executes statements associated with that case.
 
 ```swift
 var char = "z";
@@ -276,11 +276,11 @@ switch char {
 	default:
 		print("Some other character");
 }
-// Prints "The last letter of the alphabet"
+// output "The last letter of the alphabet"
 ```
-Similar to Swift programming language, `switch` statements in **YJLO Script** do not fall through the bottom of each case and into the next one by default. Thus, the explicit break statement at the end of each case is not required.
+Similar to Swift programming language, `switch` statements in **YJLO Script** do not fall through the bottom of each case and into the next one by default. Thus, the explicit break statement at the end of each case is not required. However, using `break` inside the `switch` statement causes the `switch` statement to end its execution immediately and to transfer control to the code after the `switch` statement’s closing brace (}).
 
-To make a switch with a single case that matches bmultiple values, combine the these values into a compound case, separating the values with commas.
+To make a `switch` with a single case that matches multiple values, combine these values into a compound case, separating the values with commas.
 ```swift
 var month = 2;
 var year = 2020;
@@ -303,6 +303,21 @@ switch (month) {
 }
 print("Number of Days = " + numDays);
 ```
+If you need C-style fallthrough behavior, you can add a `fallthrough` statement at the end of the case clause.
+```swift
+var integerToDescribe = 5;
+var description = "The number " + integerToDescribe + " is";
+switch integerToDescribe {
+	case 2, 3, 5, 7, 11, 13, 17, 19:
+		description += " a prime number, and also";
+		fallthrough;
+	default:
+		description += " an integer.";
+}
+print(description)
+// output "The number 5 is a prime number, and also an integer."
+```
+
 ## Loop
 ### While Loop
 ```swift
