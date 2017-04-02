@@ -28,6 +28,14 @@ var make_parse = function () {
 		return t.type === 'operator';
 	};
 
+	var isOpeningBracketToken = function (t) {
+		return t && isOperatorToken(t) && t.value === "(";
+	}
+
+	var isClosingBracketToken = function (t) {
+		return t && isOperatorToken(t) && t.value === ")";
+	}
+
 	var precedence = function(operator) {
 		switch(operator){
 		case "**": // power
@@ -105,14 +113,14 @@ var make_parse = function () {
 		}
 
 		while (token && token.value !== "," && token.value !== ";" && token.value !== "{") {
-			if(token.value === ")" && bracket_count === 0){
+			if(isClosingBracketToken(token) && bracket_count === 0){
 				// end of current expression
 				break;
 			}
 
-			if(token.value === '(') bracket_count += 1;
-			if(token.value === ')') bracket_count -= 1;
-			if(isVarNameToken(token) && next_token && next_token.value === '('){
+			if(isOpeningBracketToken(token)) bracket_count += 1;
+			if(isClosingBracketToken(token)) bracket_count -= 1;
+			if(isVarNameToken(token) && isOpeningBracketToken(next_token)){
 				// function call in expression
 				var func_token = token;
 				advance();
@@ -341,11 +349,11 @@ var make_parse = function () {
 		var operator = operator || new_var_node(t.value);
 		var operands = [];
 		advance("(");
-		if (token.value !== ")") {
+		if (!isClosingBracketToken(token)) {
 			while (true) {
 				var o = expression();
 				operands.push(o);
-				if (token.value === ")") {
+				if (isClosingBracketToken(token)) {
 					break;
 				}
 				advance(",");
@@ -406,14 +414,14 @@ var make_parse = function () {
 			t.variable = token.value;
 			t.tag = "var_definition";
 			advance(); // func name
-		} else if (token.value === '(') {
+		} else if (isOpeningBracketToken(token)) {
 			// anonymous function
 		} else {
 			throw new Error("Invalid function definition.");
 		}
 
 		advance("(");
-		if (token.value !== ")") {
+		if (!isClosingBracketToken(token)) {
 			while (true) {
 				if (token.type !== "name") {
 					throw new Error("Expected a parameter name, but '"+token.value+"' found.");
@@ -580,8 +588,8 @@ var make_parse = function () {
 /*===================== FOR ======================= */
 	var for_stmt = function() {
 		print("parsing for.");
-		var bracket = token.value === '(';
-		if (bracket) { advance('('); }
+		var hasBracket = isOpeningBracketToken(token);
+		if (hasBracket) { advance("("); }
 		var n = new_node();
 		n.tag = "for";
 		// variable
@@ -594,7 +602,7 @@ var make_parse = function () {
 		n.range = parse_range();
 		// increment
 		n.increment = parse_increment();
-		if (bracket) { advance(')'); }
+		if (hasBracket) { advance(")"); }
 		n.consequent = block();
 		return n;
 	};
@@ -602,9 +610,9 @@ var make_parse = function () {
 	var parse_range = function() {
 		var range = {};
 		advance("in");
-		advance('(');
+		advance("(");
 		var first_value = expression();
-		if(token.value === ')') {
+		if(isClosingBracketToken(token)) {
 			range.from = 0;
 			range.to = first_value;
 		} else {
@@ -612,7 +620,7 @@ var make_parse = function () {
 			advance(',');
 			range.to = expression();
 		}
-		advance(')');
+		advance(")");
 		return range;
 	};
 
@@ -641,7 +649,7 @@ var make_parse = function () {
 /*===================== CONDITION ======================= */
 	var condition = function() {
 		var condition_expression = null;
-		if (token.value !== '('){
+		if (!isOpeningBracketToken(token)){
 			condition_expression = expression();
 		} else {
 			advance("(");
@@ -695,7 +703,7 @@ var make_parse = function () {
 		ref_node.member = token.value;
 		advance(); // advance member
 		
-		if (token.value === "(") {
+		if (isOperatorToken(token) && token.value === "(") {
 			// member application
 			var apply_node = new_node();
 			apply_node.value = apply_node.tag;
