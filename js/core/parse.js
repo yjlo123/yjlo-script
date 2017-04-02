@@ -490,7 +490,7 @@ var make_parse = function () {
 		n.tag = "if";
 		n.predicate = condition();
 		n.consequent = block();
-		if (token.value === "else") {
+		if (token && token.value === "else") {
 			advance("else");
 			if (token.value === "if"){
 				// else if
@@ -617,7 +617,7 @@ var make_parse = function () {
 	};
 
 	var parse_increment = function() {
-		if (token.value !== "by"){
+		if (token && token.value !== "by"){
 			return null;
 		}
 		advance("by");
