@@ -1,3 +1,9 @@
+/*
+ * (c) 2017 Liu Siwei
+ * 
+ * Expression parser and evaluator
+ * written in YJLO Script
+ */
 import Tokenizer;
 import Stack;
 
@@ -17,7 +23,7 @@ func precedence(operator) {
 }
 
 func isOperator(v) {
-	if v == "+" || v == "-" || v == "*" || v == "/" {
+	if v == "+" || v == "-" || v == "*" || v == "/" || v == "%"{
 		return 2;
 	} else if v == "_-" {
 		return 1;
@@ -29,6 +35,7 @@ func add(x, y) { return x+y; }
 func sub(x, y) { return x-y; }
 func mul(x, y) { return x*y; }
 func div(x, y) { return x/.y; }
+func mod(x, y) { return x%y; }
 func neg(x) { return -x; }
 
 func eval(op, x, y) {
@@ -42,16 +49,24 @@ func eval(op, x, y) {
 			op = mul;
 		case "/":
 			op = div;
+		case "%":
+			op = mod;
 		case "_-":
 			return neg(x);
 	}
 	return op(x,y);
 }
 
+/**
+ * Tokenization
+ */
 var tokenizer = Tokenizer();
 tokenizer.tokenize(expression);
 var tokens = tokenizer.tokens;
 
+/**
+ * Convert in-fix expression to post-fix expression
+ */
 var infix_list = tokenizer.tokens;
 var postfix_stack = Stack();
 var stack = Stack();
@@ -108,11 +123,13 @@ while !is_empty(infix_list) {
 	infix_list = tail(infix_list);
 }
 
+// pop the rest of the tokens in the stack
 while stack.size() > 0 {
 	var v = stack.pop();
 	postfix_stack.push(v.value);
 }
 
+// Reverse stack
 var reversed_stack = Stack();
 var token = null;
 while postfix_stack.size() > 0  {
@@ -121,6 +138,9 @@ while postfix_stack.size() > 0  {
 	reversed_stack.push(token);
 }
 
+/**
+ * Evaluation
+ */
 var value_stack = Stack();
 while reversed_stack.size() > 0 {
 	var token = reversed_stack.pop();
@@ -139,4 +159,5 @@ while reversed_stack.size() > 0 {
 	// print(value_stack.toString());
 }
 
+// print evaluation result
 print(value_stack.pop());
