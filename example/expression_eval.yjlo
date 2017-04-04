@@ -23,9 +23,12 @@ func precedence(operator) {
 }
 
 func isOperator(v) {
-	if v == "+" || v == "-" || v == "*" || v == "/" || v == "%"{
+	if precedence(v) > 0
+		&& precedence(v) < 3{
+		// binary op: + - * / %
 		return 2;
-	} else if v == "_-" {
+	} else if precedence(v) > 2 {
+		// unary op: _-
 		return 1;
 	}
 	return 0;
