@@ -80,13 +80,12 @@ while !is_empty(infix_list) {
 		postfix_stack.push(token.value);
 	} else if token.value == ')' {
 		var stack_peek = stack.peek();
-		if stack_peek {
-			while stack.size() > 0 && stack_peek.value != "(" {
-				var op_token = stack.pop();
-				postfix_stack.push(op_token.value);
-				if stack.size() > 0 {
-					stack_peek = stack.peek();
-				}
+		while stack.size() > 0 && stack_peek != null
+				&& stack_peek.value != "(" {
+			var op_token = stack.pop();
+			postfix_stack.push(op_token.value);
+			if stack.size() > 0 {
+				stack_peek = stack.peek();
 			}
 		}
 		if stack.size() > 0 {
@@ -101,21 +100,17 @@ while !is_empty(infix_list) {
 			// negative operator
 			if postfix_stack.size() == 0 {
 				token = Tokenizer.Token("operator", "_-");
-			} else if prev_token != null {
-				if prev_token.value == "(" {
-					token = Tokenizer.Token("operator", "_-");
-				}
+			} else if prev_token != null && prev_token.value == "("{
+				token = Tokenizer.Token("operator", "_-");
 			}
 		}
 		var stack_peek = stack.peek();
-		if stack_peek {
-			while stack.size() > 0 
+		while stack.size() > 0 && stack_peek != null 
 				&& precedence(token.value) <= precedence(stack_peek.value) {
-				var op_token = stack.pop();
-				postfix_stack.push(op_token.value);
-				if stack.size() > 0 {
-					stack_peek = stack.peek();
-				}
+			var op_token = stack.pop();
+			postfix_stack.push(op_token.value);
+			if stack.size() > 0 {
+				stack_peek = stack.peek();
 			}
 		}
 		stack.push(token);
