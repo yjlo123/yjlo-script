@@ -27,7 +27,7 @@ func precedence(operator) {
 
 func isOperator(v) {
 	if precedence(v) > 0
-		&& precedence(v) < 3{
+		&& precedence(v) < 3 {
 		// binary op: + - * / %
 		return 2;
 	} else if precedence(v) > 2 {
@@ -47,18 +47,12 @@ func neg(x) { return -x; }
 func eval(op, x, y) {
 	var fun = null;
 	switch op {
-		case "+":
-			op = add;
-		case "-":
-			op = sub;
-		case "*":
-			op = mul;
-		case "/":
-			op = div;
-		case "%":
-			op = mod;
-		case "_-":
-			return neg(x);
+		case "+": op = add;
+		case "-": op = sub;
+		case "*": op = mul;
+		case "/": op = div;
+		case "%": op = mod;
+		case "_-": return neg(x);
 	}
 	return op(x,y);
 }
@@ -116,7 +110,7 @@ while !is_empty(infix_list) {
 		var stack_peek = stack.peek();
 		if stack_peek {
 			while stack.size() > 0 
-				   && precedence(token.value) <= precedence(stack_peek.value) {
+				&& precedence(token.value) <= precedence(stack_peek.value) {
 				var op_token = stack.pop();
 				postfix_stack.push(op_token.value);
 				if stack.size() > 0 {
@@ -138,7 +132,7 @@ while stack.size() > 0 {
 // Reverse stack
 var reversed_stack = Stack();
 var token = null;
-while postfix_stack.size() > 0  {
+while postfix_stack.size() > 0 {
 	token = postfix_stack.pop();
 	// print(token);
 	reversed_stack.push(token);
