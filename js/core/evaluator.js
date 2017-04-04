@@ -420,9 +420,8 @@ function primitive_implementation(fun) {
 	 
 function apply_primitive_function(fun,argument_list) {
 	 return apply_in_underlying_javascript(primitive_implementation(fun),
-														argument_list);	  
+														argument_list);
 }
-	 
 
 function extend_environment(vars,vals,base_env) {
 	if (length(vars) === length(vals))
@@ -450,18 +449,30 @@ function return_value_content(value) {
 	return value.content;
 }
  
-function apply(fun,arguments) {
+function apply(fun, args) {
 	if (is_primitive_function(fun))
-		return apply_primitive_function(fun,arguments);
+		return apply_primitive_function(fun, args);
 	else if (is_compound_function_value(fun)) {
 		var result =
 			evaluate(function_value_body(fun),
 						extend_environment(function_value_parameters(fun),
-											arguments,
+											args,
 											function_value_environment(fun)));
 		if (is_return_value(result)) 
 			return return_value_content(result);
 	} else throw new Error("Unknown function type - APPLY: "+fun);
+}
+
+function apply_logic(fun_raw, args, env) {
+	var oprnd1 = evaluate(head(args), env);
+	var oprnd2 = false;
+	if ((fun_raw.name === "&&" && oprnd1 === true)
+		|| (fun_raw.name === "||" && oprnd1 === false)) {
+		oprnd2 = evaluate(head(tail(args)), env);
+	}
+	var fun = evaluate(fun_raw, env);
+	var arg_list = pair(oprnd1, pair(oprnd2, list()));
+	return apply_in_underlying_javascript(primitive_implementation(fun), arg_list);
 }
 
 function is_reference(stmt) {
@@ -595,10 +606,15 @@ function evaluate(stmt,env) {
 		return evaluate_function_definition(stmt,env);
 	else if (is_sequence(stmt))
 		return evaluate_sequence(stmt,env);
-	else if (is_application(stmt))
-		return apply(evaluate(operator(stmt),env),
-					 list_of_values(operands(stmt),env));
-	else if (is_reference(stmt))
+	else if (is_application(stmt)){
+		var optr = operator(stmt);
+		if (optr.name === "&&" || optr.name === "||"){
+			// short-circuit evaluation
+			return apply_logic(optr, operands(stmt), env);
+		} else {
+			return apply(evaluate(optr,env), list_of_values(operands(stmt),env));
+		}
+	} else if (is_reference(stmt))
 		return refer(evaluate(operator(stmt),env),member(stmt));
 	else if (is_return_statement(stmt))
 		return make_return_value(
