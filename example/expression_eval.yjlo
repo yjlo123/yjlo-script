@@ -1,9 +1,12 @@
-/*
- * (c) 2017 Liu Siwei
- * 
+/**
+ * (c) 2017 liusiwei.com
+ *
  * Expression parser and evaluator
  * written in YJLO Script
+ *
+ * @author Liu Siwei
  */
+
 import Tokenizer;
 import Stack;
 
