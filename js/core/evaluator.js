@@ -478,16 +478,10 @@ function apply_logic(fun_raw, args, env) {
 function is_reference(stmt) {
 	return is_tagged_object(stmt,"reference");
 }
-function refer(fun, member, env) {
+function refer(fun, member) {
 	if (member.charAt(0) === "_"){
 		throw new Error("Referencing private members is not allowed.");
 	}
-	console.log("before", fun)
-	console.log(env);
-	if (is_variable(fun)) {
-		fun = evaluate(fun, env);
-	}
-	console.log("after",fun);
 	if (is_compound_function_value(fun)) {
 		var func_env = extend_environment([],[],function_value_environment(fun));
 		if (function_value_body(fun)) {
@@ -621,10 +615,10 @@ function evaluate(stmt,env) {
 			var member = head(tail(oprnd));
 			if (is_application(member)) {
 				// reference function member
-				return apply(refer(evaluate(fun, env), operator(member).name, env),
-						operands(member));
+				return apply(refer(evaluate(fun, env), operator(member).name),
+						list_of_values(operands(member), env));
 			} else {
-				return refer(evaluate(fun,env), member.name, env);
+				return refer(evaluate(fun,env), member.name);
 			}
 		} else {
 			return apply(evaluate(optr,env), list_of_values(operands(stmt),env));

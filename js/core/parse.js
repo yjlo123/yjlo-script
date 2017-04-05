@@ -698,41 +698,6 @@ var make_parse = function () {
 		advance(";");
 		return n;
 	};
-	
-/*===================== REFERENCE ======================= */
-	var reference = function(t, obj) {
-		print("parsing reference. "+((t && t.value) || ""));
-		var ref_node = new_node();
-		var operator = obj || new_var_node(t.value);
-
-		advance(".");
-		
-		if (token.type !== "name"){
-			throw new Error("Expected a member name, but '"+token.value+"' found.");
-		}
-
-		ref_node.tag = "reference";
-		ref_node.operator = operator;
-		ref_node.member = token.value;
-		advance(); // advance member
-		
-		if (isOperatorToken(token) && token.value === "(") {
-			// member application
-			var apply_node = new_node();
-			apply_node.value = apply_node.tag;
-			return func_call(apply_node, ref_node);
-		}
-		if (token.value === "=") {
-			// assign member value
-			throw new Error("Please use setters to update member values.");
-		}
-		if (token.value === ".") {
-			// chain of memeber reference
-			return reference(null, ref_node);
-		}
-
-		return ref_node;
-	};
 
 /* helper functions */
 	function print(msg){
