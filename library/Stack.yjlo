@@ -13,7 +13,7 @@ func Stack() {
 	/* Removes the item at the top of this stack 
 	 * and returns that item. */
 	func pop() {
-		if is_empty(_list) { return null; }
+		if is_empty(_list) { throw("Exception: empty stack."); }
 		var value = head(_list);
 		_list = tail(_list);
 		_size--;
@@ -26,7 +26,7 @@ func Stack() {
 		if !empty() {
 			return head(_list);
 		} else {
-			return null;
+			throw("Exception: empty stack.");
 		}
 	}
 	

@@ -491,9 +491,6 @@ function refer(fun, member) {
 		return lookup_variable_value(member,func_env);
 	} else throw new Error("Unknown function type - REFER: "+fun);
 }
-function member(stmt) {
-	return stmt.member;
-}
 
 function list_of_values(exps,env) {
 	if (no_operands(exps)) return [];
@@ -611,12 +608,22 @@ function evaluate(stmt,env) {
 		if (optr.name === "&&" || optr.name === "||"){
 			// short-circuit evaluation
 			return apply_logic(optr, operands(stmt), env);
+		} else if (optr.name === ".") {
+			// reference
+			var oprnd = operands(stmt);
+			var fun = head(oprnd);
+			var member = head(tail(oprnd));
+			if (is_application(member)) {
+				// reference function member
+				return apply(refer(evaluate(fun, env), operator(member).name),
+						list_of_values(operands(member), env));
+			} else {
+				return refer(evaluate(fun,env), member.name);
+			}
 		} else {
 			return apply(evaluate(optr,env), list_of_values(operands(stmt),env));
 		}
-	} else if (is_reference(stmt))
-		return refer(evaluate(operator(stmt),env),member(stmt));
-	else if (is_return_statement(stmt))
+	} else if (is_return_statement(stmt))
 		return make_return_value(
 					 evaluate(return_statement_expression(stmt), env));
 	else throw new Error("Unknown expression type - - evaluate: "+stmt);

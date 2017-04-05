@@ -37,11 +37,11 @@ func isOperator(v) {
 	return 0;
 }
 
-func add(x, y) { return x+y; }
-func sub(x, y) { return x-y; }
-func mul(x, y) { return x*y; }
-func div(x, y) { return x/.y; }
-func mod(x, y) { return x%y; }
+func add(x, y) { return x + y; }
+func sub(x, y) { return x - y; }
+func mul(x, y) { return x * y; }
+func div(x, y) { return x /. y; }
+func mod(x, y) { return x % y; }
 func neg(x) { return -x; }
 
 func eval(op, x, y) {
@@ -79,14 +79,8 @@ while !is_empty(infix_list) {
 	if token.type == 'number' {
 		postfix_stack.push(token.value);
 	} else if token.value == ')' {
-		var stack_peek = stack.peek();
-		while stack.size() > 0 && stack_peek != null
-				&& stack_peek.value != "(" {
-			var op_token = stack.pop();
-			postfix_stack.push(op_token.value);
-			if stack.size() > 0 {
-				stack_peek = stack.peek();
-			}
+		while stack.size() > 0 && stack.peek().value != "(" {
+			postfix_stack.push(stack.pop().value);
 		}
 		if stack.size() > 0 {
 			stack.pop(); // pop '('
@@ -104,14 +98,9 @@ while !is_empty(infix_list) {
 				token = Tokenizer.Token("operator", "_-");
 			}
 		}
-		var stack_peek = stack.peek();
-		while stack.size() > 0 && stack_peek != null 
-				&& precedence(token.value) <= precedence(stack_peek.value) {
-			var op_token = stack.pop();
-			postfix_stack.push(op_token.value);
-			if stack.size() > 0 {
-				stack_peek = stack.peek();
-			}
+		while stack.size() > 0 
+			&& precedence(token.value) <= precedence(stack.peek().value) {
+			postfix_stack.push(stack.pop().value);
 		}
 		stack.push(token);
 	}
@@ -120,17 +109,13 @@ while !is_empty(infix_list) {
 
 // pop the rest of the tokens in the stack
 while stack.size() > 0 {
-	var v = stack.pop();
-	postfix_stack.push(v.value);
+	postfix_stack.push(stack.pop().value);
 }
 
 // Reverse stack
 var reversed_stack = Stack();
-var token = null;
 while postfix_stack.size() > 0 {
-	token = postfix_stack.pop();
-	// print(token);
-	reversed_stack.push(token);
+	reversed_stack.push(postfix_stack.pop());
 }
 
 /**
@@ -142,12 +127,10 @@ while reversed_stack.size() > 0 {
 	if isOperator(token) == 2 {
 		var operand2 = value_stack.pop();
 		var operand1 = value_stack.pop();
-		var result = eval(token, operand1, operand2);
-		value_stack.push(result);
+		value_stack.push(eval(token, operand1, operand2));
 	} else if isOperator(token) == 1 {
 		var operand = value_stack.pop();
-		var result = eval(token, operand, 0);
-		value_stack.push(result);
+		value_stack.push(eval(token, operand, 0));
 	} else {
 		value_stack.push(token);
 	}
