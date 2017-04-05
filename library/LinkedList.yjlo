@@ -16,6 +16,8 @@ func LinkedList() {
 		return func(){};
 	}
 	
+	var EMPTY_LIST_EXCEPTION_MESSAGE = "Exception: empty list.";
+	
 	var _size = 0;
 	
 	/* Pointer to first node. */
@@ -90,8 +92,7 @@ func LinkedList() {
 	func getFirst() {
 		var f = _first;
 		if f == null {
-			// TODO throw error
-			return null;
+			throw(EMPTY_LIST_EXCEPTION_MESSAGE);
 		}
 		return f.item;
 	}
@@ -100,8 +101,7 @@ func LinkedList() {
 	func getLast() {
 		var l = _last;
 		if l == null {
-			// TODO throw error
-			return null;
+			throw(EMPTY_LIST_EXCEPTION_MESSAGE);
 		}
 		return l.item;
 	}
@@ -110,8 +110,7 @@ func LinkedList() {
 	func removeFirst() {
 		var f = _first;
 		if f == null {
-			// TODO throw error
-			return null;
+			throw(EMPTY_LIST_EXCEPTION_MESSAGE);
 		}
 		return _unlinkFirst(f);
 	}
@@ -120,8 +119,7 @@ func LinkedList() {
 	func removeLast() {
 		var l = _last;
 		if l == null {
-			// TODO throw error
-			return null;
+			throw(EMPTY_LIST_EXCEPTION_MESSAGE);
 		}
 		return _unlinkLast(l);
 	}

@@ -16,10 +16,8 @@ func Tokenizer() {
 	
 	func _strToNum(str) {
 		func help(lst, num){
-			if is_empty(lst) { return num;} 
-
-			var dc = head(lst);
-			var d = dc - "0";
+			if is_empty(lst) { return num; } 
+			var d = head(lst) - "0";
 			return help(tail(lst), num*10+d);
 		}
 
@@ -75,10 +73,8 @@ func Tokenizer() {
 var tokenizer = Tokenizer();
 tokenizer.tokenize("12*34-78/(12+4)");
 var tokens = tokenizer.tokens;
-var token = null;
 while !is_empty(tokens) {
-	token = head(tokens);
-	print(token.type, " ", token.value);
+	print(head(tokens).type, " ", head(tokens).value);
 	tokens = tail(tokens);
 }
 */
