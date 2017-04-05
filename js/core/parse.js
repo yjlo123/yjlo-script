@@ -38,6 +38,8 @@ var make_parse = function () {
 
 	var precedence = function(operator) {
 		switch(operator){
+		case ".": // reference
+			return 13;
 		case "**": // power
 			return 12;
 		case "_-": // negative
@@ -112,6 +114,7 @@ var make_parse = function () {
 			return func();
 		}
 
+		// read in the tokens in this expression
 		while (token && token.value !== "," && token.value !== ";" && token.value !== "{") {
 			if(isClosingBracketToken(token) && bracket_count === 0){
 				// end of current expression
@@ -120,19 +123,29 @@ var make_parse = function () {
 
 			if(isOpeningBracketToken(token)) bracket_count += 1;
 			if(isClosingBracketToken(token)) bracket_count -= 1;
-			if(isVarNameToken(token) && isOpeningBracketToken(next_token)){
+			if(token.value === '.'){
+				// reference
+				var func_token = token;
+				// advance();
+				/*
+				var ref_node = reference(func_token, expression_nodes_infix[expression_nodes_infix.length-1]);
+				expression_nodes_infix.pop();
+				expression_nodes_infix.push(ref_node);
+				*/
+
+				var ref_node = new_node();
+				ref_node.type = "reference";
+				ref_node.name = ".";
+				expression_nodes_infix.push(ref_node);
+				advance(".");
+				continue;
+			} else if (isVarNameToken(token) && isOpeningBracketToken(next_token)){
 				// function call in expression
 				var func_token = token;
 				advance();
 				expression_nodes_infix.push(func_call(func_token));
 				continue;
-			} else if(isVarNameToken(token) && next_token && next_token.value === '.'){
-				// reference
-				var func_token = token;
-				advance();
-				expression_nodes_infix.push(reference(func_token));
-				continue;
-			}else if(isConstantToken(token)) {
+			} else if (isConstantToken(token)) {
 				// constant
 				left_node = new_node();
 				left_node.tag = "constant";
@@ -167,8 +180,8 @@ var make_parse = function () {
 			if(thisNode.name === '('){
 				temp_stack.push(thisNode);
 			} else if (thisNode.type === 'variable' 
-						|| thisNode.tag === 'application'
-						|| thisNode.tag === 'reference') {
+						|| thisNode.tag === 'application') {
+						//|| thisNode.tag === 'reference') {
 				expression_nodes_postfix.push(thisNode);
 			} else if (thisNode.type === 'boolean' ) {
 				expression_nodes_postfix.push(thisNode.name==="true" ? true : false);
@@ -212,7 +225,7 @@ var make_parse = function () {
 		// build syntax tree
 		var tree_stack = [];
 		for (var i = 0; i < expression_nodes_postfix.length; i++) {
-			if (expression_nodes_postfix[i].type === 'operator'){
+			if (expression_nodes_postfix[i].type === 'operator' || expression_nodes_postfix[i].type === 'reference'){
 				var apply_node = {};
 				var operands = [];
 				operands.unshift(tree_stack.pop());
