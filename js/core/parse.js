@@ -115,7 +115,9 @@ var make_parse = function () {
 		}
 
 		// read in the tokens in this expression
-		while (token && token.value !== "," && token.value !== ";" && token.value !== "{") {
+		while (token && token.value !== "," && token.value !== ";" && token.value !== "{"
+			&& token.value !== "="
+			&& !/[+-/*\/%]=/.test(token.value) && token.value !== "++" && token.value !== "--") {
 			if(isClosingBracketToken(token) && bracket_count === 0){
 				// end of current expression
 				break;
@@ -296,14 +298,14 @@ var make_parse = function () {
 				v = fallthrough_stmt();
 				break;
 			default:
-				if(next_token){
+				v = expression();
+				if(token){
 					// Assignment statement
 					var prev_token = token;
-					var next_operator = next_token.value;
-					switch (next_operator){
+					switch (token.value){
 						case "=":
 							advance();
-							v = assign(prev_token);
+							v = assign(v, null);
 							break;
 						case "+=":
 						case "-=":
@@ -319,15 +321,14 @@ var make_parse = function () {
 						case ">>=":
 						case ">>>=":
 							advance();
-							v = assign(prev_token, next_operator);
+							v = assign(v, prev_token.value);
 							break;
 						case "++":
 						case "--":
 							advance();
-							v = assign(prev_token, next_operator, 1);
+							v = assign(v, prev_token.value, 1);
 							break;
 						default:
-							v = expression();
 							advance(";");
 					}
 				}
@@ -390,26 +391,34 @@ var make_parse = function () {
 	};
 
 /*===================== ASSIGN ======================= */
-	var assign = function(variable, operator, value) {
+	var assign = function(left, operator, value) {
 		print("parsing assign. " + token.value);
-		if (variable.type !== "name") {
-			throw new Error("Expected a new variable name, but '"+variable.value+"' found.");
-		}
+		
 		var t = new_node();
 		t.tag = "assignment";
-		t.variable = variable.value;
+		
+		if (left.tag === "application"){
+			// assign to reference
+			t.left = left;
+		} else if (left.type !== "variable") {
+			throw new Error("Expected a new variable name, but '"+left.value+"' found.");
+		} else {
+			// assign to variable
+			t.variable = left.name;
+		}
+
 		if (operator){
 			// Compound Assignment
-			advance(operator);
+			// advance(operator);
 			var apply_node = {};
 			apply_node.tag = "application";
 			apply_node.operator = new_var_node(operator.slice(0, -1), "operator");
 			apply_node.operands = array_to_list([
-										new_var_node(variable.value, "variable"),
+										new_var_node(left.name, "variable"),
 										value || expression()]);
 			t.value = apply_node;
 		}else{
-			advance("=");
+			// advance("=");
 			t.value = expression();
 		}
 		advance(";");
