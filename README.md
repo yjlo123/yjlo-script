@@ -200,18 +200,31 @@ print( fun.name );		// output "sum"
 print( fun.sum(3, 4) );		// output 7
 ```
 
-Assigning new values to function members through reference is not allowed.
-
 >#### **Caveat** 
 >Every time a function member is referenced, the whole function is evaluated.
 
-A private function memeber, including member fields and member functions, cannot be referenced from outside of the function. Prepending an `underscore (_)` to the member name to makes it private.
+Private function memebers, including member fields and member functions, cannot be referenced from outside of the function. Prepending an `underscore (_)` to the member name to makes it private.
 ```swift
 func fun(){
 	_value = 10;
 }
 print( fun._value );	// Error
 ```
+
+Assigning new values directly to function members is not supported. However, you can assign values to closure function members.
+```swift
+func A(){
+	var a = 2;
+	return func(){};
+}
+
+var myA = A();
+print(myA.a);	// output 2
+
+myA.a = 3;
+print(myA.a);	// output 3
+```
+To learn more advanced topics about function member reference, please read the OOP section.
 
 ## Control Flow
 Executing different pieces of code based on certain conditions.

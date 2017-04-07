@@ -9,10 +9,6 @@ func LinkedList() {
 		var next = next_;
 		var prev = prev_;
 		
-		func setItem(item_) { item = item_; }
-		func setNext(next_) { next = next_; }
-		func setPrev(prev_) { prev = prev_; }
-		
 		return func(){};
 	}
 	
@@ -56,7 +52,7 @@ func LinkedList() {
 		if f == null {
 			_last = newNode;
 		} else {
-			f.setPrev(newNode);
+			f.prev = newNode;
 		}
 		_size++;
 	}
@@ -69,7 +65,7 @@ func LinkedList() {
 		if l == null {
 			_first = newNode;
 		} else {
-			l.setNext(newNode);
+			l.next = newNode;
 		}
 		_size++;
 	}
@@ -78,9 +74,9 @@ func LinkedList() {
 		var x = _first;
 		while x != null {
 			var next = x.next;
-			x.setItem(null);
-			x.setNext(null);
-			x.setPrev(null);
+			x.item = null;
+			x.next = null;
+			x.prev = null;
 			x = next;
 		}
 		_first = null;
@@ -129,13 +125,13 @@ func LinkedList() {
 		// assert f == first && f != null;
 		var element = f.item;
 		var next = f.next;
-		f.setItem(null);
-		f.setNext(null);
+		f.item = null;
+		f.next = null;
 		_first = next;
 		if next == null {
 			_last = null;
 		} else {
-			next.setPrev(null);
+			next.prev = null;
 		}
 		_size--;
 		return element;
@@ -146,13 +142,13 @@ func LinkedList() {
 		// assert l == last && l != null;
 		var element = l.item;
 		var prev = l.prev;
-		l.setItem(null);
-		l.setPrev(null);
+		l.item = null;
+		l.prev = null;
 		_last = prev;
 		if prev == null {
 			_first = null;
 		} else {
-			prev.setNext(null);
+			prev.next = null;
 		}
 		_size--;
 		return element;

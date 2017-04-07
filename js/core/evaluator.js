@@ -69,11 +69,18 @@ function set_variable_value(variable,value,env) {
 	return;
 }
 	 
-function evaluate_assignment(stmt,env) {
+function evaluate_assignment(stmt, env) {
 	var value = evaluate(assignment_value(stmt),env);
-	set_variable_value(assignment_variable(stmt),
-							 value,
-							 env);
+	var left = stmt.left;
+	if (left && is_application(left)){
+		var member = head(tail(operands(left))).name;
+		set_variable_value(member, 
+							value, 
+							function_value_environment(
+								evaluate(head(operands(left)), env)));
+	} else {
+		set_variable_value(assignment_variable(stmt), value, env);
+	}
 	return value;
 }
 	 

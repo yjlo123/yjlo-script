@@ -10,7 +10,7 @@
 import Tokenizer;
 import Stack;
 
-var expression = "35-(-95)/5+4*(23-4)";
+var expression = "35-(-95)/5+4*(-23-3)";
 
 func precedence(operator) {
 	switch operator {
@@ -92,10 +92,9 @@ while !is_empty(infix_list) {
 		/* prefix unary operators with '_' */
 		if token.value == '-' {
 			// negative operator
-			if postfix_stack.size() == 0 {
-				token = Tokenizer.Token("operator", "_-");
-			} else if prev_token != null && prev_token.value == "("{
-				token = Tokenizer.Token("operator", "_-");
+			if postfix_stack.size() == 0 
+				|| (prev_token != null && prev_token.value == "("){
+				token.value = "_-";
 			}
 		}
 		while stack.size() > 0 

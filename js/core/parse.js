@@ -115,31 +115,21 @@ var make_parse = function () {
 		}
 
 		// read in the tokens in this expression
-		while (token && token.value !== "," && token.value !== ";" && token.value !== "{") {
-			if(isClosingBracketToken(token) && bracket_count === 0){
+		while (token
+			// , ; {
+			&& !/^[,;{]$/.test(token.value)
+			&& token.value !== "="
+			// compound assignment += -= *= /= /.= &= |= ^= <<= >>= >>>=
+			&& !/^([+\-\*\/%&|^]|\/\.|[<>]{2}|[>]{3})=$/.test(token.value)
+			&& token.value !== "++" && token.value !== "--") {
+			if(isClosingBracketToken(token) && bracket_count === 0) {
 				// end of current expression
 				break;
 			}
 
 			if(isOpeningBracketToken(token)) bracket_count += 1;
 			if(isClosingBracketToken(token)) bracket_count -= 1;
-			if(token.value === '.'){
-				// reference
-				var func_token = token;
-				// advance();
-				/*
-				var ref_node = reference(func_token, expression_nodes_infix[expression_nodes_infix.length-1]);
-				expression_nodes_infix.pop();
-				expression_nodes_infix.push(ref_node);
-				*/
-
-				var ref_node = new_node();
-				ref_node.type = "reference";
-				ref_node.name = ".";
-				expression_nodes_infix.push(ref_node);
-				advance(".");
-				continue;
-			} else if (isVarNameToken(token) && isOpeningBracketToken(next_token)){
+			if (isVarNameToken(token) && isOpeningBracketToken(next_token)){
 				// function call in expression
 				var func_token = token;
 				advance();
@@ -181,7 +171,6 @@ var make_parse = function () {
 				temp_stack.push(thisNode);
 			} else if (thisNode.type === 'variable' 
 						|| thisNode.tag === 'application') {
-						//|| thisNode.tag === 'reference') {
 				expression_nodes_postfix.push(thisNode);
 			} else if (thisNode.type === 'boolean' ) {
 				expression_nodes_postfix.push(thisNode.name==="true" ? true : false);
@@ -296,14 +285,14 @@ var make_parse = function () {
 				v = fallthrough_stmt();
 				break;
 			default:
-				if(next_token){
+				v = expression();
+				if(token){
 					// Assignment statement
 					var prev_token = token;
-					var next_operator = next_token.value;
-					switch (next_operator){
+					switch (token.value){
 						case "=":
 							advance();
-							v = assign(prev_token);
+							v = assign(v, null);
 							break;
 						case "+=":
 						case "-=":
@@ -319,15 +308,14 @@ var make_parse = function () {
 						case ">>=":
 						case ">>>=":
 							advance();
-							v = assign(prev_token, next_operator);
+							v = assign(v, prev_token.value);
 							break;
 						case "++":
 						case "--":
 							advance();
-							v = assign(prev_token, next_operator, 1);
+							v = assign(v, prev_token.value, 1);
 							break;
 						default:
-							v = expression();
 							advance(";");
 					}
 				}
@@ -390,26 +378,35 @@ var make_parse = function () {
 	};
 
 /*===================== ASSIGN ======================= */
-	var assign = function(variable, operator, value) {
+	var assign = function(left, operator, value) {
 		print("parsing assign. " + token.value);
-		if (variable.type !== "name") {
-			throw new Error("Expected a new variable name, but '"+variable.value+"' found.");
-		}
+		
 		var t = new_node();
 		t.tag = "assignment";
-		t.variable = variable.value;
+		var right_var_node = null;
+		
+		if (left.tag === "application"){
+			// assign to reference
+			t.left = left;
+			right_var_node = left;
+		} else if (left.type !== "variable") {
+			throw new Error("Expected a new variable name, but '"+left.value+"' found.");
+		} else {
+			// assign to variable
+			t.variable = left.name;
+			right_var_node = new_var_node(left.name, "variable");
+		}
+
 		if (operator){
 			// Compound Assignment
-			advance(operator);
 			var apply_node = {};
 			apply_node.tag = "application";
 			apply_node.operator = new_var_node(operator.slice(0, -1), "operator");
 			apply_node.operands = array_to_list([
-										new_var_node(variable.value, "variable"),
+										right_var_node,
 										value || expression()]);
 			t.value = apply_node;
 		}else{
-			advance("=");
 			t.value = expression();
 		}
 		advance(";");
@@ -532,11 +529,8 @@ var make_parse = function () {
 		print("parsing switch.");
 		var n = new_node();
 		n.tag = "switch";
-		// advance("(");
 		n.variable = expression();
 		n.default = null;
-		//advance(); // variable
-		// advance(")");
 		var cases = [];
 		advance("{");
 		/* cases */
