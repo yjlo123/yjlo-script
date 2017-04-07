@@ -115,9 +115,13 @@ var make_parse = function () {
 		}
 
 		// read in the tokens in this expression
-		while (token && token.value !== "," && token.value !== ";" && token.value !== "{"
+		while (token
+			// , ; {
+			&& !/^[,;{]$/.test(token.value)
 			&& token.value !== "="
-			&& !/^([+\-\*\/%&|^]|\/\.|[<>]{2}|[>]{3})=$/.test(token.value) && token.value !== "++" && token.value !== "--") {
+			// compound assignment += -= *= /= /.= &= |= ^= <<= >>= >>>=
+			&& !/^([+\-\*\/%&|^]|\/\.|[<>]{2}|[>]{3})=$/.test(token.value)
+			&& token.value !== "++" && token.value !== "--") {
 			if(isClosingBracketToken(token) && bracket_count === 0) {
 				// end of current expression
 				break;
@@ -525,11 +529,8 @@ var make_parse = function () {
 		print("parsing switch.");
 		var n = new_node();
 		n.tag = "switch";
-		// advance("(");
 		n.variable = expression();
 		n.default = null;
-		//advance(); // variable
-		// advance(")");
 		var cases = [];
 		advance("{");
 		/* cases */
