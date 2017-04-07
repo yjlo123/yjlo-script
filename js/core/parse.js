@@ -117,31 +117,15 @@ var make_parse = function () {
 		// read in the tokens in this expression
 		while (token && token.value !== "," && token.value !== ";" && token.value !== "{"
 			&& token.value !== "="
-			&& !/[+-/*\/%]=/.test(token.value) && token.value !== "++" && token.value !== "--") {
-			if(isClosingBracketToken(token) && bracket_count === 0){
+			&& !/^([+\-\*\/%&|^]|\/\.|[<>]{2}|[>]{3})=$/.test(token.value) && token.value !== "++" && token.value !== "--") {
+			if(isClosingBracketToken(token) && bracket_count === 0) {
 				// end of current expression
 				break;
 			}
 
 			if(isOpeningBracketToken(token)) bracket_count += 1;
 			if(isClosingBracketToken(token)) bracket_count -= 1;
-			if(token.value === '.'){
-				// reference
-				var func_token = token;
-				// advance();
-				/*
-				var ref_node = reference(func_token, expression_nodes_infix[expression_nodes_infix.length-1]);
-				expression_nodes_infix.pop();
-				expression_nodes_infix.push(ref_node);
-				*/
-
-				var ref_node = new_node();
-				ref_node.type = "reference";
-				ref_node.name = ".";
-				expression_nodes_infix.push(ref_node);
-				advance(".");
-				continue;
-			} else if (isVarNameToken(token) && isOpeningBracketToken(next_token)){
+			if (isVarNameToken(token) && isOpeningBracketToken(next_token)){
 				// function call in expression
 				var func_token = token;
 				advance();
@@ -183,7 +167,6 @@ var make_parse = function () {
 				temp_stack.push(thisNode);
 			} else if (thisNode.type === 'variable' 
 						|| thisNode.tag === 'application') {
-						//|| thisNode.tag === 'reference') {
 				expression_nodes_postfix.push(thisNode);
 			} else if (thisNode.type === 'boolean' ) {
 				expression_nodes_postfix.push(thisNode.name==="true" ? true : false);
@@ -396,29 +379,30 @@ var make_parse = function () {
 		
 		var t = new_node();
 		t.tag = "assignment";
+		var right_var_node = null;
 		
 		if (left.tag === "application"){
 			// assign to reference
 			t.left = left;
+			right_var_node = left;
 		} else if (left.type !== "variable") {
 			throw new Error("Expected a new variable name, but '"+left.value+"' found.");
 		} else {
 			// assign to variable
 			t.variable = left.name;
+			right_var_node = new_var_node(left.name, "variable");
 		}
 
 		if (operator){
 			// Compound Assignment
-			// advance(operator);
 			var apply_node = {};
 			apply_node.tag = "application";
 			apply_node.operator = new_var_node(operator.slice(0, -1), "operator");
 			apply_node.operands = array_to_list([
-										new_var_node(left.name, "variable"),
+										right_var_node,
 										value || expression()]);
 			t.value = apply_node;
 		}else{
-			// advance("=");
 			t.value = expression();
 		}
 		advance(";");
