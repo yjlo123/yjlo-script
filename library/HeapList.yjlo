@@ -27,6 +27,7 @@ func HeapList() {
 	}
 
 	func _getNodeByPath(path, create) {
+		if is_empty(path) { return _root; }
 		var current = _root;
 		while !is_empty(path) && current != null {
 			if head(path) == 1 {
@@ -46,6 +47,8 @@ func HeapList() {
 	}
 
 	func init(lst) {
+		_root = _Node();
+		_size = 0;
 		var i = 0;
 		while !is_empty(lst) {
 			put(i, head(lst));
@@ -63,7 +66,7 @@ func HeapList() {
 
 	func get(index) {
 		index /= 1;
-		if !index || index < 0 { return null; }
+		if !(index >= 0) { return null; }
 		var target = _getNodeByPath(_getPathByIndex(index), false);
 		if target {
 			return target.value;
