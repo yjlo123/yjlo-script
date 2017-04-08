@@ -73,9 +73,9 @@ var stack = Stack();
 
 var prev_token = null;
 var token = null;
-while !is_empty(infix_list) {
+while !$is_empty(infix_list) {
 	prev_token = token;
-	token = head(infix_list);
+	token = $head(infix_list);
 	if token.type == 'number' {
 		postfix_stack.push(token.value);
 	} else if token.value == ')' {
@@ -103,7 +103,7 @@ while !is_empty(infix_list) {
 		}
 		stack.push(token);
 	}
-	infix_list = tail(infix_list);
+	infix_list = $tail(infix_list);
 }
 
 // pop the rest of the tokens in the stack

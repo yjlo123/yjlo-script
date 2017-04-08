@@ -15,22 +15,22 @@ func HeapList() {
 	var _size = 0;
 
 	func _getPathByIndex(n) {
-		var pathList = list();
+		var pathList = $list();
 		if n == 0 { return pathList; }
-		pathList = pair(n % 2, pathList);
+		pathList = $pair(n % 2, pathList);
 		n = (n - 1) / 2;
 		while n != 0 {
-			pathList = pair(n % 2, pathList);
+			pathList = $pair(n % 2, pathList);
 			n = (n - 1) / 2;
 		}
 		return pathList;
 	}
 
 	func _getNodeByPath(path, create) {
-		if is_empty(path) { return _root; }
+		if $is_empty(path) { return _root; }
 		var current = _root;
-		while !is_empty(path) && current != null {
-			if head(path) == 1 {
+		while !$is_empty(path) && current != null {
+			if $head(path) == 1 {
 				if current.left == null && create {
 					current.left = _Node();
 				}
@@ -41,7 +41,7 @@ func HeapList() {
 				}
 				current = current.right;
 			}
-			path = tail(path);
+			path = $tail(path);
 		}
 		return current;
 	}
@@ -50,10 +50,10 @@ func HeapList() {
 		_root = _Node();
 		_size = 0;
 		var i = 0;
-		while !is_empty(lst) {
-			put(i, head(lst));
+		while !$is_empty(lst) {
+			put(i, $head(lst));
 			i++;
-			lst = tail(lst);
+			lst = $tail(lst);
 		}
 	}
 
@@ -85,7 +85,7 @@ func HeapList() {
 /*
 var arr = HeapList();
 
-arr.init(list("zero", "one", "two", "three", "four", "five", "six"));
+arr.init($list("zero", "one", "two", "three", "four", "five", "six"));
 arr.put(7, "seven");
 
 print(arr.size());

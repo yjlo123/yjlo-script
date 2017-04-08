@@ -104,16 +104,6 @@ function runtime() {
 	return d.getTime();
 }
 
-function error(x) {
-	var output_string = x;
-	for (var i=1; i < arguments.length; i++)
-		output_string = output_string + " " + format(arguments[i]);
-	alert(output_string);
-	return 
-}
-
-
-
 function _floor(n) {
 	return Math.floor(n);
 }
@@ -145,6 +135,10 @@ function _string_to_char_list(str) {
 		char_list = pair(str.charAt(i), char_list);
 	}
 	return char_list;
+}
+
+function _char_code(char) {
+	return char.charCodeAt(0);
 }
 
 /*  UI Output */

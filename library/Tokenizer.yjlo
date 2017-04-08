@@ -5,7 +5,7 @@
 
 func Tokenizer() {
 	
-	var tokens = list();
+	var tokens = $list();
 	
 	func Token(type_, value_) {
 		var type = type_;
@@ -16,53 +16,53 @@ func Tokenizer() {
 	
 	func _strToNum(str) {
 		func help(lst, num){
-			if is_empty(lst) { return num; } 
-			var d = head(lst) - "0";
-			return help(tail(lst), num*10+d);
+			if $is_empty(lst) { return num; } 
+			var d = $head(lst) - "0";
+			return help($tail(lst), num*10+d);
 		}
 
-		return help(string_to_char_list(str), 0);
+		return help($string_to_char_list(str), 0);
 	}
 
 	func tokenize(str) {
-		var result = list();
-		var chars = string_to_char_list(str);
-		var reversed_tokens = list();
+		var result = $list();
+		var chars = $string_to_char_list(str);
+		var reversed_tokens = $list();
 
 		var current = "";
-		while !is_empty(chars) {
-			var c = head(chars);
+		while !$is_empty(chars) {
+			var c = $head(chars);
 
 			// Ignore whitespace.
 			if c == " " {
-				chars = tail(chars);
+				chars = $tail(chars);
 				continue;
 			// number.
 			} else if c >= '0' && c <= '9' {
 				current = c;
-				chars = tail(chars);
-				c = head(chars);
+				chars = $tail(chars);
+				c = $head(chars);
 				while c >= '0' && c <= '9' {
 					current += c;
-					chars = tail(chars);
-					c = head(chars);
+					chars = $tail(chars);
+					c = $head(chars);
 				}
 				//print("number ", _strToNum(current));
-				reversed_tokens = pair(
+				reversed_tokens = $pair(
 					Token("number", _strToNum(current)), 
 					reversed_tokens);
 			// operator
 			} else {
 				//print("char ", c);
-				chars = tail(chars);
-				reversed_tokens = pair(Token("operator", c), 
+				chars = $tail(chars);
+				reversed_tokens = $pair(Token("operator", c), 
 									   reversed_tokens);
 			}
 		}
 		// reverse tokens
-		while !is_empty(reversed_tokens) {
-			tokens = pair(head(reversed_tokens), tokens);
-			reversed_tokens = tail(reversed_tokens);
+		while !$is_empty(reversed_tokens) {
+			tokens = $pair($head(reversed_tokens), tokens);
+			reversed_tokens = $tail(reversed_tokens);
 		}
 	}
 	
@@ -73,8 +73,8 @@ func Tokenizer() {
 var tokenizer = Tokenizer();
 tokenizer.tokenize("12*34-78/(12+4)");
 var tokens = tokenizer.tokens;
-while !is_empty(tokens) {
-	print(head(tokens).type, " ", head(tokens).value);
-	tokens = tail(tokens);
+while !$is_empty(tokens) {
+	print($head(tokens).type, " ", $head(tokens).value);
+	tokens = $tail(tokens);
 }
 */
