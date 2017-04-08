@@ -2,20 +2,20 @@ func Stack() {
 	var _list = null;
 	var _size = 0;
 	
-	_list = list();
+	_list = $list();
 	
 	/* Pushes an item onto the top of this stack. */
 	func push(n) {
-		_list = pair(n, _list);
+		_list = $pair(n, _list);
 		_size++;
 	}
 	
 	/* Removes the item at the top of this stack 
 	 * and returns that item. */
 	func pop() {
-		if is_empty(_list) { throw("Exception: empty stack."); }
-		var value = head(_list);
-		_list = tail(_list);
+		if $is_empty(_list) { throw("Exception: empty stack."); }
+		var value = $head(_list);
+		_list = $tail(_list);
 		_size--;
 		return value;
 	}
@@ -24,7 +24,7 @@ func Stack() {
 	 * without removing it from the stack. */
 	func peek() {
 		if !empty() {
-			return head(_list);
+			return $head(_list);
 		} else {
 			throw("Exception: empty stack.");
 		}
@@ -38,15 +38,15 @@ func Stack() {
 	
 	/* Removes all of the elements from this stack. */
 	func clear() {
-		_list = list();
+		_list = $list();
 		_size = 0;
 	}
 	
 	/* Returns a string representation of the stack. */
 	func toString() {
 		func help(lst, str) {
-			if is_empty(lst) { return str; }
-			return help(tail(lst), head(lst)+" ) "+str);
+			if $is_empty(lst) { return str; }
+			return help($tail(lst), $head(lst)+" ) "+str);
 		}
 		return help(_list, "");
 	}
