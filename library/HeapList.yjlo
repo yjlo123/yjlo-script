@@ -1,0 +1,90 @@
+/* HeapList
+ * @author Liu Siwei (liusiwei.yjlo@gmail.com)
+ * A heap that works like an array list.
+ */
+
+func HeapList() {
+	func _Node() {
+		var value = null;
+		var left = null;
+		var right = null;
+		return func(){};
+	}
+
+	var _root = _Node();
+	var _size = 0;
+
+	func _getPathByIndex(n) {
+		var pathList = list();
+		if n == 0 { return pathList; }
+		pathList = pair(n % 2, pathList);
+		n = (n - 1) / 2;
+		while n != 0 {
+			pathList = pair(n % 2, pathList);
+			n = (n - 1) / 2;
+		}
+		return pathList;
+	}
+
+	func _getNodeByPath(path, create) {
+		var current = _root;
+		while !is_empty(path) && current != null {
+			if head(path) == 1 {
+				if current.left == null && create {
+					current.left = _Node();
+				}
+				current = current.left;
+			} else {
+				if current.right == null && create {
+					current.right = _Node();
+				}
+				current = current.right;
+			}
+			path = tail(path);
+		}
+		return current;
+	}
+
+	func init(lst) {
+		var i = 0;
+		while !is_empty(lst) {
+			put(i, head(lst));
+			i++;
+			lst = tail(lst);
+		}
+	}
+
+	func put(index, value) {
+		_getNodeByPath(_getPathByIndex(index), true).value = value;
+		if index + 1 > _size {
+			_size = index + 1;
+		}
+	}
+
+	func get(index) {
+		index /= 1;
+		if !index || index < 0 { return null; }
+		var target = _getNodeByPath(_getPathByIndex(index), false);
+		if target {
+			return target.value;
+		} else {
+			return null;
+		}
+	}
+
+	func size() {
+		return _size;
+	}
+
+	return func(){};
+}
+
+/*
+var arr = HeapList();
+
+arr.init(list("zero", "one", "two", "three", "four", "five", "six"));
+arr.put(7, "seven");
+
+print(arr.size());
+print(arr.get(5));
+*/

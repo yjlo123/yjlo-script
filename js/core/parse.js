@@ -30,11 +30,11 @@ var make_parse = function () {
 
 	var isOpeningBracketToken = function (t) {
 		return t && isOperatorToken(t) && t.value === "(";
-	}
+	};
 
 	var isClosingBracketToken = function (t) {
 		return t && isOperatorToken(t) && t.value === ")";
-	}
+	};
 
 	var precedence = function(operator) {
 		switch(operator){
@@ -79,7 +79,7 @@ var make_parse = function () {
 		default:
 			return 0;
 		}
-	}
+	};
 
 	var advance = function (value) {
 		if (token_nr >= tokens.length) {
@@ -176,13 +176,13 @@ var make_parse = function () {
 				expression_nodes_postfix.push(thisNode.name==="true" ? true : false);
 			} else if (thisNode.tag === 'constant') {
 				expression_nodes_postfix.push(thisNode.value);
-			} else if (thisNode.name === ')'){
+			} else if (thisNode.name === ')') {
 				while (temp_stack.length > 0 && temp_stack[temp_stack.length-1].name !== '(') {
 					expression_nodes_postfix.push(temp_stack.pop());
 				}
-				if (temp_stack.length > 0){
+				if (temp_stack.length > 0) {
 					temp_stack.pop(); // pop '('
-				}else{
+				} else {
 					throw new Error("Unmatched bracket");
 				}
 			} else {
@@ -347,7 +347,8 @@ var make_parse = function () {
 	var func_call = function(t, operator) {
 		print("parsing func call. "+t.value);
 		var a = new_node();
-		var operator = operator || new_var_node(t.value);
+		a.tag = "application";
+		a.operator = operator || new_var_node(t.value);
 		var operands = [];
 		advance("(");
 		if (!isClosingBracketToken(token)) {
@@ -361,8 +362,6 @@ var make_parse = function () {
 			}
 		}
 		advance(")");
-		a.tag = "application";
-		a.operator = operator;
 		a.operands = array_to_list(operands);
 		return a;
 	};
@@ -568,7 +567,7 @@ var make_parse = function () {
 		advance("}");
 		n.cases = array_to_list(cases);
 		return n;
-	}
+	};
 
 /*===================== WHILE ======================= */
 	var while_stmt = function() {
@@ -710,7 +709,7 @@ var make_parse = function () {
 	
 	function tokenize(source){
 		var program_string_without_comments = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
-		return program_string_without_comments.tokens('=<>!+-*&|/%^*', '=<>&|*+-.')
+		return program_string_without_comments.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
 	}
 	
 	function loadLibraries(libs, compiled, parse_callback, evaluate_callback) {
@@ -764,7 +763,7 @@ var make_parse = function () {
 	return function (source, evaluate_callback) {
 		tokens = tokenize(source);
 		
-		if(!tokens || tokens.length == 0){
+		if (!tokens || tokens.length === 0) {
 			throw new Error("Empty source code.");
 		}
 		
@@ -772,13 +771,13 @@ var make_parse = function () {
 		token_nr = 0;
 		token = tokens[token_nr];
 		var libs = list(); //list("Stack", "LinkedList");
-		while(token.value === "import"){
+		while (token.value === "import") {
 			advance();
-			if(token && isVarNameToken(token)){
+			if (token && isVarNameToken(token)) {
 				libs = pair(token.value, libs);
 				advance(); // library name
 				advance(";");
-			}else{
+			} else {
 				throw new Error("Invalid library '"+token.value()+"'.");
 			}
 		}
