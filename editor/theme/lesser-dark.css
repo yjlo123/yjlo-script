@@ -23,14 +23,14 @@ Ported to CodeMirror by Peter Kroon
 .cm-s-lesser-dark span.cm-quote { color: #090; }
 .cm-s-lesser-dark span.cm-keyword { color: #599eff; }
 .cm-s-lesser-dark span.cm-keyword-2 { color: #cc7bc0; }
-.cm-s-lesser-dark span.cm-atom { color: #C2B470; }
-.cm-s-lesser-dark span.cm-number { color: #B35E4D; }
+.cm-s-lesser-dark span.cm-atom { color: #599eff; }
+.cm-s-lesser-dark span.cm-number { color: #acd2a8; } /* { color: #B35E4D; } */
 .cm-s-lesser-dark span.cm-def { color: white; }
 .cm-s-lesser-dark span.cm-variable { color:#D9BF8C; }
-.cm-s-lesser-dark span.cm-variable-2 { color: #669199; }
+.cm-s-lesser-dark span.cm-variable-2 { color: #8bdcff; } /*{ color: #669199; }*/
 .cm-s-lesser-dark span.cm-variable-3 { color: white; }
 .cm-s-lesser-dark span.cm-property { color: #92A75C; }
-.cm-s-lesser-dark span.cm-operator { color: #92A75C; }
+.cm-s-lesser-dark span.cm-operator { color: #ccffff; } /* { color: #92A75C; }*/
 .cm-s-lesser-dark span.cm-comment { color: #666; }
 .cm-s-lesser-dark span.cm-string { color: #BCD279; }
 .cm-s-lesser-dark span.cm-string-2 { color: #f50; }
