@@ -98,9 +98,9 @@ function make_frame(variables,values) {
 	if (is_empty(variables) && is_empty(values)) 
 		return {};
 	else {
-		var frame = make_frame(tail(variables),tail(values));
-		frame[head(variables)] = head(values); // object field
-															// assignment
+		var next_tail = is_empty(values) ? values : tail(values);
+		var frame = make_frame(tail(variables),next_tail);
+		frame[head(variables)] = is_empty(values) ? null : head(values);
 		return frame;
 	}
 }
@@ -431,12 +431,10 @@ function apply_primitive_function(fun,argument_list) {
 }
 
 function extend_environment(vars,vals,base_env) {
-	if (length(vars) === length(vals))
+	if (length(vars) >= length(vals))
 		return enclose_by(make_frame(vars,vals),base_env);
 	else if (length(vars) < length(vals))
 		throw new Error("Too many arguments supplied: "+vars+" "+vals);
-	else
-		throw new Error("Too few arguments supplied: "+vars+" "+vals);
 }
 	 
 function is_return_statement(stmt) {
