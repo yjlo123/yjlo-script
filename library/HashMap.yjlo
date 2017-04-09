@@ -1,0 +1,190 @@
+func HashMap(capacity) {
+	/* for building heap */
+	func _Node() {
+		var entry = $list();
+		var left = null;
+		var right = null;
+		func toString() {
+			var str = "";
+			var tempEntry = entry;
+			while !$is_empty(tempEntry) {
+				str += $head(tempEntry).toString();
+				tempEntry = $tail(tempEntry);
+			}
+			return str;
+		}
+		return func(){};
+	}
+	
+	/* for storing key value pairs */
+	func _Entry(k, v) {
+		var key = k;
+		var value = v;
+		func toString() {
+			return "("+key+", "+value+")";
+		}
+		return func(){};
+	}
+	
+	var _CAPACITY = 63;
+	var _root = _Node();
+	
+	/* initialization */
+	func _init() {
+		if capacity {
+			_CAPACITY = capacity;
+		}
+	}
+	_init();
+	
+	/**
+	 * given an index, return the path from root 
+	 * 1: go left
+	 * 0: go right
+	 */
+	func _getPathByIndex(n) {
+		var pathList = $list();
+		if n == 0 { return pathList; }
+		pathList = $pair(n % 2, pathList);
+		n = (n - 1) / 2;
+		while n != 0 {
+			pathList = $pair(n % 2, pathList);
+			n = (n - 1) / 2;
+		}
+		return pathList;
+	}
+
+	/**
+	 * In create mode, unexisting nodes will be created
+	 * while going through the path
+	 */
+	func _getNodeByPath(path, create) {
+		if $is_empty(path) { return _root; }
+		var current = _root;
+		while !$is_empty(path) && current != null {
+			if $head(path) == 1 {
+				if current.left == null && create {
+					current.left = _Node();
+				}
+				current = current.left;
+			} else {
+				if current.right == null && create {
+					current.right = _Node();
+				}
+				current = current.right;
+			}
+			path = $tail(path);
+		}
+		return current;
+	}
+	
+	func hashCode(str) {
+		var hash = 0;
+		var chars = $string_to_char_list(str);
+		if $is_empty(chars) return hash;
+		while !$is_empty(chars) {
+			var chr   = $head(chars);
+			hash  = ((hash << 5) - hash) + $char_code(chr);
+			hash = hash & hash; // Convert to 32bit integer
+			chars = $tail(chars);
+		}
+		return hash % _CAPACITY;
+	}
+
+	func put(key, value) {
+		var index = hashCode(key);
+		var target = _getNodeByPath(_getPathByIndex(index), true);
+		var entries = target.entry;
+		while !$is_empty(entries) {
+			var entry = $head(entries);
+			if entry.key == key {
+				// found existing key
+				entry.value = value;
+				return true;
+			}
+			entries = $tail(entries);
+		}
+		// new key
+		target.entry = $pair(_Entry(key, value), target.entry);
+	}
+
+	func get(key) {
+		var index = hashCode(key);
+		var target = _getNodeByPath(_getPathByIndex(index), false);
+		if target {
+			var list = target.entry;
+			while !$is_empty(list) {
+				if $head(list).key == key {
+					return $head(list).value;
+				}
+				list = $tail(list);
+			}
+			return null;
+		} else {
+			return null;
+		}
+	}
+	
+	func remove(key) {
+		func deleteFromList(list, key) {
+			if $is_empty(list) { return list; }
+			if $head(list).key == key {
+				return deleteFromList($tail(list), key);
+			} else {
+				return $pair($head(list), deleteFromList($tail(list), key));
+			}
+		}
+		var index = hashCode(key);
+		var target = _getNodeByPath(_getPathByIndex(index), false);
+		if target {
+			var list = target.entry;
+			var foundEntry = null;
+			while !$is_empty(list) {
+				if $head(list).key == key {
+					foundEntry = $head(list);
+					target.entry = deleteFromList(target.entry, key);
+					return foundEntry.value;
+				}
+				list = $tail(list);
+			}
+			return null;
+		} else {
+			return null;
+		}
+	}
+	
+	func toString() {
+		var str = "";
+		for i in (0, _CAPACITY) {
+			var node = _getNodeByPath(_getPathByIndex(i), false);
+			if node != null && !$is_empty(node.entry) {
+				str += (i + ": " + node.toString() + "\n");
+			}
+		}
+		return str;
+	}
+
+	return func(){};
+}
+
+/*
+var hm = HashMap(7);
+
+hm.put("yjlo", 12);
+hm.put("siwei", 24);
+hm.put("cn", 36);
+hm.put("Singapore", 1);
+
+print(hm.toString());
+
+print(hm.get("yjlo"));
+print(hm.get("cn"));
+
+hm.put("siwei", "1992");
+hm.remove("abc");
+hm.remove("yjlo");
+	
+print(hm.toString());
+
+print(hm.get("siwei"));
+*/
