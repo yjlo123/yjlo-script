@@ -106,6 +106,9 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		if (ch == '"' || ch == "'") {
 			state.tokenize = tokenString(ch);
 			return state.tokenize(stream, state);
+		} else if (ch == "/" && stream.eat(".")) {
+			// operator /.
+			return ret("operator", "operator", stream.current());
 		} else if (ch == "." && stream.match(/^\d+(?:[eE][+\-]?\d+)?/)) {
 			return ret("number", "number");
 		} else if (ch == "." && stream.match("..")) {
@@ -124,7 +127,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 			stream.eatWhile(/[01]/i);
 			return ret("number", "number");
 		} else if (/\d/.test(ch)) {
-			stream.match(/^\d*(?:\.\d*)?(?:[eE][+\-]?\d+)?/);
+			stream.match(/^\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/);
 			return ret("number", "number");
 		} else if (ch == "/") {
 			if (stream.eat("*")) {
@@ -582,7 +585,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		if (type == "keyword b" && value == "else") return cont(pushlex("form", "else"), statement, poplex);
 	}
 	function forspec(type) {
-		if (type == "(") return cont(pushlex(")"), forspec1, expect(")"), poplex);
+		//if (type == "(") return cont(pushlex(")"), forspec1, expect(")"), poplex);
 	}
 	function forspec1(type) {
 		if (type == "var") return cont(vardef, expect(";"), forspec2);
