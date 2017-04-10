@@ -717,7 +717,15 @@ var make_parse = function () {
 			var lib_tokens = tokenize(compiled);
 			tokens = lib_tokens.concat(tokens);
 			//print(tokens)
-			evaluate_callback(parse_callback());
+			try {
+				evaluate_callback(parse_callback());
+			} catch (error) {
+				if (debug) {
+					console.error(error);
+				} else {
+					con.error(error.message);
+				}
+			}
 			return true;
 		}
 		
