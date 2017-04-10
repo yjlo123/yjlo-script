@@ -170,7 +170,8 @@ function print() {
 		}
 	}
 	
-	$("#program-result").append("<pre>"+output+"</pre>");
+	//$("#program-result").append("<pre>"+output+"</pre>");
+	con.log(output);
 	return undefined;
 }
 

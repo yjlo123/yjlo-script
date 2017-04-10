@@ -36,17 +36,31 @@ var myCodeMirror = CodeMirror(document.getElementById("editor-area"), {
 
 myCodeMirror.setSize("100%", "100%");
 
+var con = new SimpleConsole({
+	outputOnly: true,
+	placeholder: "input",
+	storageID: "yjlo-script"
+});
+	
 $(document).ready(function() {
 	$("#version").text(version);
 	registerEventListeners();
+	
+	$("#console").append(con.element);
+	con.element.classList.add("dark");
 });
 
 function exec(){
 	$("#program-result").html('<p class="output-finish">[Processing]</p>');
+	con.clear();
+	con.info("[Processing]");
+	
 	setup_global_environment();
 	var source = myCodeMirror.getValue();
 	driver_loop(source, current_parser, function(){
-		$("#program-result").append('<br/><p class="output-finish">[Finished]</p>');
+		//$("#program-result").append('<br/><p class="output-finish">[Finished]</p>');
+		con.log("\n");
+		con.logHTML('<p class="output-finish">[Finished]</p>');
 	});
 	
 }

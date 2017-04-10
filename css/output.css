@@ -3,5 +3,14 @@
 }
 
 .output-finish{
-	color: #CCCCCC;
+	color: #555;
+}
+
+.simple-console{
+	height: 100%;
+	font-family: "Courier", "Consolas", "Andale Mono", monospace;
+}
+
+#console{
+	background-color: #111;
 }

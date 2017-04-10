@@ -723,7 +723,8 @@ var make_parse = function () {
 				try {
 					evaluate_callback(parse_callback());
 				} catch(err) {
-					$("#program-result").append('<p class="output-error">'+err.message.replace(/\n/g, "<br />")+'</p>');
+					//$("#program-result").append('<p class="output-error">'+err.message.replace(/\n/g, "<br />")+'</p>');
+					con.error(err.message);
 				}
 			}
 			return true;
@@ -736,8 +737,9 @@ var make_parse = function () {
 		}).done(function(data){
 			loadLibraries(tail(libs), compiled+" "+data, parse_callback, evaluate_callback);
 		}).fail(function(){
-			var err_msg = "Importing "+head(libs)+" failed.";
-			$("#program-result").append('<p class="output-error">'+err_msg.replace(/\n/g, "<br />")+'</p>');
+			var err_msg = "Importing '"+head(libs)+"' failed.";
+			con.error(err_msg);
+			//$("#program-result").append('<p class="output-error">'+err_msg.replace(/\n/g, "<br />")+'</p>');
 		});
 	}
 
@@ -750,7 +752,8 @@ var make_parse = function () {
 		
 		// Finished parsing, clear output
 		// prepare for evaluation output
-		$("#program-result").empty();
+		//$("#program-result").empty();
+		con.clear();
 		
 		if (syntax_tree) {
 			return syntax_tree;

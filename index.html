@@ -7,7 +7,6 @@
 		
 		<link type="text/css" rel="stylesheet" href="css/layout-default-latest.css"/>
 		<link type="text/css" rel="stylesheet" href="css/layout.css"/>
-		<link type="text/css" rel="stylesheet" href="css/output.css"/>
 
 		<!-- Core -->
 		<script type="text/javascript" src="js/core/lib.js"></script>
@@ -26,12 +25,18 @@
 		<script type="text/javascript" src="editor/codemirror.js"></script>
 		<script type="text/javascript" src="editor/mode/javascript/javascript.js"></script>
 		
+		<!-- console -->
+		<script src="console/simple-console.js"></script>
+		<link rel="stylesheet" href="console/simple-console.css">
+		
 		<!-- shortcut -->
 		<script type="text/javascript" src="js/mousetrap.min.js"></script>
 		
 		<!-- fork me on github -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css" />
 		<style>.github-fork-ribbon.right-bottom:before {background-color: #090;}</style>
+		
+		<link type="text/css" rel="stylesheet" href="css/output.css"/>
 	</head>
 	
 	<body>
@@ -68,8 +73,10 @@
 			</div>
 		</div>
 
-		<div class="ui-layout-east">
+		<div class="ui-layout-east" id="console">
+			<!--
 			<div id="program-result"></div>
+			-->
 		</div>
 
 		<div id="editor-area" class="ui-layout-center"></div>
