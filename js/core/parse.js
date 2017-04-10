@@ -717,16 +717,7 @@ var make_parse = function () {
 			var lib_tokens = tokenize(compiled);
 			tokens = lib_tokens.concat(tokens);
 			//print(tokens)
-			if (debug) {
-				evaluate_callback(parse_callback());
-			} else {
-				try {
-					evaluate_callback(parse_callback());
-				} catch(err) {
-					//$("#program-result").append('<p class="output-error">'+err.message.replace(/\n/g, "<br />")+'</p>');
-					con.error(err.message);
-				}
-			}
+			evaluate_callback(parse_callback());
 			return true;
 		}
 		

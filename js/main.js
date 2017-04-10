@@ -67,7 +67,15 @@ function exec(){
 
 function run() {
 	$("#program-result").empty();
-	exec();
+	try {
+		exec();
+	} catch (error) {
+		if (debug) {
+			console.error(error);
+		} else {
+			con.error(error.message);
+		}
+	}
 }
 
 function registerEventListeners(){
