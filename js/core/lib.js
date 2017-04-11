@@ -171,7 +171,7 @@ function print() {
 	}
 	
 	//$("#program-result").append("<pre>"+output+"</pre>");
-	con.log(output);
+	jqconsole.Write(output + '\n', 'console-default');
 	return undefined;
 }
 

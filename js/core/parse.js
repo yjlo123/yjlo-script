@@ -723,7 +723,7 @@ var make_parse = function () {
 				if (debug) {
 					console.error(error);
 				} else {
-					con.error(error.message);
+					jqconsole.Write(error.message + '\n', 'console-error');
 				}
 			}
 			return true;
@@ -737,7 +737,7 @@ var make_parse = function () {
 			loadLibraries(tail(libs), compiled+" "+data, parse_callback, evaluate_callback);
 		}).fail(function(){
 			var err_msg = "Importing '"+head(libs)+"' failed.";
-			con.error(err_msg);
+			jqconsole.Write(err_msg + '\n', 'console-error');
 			//$("#program-result").append('<p class="output-error">'+err_msg.replace(/\n/g, "<br />")+'</p>');
 		});
 	}
@@ -752,7 +752,6 @@ var make_parse = function () {
 		// Finished parsing, clear output
 		// prepare for evaluation output
 		//$("#program-result").empty();
-		con.clear();
 		
 		if (syntax_tree) {
 			return syntax_tree;
