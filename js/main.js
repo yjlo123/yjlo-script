@@ -67,11 +67,12 @@ $(document).ready(function() {
 
 function exec(){
 	//$("#program-result").html('<p class="output-finish">[Processing]</p>');
-
+	jqconsole.Write("  \n", 'jqconsole-old-prompt');
 	setup_global_environment();
 	var source = myCodeMirror.getValue();
 	driver_loop(source, current_parser, function(){
 		//$("#program-result").append('<br/><p class="output-finish">[Finished]</p>');
+		//jqconsole.Write("=> [Finished]\n", 'console-arrow');
 	});
 	
 }
