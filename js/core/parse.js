@@ -19,6 +19,13 @@ var make_parse = function () {
 		node.type = type;
 		return node;
 	};
+	
+	var new_constant_node = function(value) {
+		var node = new_node();
+		node.tag = "constant";
+		node.value = value;
+		return node;
+	}
 
 	var isConstantToken = function (t) {
 		return t.type === "string" || t.type === "number";
@@ -144,9 +151,7 @@ var make_parse = function () {
 				continue;
 			} else if (isConstantToken(token)) {
 				// constant
-				left_node = new_node();
-				left_node.tag = "constant";
-				left_node.value = token.value;
+				left_node = new_constant_node(token.value);
 			} else if(isVarNameToken(token)) {
 				// variable
 				var is_boolean = (token.value=="true") || (token.value=="false");
@@ -166,6 +171,11 @@ var make_parse = function () {
 			expression_nodes_infix.push(token);
 			advance(')');
 			bracket_count -= 1;
+		}
+		
+		// empty expression
+		if (expression_nodes_infix.length === 0) {
+			return new_var_node("null", "variable");
 		}
 		
 		// convert in-fix order to post-fix order
