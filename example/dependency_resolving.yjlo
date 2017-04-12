@@ -1,0 +1,80 @@
+/* Dependency resolving
+   @author Liu Siwei
+
+      [A]
+	 /  \
+    v    v
+   [D]   [B]
+    ^   /   \
+	 \ v     v
+	 [C] --> [E]
+*/
+func Node(n) {
+	var name = n;
+	var edges = $list();
+	func addEdge(node) {
+		func help(node, head) {
+			if $is_empty(head) {
+				return $pair(node, head);
+			}
+			return $pair($head(head), help(node, $tail(head)));
+		}
+		edges = help(node, edges);
+	}
+	return func(){};
+}
+
+var a = Node('a');
+var b = Node('b');
+var c = Node('c');
+var d = Node('d');
+var e = Node('e');
+
+a.addEdge(b);
+a.addEdge(d);
+b.addEdge(c);
+b.addEdge(e);
+c.addEdge(d);
+c.addEdge(e);
+
+//d.addEdge(b); // circular dependency
+
+func isInList(node, list) {
+	if $is_empty(list) { return false; }
+	if node.name == $head(list).name { return true; }
+	return isInList(node, $tail(list));
+}
+
+func removeFromList(node, list) {
+	if $is_empty(list) { return $list(); }
+	if $head(list).name == node.name { return $tail(list); }
+	return $pair($head(list), removeFromList(node, $tail(list)));
+}
+
+func depResolve(node, unresolved){
+	unresolved = $pair(node, unresolved);
+	var edges = node.edges;
+	while !$is_empty(edges) {
+		if !isInList($head(edges), resolved) {
+        	if isInList($head(edges), unresolved) {
+            	throw('Circular dependency detected: '
+					  +node.name+' -> '+$head(edges).name);
+			}
+			depResolve($head(edges), unresolved);
+		}
+		edges = $tail(edges);
+	}
+	resolved = $pair(node, resolved);
+	unresolved = removeFromList(node, unresolved);
+}
+var resolved = $list();
+depResolve(a, $list());
+
+func printReverse(list) {
+	if $is_empty(list) {
+		return null;
+	}
+	printReverse($tail(list));
+	print($head(list).name);
+}
+printReverse(resolved);
