@@ -72,7 +72,7 @@ depResolve(a, $list());
 
 func printReverse(list) {
 	if $is_empty(list) {
-		return null;
+		return;
 	}
 	printReverse($tail(list));
 	print($head(list).name);

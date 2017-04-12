@@ -81,7 +81,7 @@ func HashMap(capacity) {
 	func hashCode(str) {
 		var hash = 0;
 		var chars = $string_to_char_list(str);
-		if $is_empty(chars) return hash;
+		if $is_empty(chars) { return hash; }
 		while !$is_empty(chars) {
 			var chr   = $head(chars);
 			hash  = ((hash << 5) - hash) + $char_code(chr);
@@ -91,6 +91,14 @@ func HashMap(capacity) {
 		return hash % _CAPACITY;
 	}
 
+	/**
+	 * Parameters:
+	 *     @param key the hashtable key
+	 *     @param value the value
+	 * Returns:
+	 *     the previous value of the specified key in this hashmap,
+	 *     or null if it did not have one
+	 */
 	func put(key, value) {
 		var index = hashCode(key);
 		var target = _getNodeByPath(_getPathByIndex(index), true);
@@ -99,13 +107,15 @@ func HashMap(capacity) {
 			var entry = $head(entries);
 			if entry.key == key {
 				// found existing key
+				var prev_value = entry.value;
 				entry.value = value;
-				return true;
+				return prev_value;
 			}
 			entries = $tail(entries);
 		}
 		// new key
 		target.entry = $pair(_Entry(key, value), target.entry);
+		return null;
 	}
 
 	func get(key) {
@@ -120,9 +130,8 @@ func HashMap(capacity) {
 				list = $tail(list);
 			}
 			return null;
-		} else {
-			return null;
 		}
+		return null;
 	}
 	
 	func remove(key) {
@@ -148,9 +157,8 @@ func HashMap(capacity) {
 				list = $tail(list);
 			}
 			return null;
-		} else {
-			return null;
 		}
+		return null;
 	}
 	
 	func toString() {
