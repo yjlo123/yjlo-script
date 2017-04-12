@@ -1,4 +1,5 @@
 var the_global_environment = null;
+var the_console_environment = null;
 var the_empty_environment = [];
 var an_empty_frame = {};
 
@@ -647,26 +648,38 @@ function parse_program(program_string, program_parser, evaluate_callback) {
 	}
 }
 	 
-function driver_loop(program_string, program_parser, finish_callback) {
+function driver_loop(program_string, program_parser, environment, finish_callback) {
 
 	parse_program(program_string, program_parser, function(syntax_tree){
 		if(debug){
 			console.log(JSON.stringify(syntax_tree,null,4));
 		}
 		if (is_tagged_object(syntax_tree,"exit")) return "interpreter completed";
-		var output = evaluate_toplevel(syntax_tree, the_global_environment);
-		finish_callback();
+		var output = evaluate_toplevel(syntax_tree, environment);
+		finish_callback(output);
 	});
 }
 
-function add_constant(name, value){
+function add_constant(name, value) {
 	an_empty_frame[name] = value;
 }
 
-function setup_global_environment(){
+function setup_global_environment() {
 	an_empty_frame = {};
 	the_global_environment = setup_environment();
 	
 	add_constant('null', null);
 	add_constant('pi', 3.141592653589793);
+}
+
+function setup_console_environment() {
+	an_empty_frame = {};
+	the_console_environment = setup_environment();
+	
+	add_constant('null', null);
+	add_constant('pi', 3.141592653589793);
+}
+
+function get_console_environment() {
+	return the_console_environment;
 }

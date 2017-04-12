@@ -120,7 +120,7 @@ a *= 2;		// same as a = a * 2;
 print( a );	// output 10
 ```
 >#### **Caveat** 
->All assignment operations, including increment/decrement operations and compound assignment operations, do not return any value. For example, `i++` can only be an assignment statement instead of a part of an expression.
+>All assignment operations return values, but they are not allowed to be used as any part of expressions. For example, `i++` can only be an assignment statement instead of a part of an expression.
 
 ## Type
 [TODO]

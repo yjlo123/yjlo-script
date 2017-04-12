@@ -44,24 +44,41 @@ $(document).ready(function() {
 	
 	jqconsole.Write('YJLO Script\n', 'console-gray');
 	jqconsole.Write(version+"\n", 'console-gray');
-	jqconsole.SetPromptLabel('  ')
+	jqconsole.Write("Type :help to see available commands.\n", 'console-gray');
+	jqconsole.SetPromptLabel('  ');
+
+	setup_console_environment();
 	var startPrompt = function () {
 		// Start the prompt with history enabled.
 		jqconsole.Prompt(true, function (input) {
 			// Output input with the class jqconsole-output.
 			if (input) {
 				switch (input) {
-					case "clear":
+					case ":ver":
+						jqconsole.Write(version+'\n', 'console-gray');
+						break;
+					case ":help":
+						jqconsole.Write(':ver\n  show version\n:clear\n  clear console\n:reset\n  reset console enviroment\n', 'console-gray');
+						break;
+					case ":clear":
 						jqconsole.Reset();
 						break;
+					case ":reset":
+						setup_console_environment();
+						break;
 					default:
-						jqconsole.Write("=> " + input + '\n', 'console-arrow');
+						driver_loop(input, current_parser, get_console_environment(), function(result){
+							jqconsole.Write("=> " + result + '\n', 'console-arrow');
+							startPrompt();
+							return;
+						});
 				}
 			}
-			// Restart the prompt.
 			startPrompt();
 		});
 	};
+
+	// initial prompt
 	startPrompt();
 });
 
@@ -70,7 +87,7 @@ function exec(){
 	jqconsole.Write("  \n", 'jqconsole-old-prompt');
 	setup_global_environment();
 	var source = myCodeMirror.getValue();
-	driver_loop(source, current_parser, function(){
+	driver_loop(source, current_parser, the_global_environment, function(){
 		//$("#program-result").append('<br/><p class="output-finish">[Finished]</p>');
 		//jqconsole.Write("=> [Finished]\n", 'console-arrow');
 	});
