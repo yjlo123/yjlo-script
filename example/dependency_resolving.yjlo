@@ -2,12 +2,12 @@
    @author Liu Siwei
 
       [A]
-	 /  \
+     /  \
     v    v
    [D]   [B]
     ^   /   \
-	 \ v     v
-	 [C] --> [E]
+     \ v     v
+     [C] --> [E]
 */
 func Node(n) {
 	var name = n;
@@ -56,9 +56,9 @@ func depResolve(node, unresolved){
 	var edges = node.edges;
 	while !$is_empty(edges) {
 		if !isInList($head(edges), resolved) {
-        	if isInList($head(edges), unresolved) {
-            	throw('Circular dependency detected: '
-					  +node.name+' -> '+$head(edges).name);
+			if isInList($head(edges), unresolved) {
+			throw('Circular dependency detected: '
+					+node.name+' -> '+$head(edges).name);
 			}
 			depResolve($head(edges), unresolved);
 		}

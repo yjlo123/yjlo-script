@@ -3,6 +3,10 @@ var make_parse = function () {
 	var next_token;
 	var tokens;
 	var token_nr;
+	
+	var reservedKeywords = ["var", "func", "import", 
+	"if", "else", "switch", "fallthrough", "case", "default",
+	"continue", "break", "while", "do", "for", "in", "by", "return"];
 
 	var new_node = function() {
 		return {};
@@ -21,6 +25,9 @@ var make_parse = function () {
 	};
 
 	var isVarNameToken = function (t) {
+		if (reservedKeywords.indexOf(t.value) != -1){
+			return false;
+		}
 		return t.type === "name";
 	};
 
@@ -169,8 +176,7 @@ var make_parse = function () {
 			var thisNode = expression_nodes_infix[i];
 			if(thisNode.name === '('){
 				temp_stack.push(thisNode);
-			} else if (thisNode.type === 'variable' 
-						|| thisNode.tag === 'application') {
+			} else if (thisNode.type === 'variable' || thisNode.tag === 'application') {
 				expression_nodes_postfix.push(thisNode);
 			} else if (thisNode.type === 'boolean' ) {
 				expression_nodes_postfix.push(thisNode.name==="true" ? true : false);
@@ -426,13 +432,13 @@ var make_parse = function () {
 		} else if (isOpeningBracketToken(token)) {
 			// anonymous function
 		} else {
-			throw new Error("Invalid function definition.");
+			throw new Error("Invalid function name.");
 		}
 
 		advance("(");
 		if (!isClosingBracketToken(token)) {
 			while (true) {
-				if (token.type !== "name") {
+				if (!isVarNameToken(token)) {
 					throw new Error("Expected a parameter name, but '"+token.value+"' found.");
 				}
 				args.push(token.value);
@@ -478,8 +484,8 @@ var make_parse = function () {
 		var a = [], n, t;
 		while (true) {
 			n = token;
-			if (n.type !== "name") {
-				throw new Error("Expected a new variable name, but '" + n.value + "' found.");
+			if (!isVarNameToken(n)) {
+				throw new Error("Expected a valid variable name, but '" + n.value + "' found.");
 			}
 			advance();
 			if (token.value === "=") {
@@ -599,7 +605,7 @@ var make_parse = function () {
 		var n = new_node();
 		n.tag = "for";
 		// variable
-		if (token.type !== "name") {
+		if (!isVarNameToken(token)) {
 			throw new Error("Expected a variable name after for, but '"+token.value+"' found.");
 		}
 		n.variable = new_var_node(token.value, "variable");
