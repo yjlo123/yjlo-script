@@ -3,6 +3,10 @@ var the_console_environment = null;
 var the_empty_environment = [];
 var an_empty_frame = {};
 
+function throwError(line, message) {
+	throw new Error("[line "+ line + "] " + message);
+}
+
 function is_tagged_object(stmt,the_tag) {
 	return stmt 
 			&& typeof stmt === "object" 
@@ -37,10 +41,10 @@ function enclose_by(frame,env) {
 	return pair(frame,env);
 }
 	 
-function lookup_variable_value(variable,env) {
+function lookup_variable_value(stmt, variable, env) {
 	function env_loop(env) {
 		if (is_empty_environment(env))
-			throw new Error("Cannot find variable: "+variable);
+			throwError(stmt.line?stmt.line:"?", "Cannot find variable: "+variable);
 		else if (has_binding_in_frame(variable,first_frame(env)))
 			return first_frame(env)[variable];
 		else return env_loop(enclosing_environment(env));
@@ -58,10 +62,10 @@ function assignment_value(stmt) {
 	return stmt.value;
 }
 	
-function set_variable_value(variable,value,env) {
+function set_variable_value(stmt, variable,value,env) {
 	function env_loop(env) {
 		if (is_empty_environment(env))
-			throw new Error("Cannot find variable: "+variable);
+			throwError(stmt.line?stmt.line:"?", "Cannot find variable: "+variable);
 		else if (has_binding_in_frame(variable,first_frame(env)))
 			add_binding_to_frame(variable,value,first_frame(env));
 		else env_loop(enclosing_environment(env));
@@ -75,12 +79,12 @@ function evaluate_assignment(stmt, env) {
 	var left = stmt.left;
 	if (left && is_application(left)){
 		var member = head(tail(operands(left))).name;
-		set_variable_value(member, 
+		set_variable_value(stmt, member, 
 							value, 
 							function_value_environment(
 								evaluate(head(operands(left)), env)));
 	} else {
-		set_variable_value(assignment_variable(stmt), value, env);
+		set_variable_value(stmt, assignment_variable(stmt), value, env);
 	}
 	return value;
 }
@@ -328,7 +332,7 @@ function function_definition_parent(stmt) {
 function evaluate_function_definition(stmt,env) {
 	if (function_definition_parent(stmt)) {
 		// extends parent
-		var parent = lookup_variable_value(function_definition_parent(stmt), env);
+		var parent = lookup_variable_value(null, function_definition_parent(stmt), env);
 		var parent_env = extend_environment([],[],function_value_environment(parent));
 		evaluate(function_value_body(parent), parent_env);
 		return make_function_value(
@@ -494,7 +498,7 @@ function refer(fun, member) {
 			// evaluate function body to update environment
 			evaluate(function_value_body(fun), func_env);
 		}
-		return lookup_variable_value(member,func_env);
+		return lookup_variable_value(null, member,func_env);
 	} else throw new Error("Unknown function type - REFER: "+fun);
 }
 
@@ -585,7 +589,7 @@ function evaluate(stmt,env) {
 	if (is_self_evaluating(stmt)) 
 		return stmt;
 	else if (is_variable(stmt)) 
-		return lookup_variable_value(variable_name(stmt),env);
+		return lookup_variable_value(stmt, variable_name(stmt),env);
 	else if (is_assignment(stmt)) 
 		return evaluate_assignment(stmt,env);
 	else if (is_var_definition(stmt)) 

@@ -12,11 +12,12 @@ var make_parse = function () {
 		return {};
 	};
 
-	var new_var_node = function(name, type) {
+	var new_var_node = function(name, type, line) {
 		var node = new_node();
 		node.tag = "variable";
 		node.name = name;
 		node.type = type;
+		node.line = line;
 		return node;
 	};
 	
@@ -48,6 +49,14 @@ var make_parse = function () {
 
 	var isClosingBracketToken = function (t) {
 		return t && isOperatorToken(t) && t.value === ")";
+	};
+	
+	var throwError = function (token, message) {
+		throw new Error((token?"[line "+token.line + "] ":"") + message);
+	};
+	
+	var throwTokenError = function (expect, token) {
+		throwError(token, "Expected "+expect+". But '" + token.value + "' found.");
 	};
 
 	var precedence = function(operator) {
@@ -103,7 +112,7 @@ var make_parse = function () {
 		}
 		
 		if (value && token.value !== value) {
-			throw new Error("Expected '" + value + "'. But '"+token.value+"' found.");
+			throwTokenError(value, token);
 		}
 		token_nr = token_nr + 1;
 		token = tokens[token_nr];
@@ -155,15 +164,23 @@ var make_parse = function () {
 			} else if(isVarNameToken(token)) {
 				// variable
 				var is_boolean = (token.value=="true") || (token.value=="false");
-				left_node = new_var_node(token.value, is_boolean ? "boolean" : "variable");
+				left_node = new_var_node(token.value, is_boolean ? "boolean" : "variable", token.line);
 			} else if(isOperatorToken(token)) {
 				// operator
-				left_node = new_var_node(token.value, "operator");
+				left_node = new_var_node(token.value, "operator", token.line);
 			} else {
-				throw new Error("Expected expression. But '" + token.value + "' found.");
+				throwTokenError("expression", token);
 			}
 			expression_nodes_infix.push(left_node);
 			advance();
+		}
+		
+		var expression_length = expression_nodes_infix.length;
+		if (expression_length > 0) {
+			var last_node = expression_nodes_infix[expression_length-1];
+			if (last_node.type === "operator" && last_node.name !== ")"){
+				throwError(token, "Invalid expression.");
+			}
 		}
 
 		// push the rest closing brackets
@@ -175,7 +192,7 @@ var make_parse = function () {
 		
 		// empty expression
 		if (expression_nodes_infix.length === 0) {
-			return new_var_node("null", "variable");
+			return new_var_node("null", "variable", token.line);
 		}
 		
 		// convert in-fix order to post-fix order
@@ -199,7 +216,7 @@ var make_parse = function () {
 				if (temp_stack.length > 0) {
 					temp_stack.pop(); // pop '('
 				} else {
-					throw new Error("Unmatched bracket");
+					throwError(token, "Unmatched bracket");
 				}
 			} else {
 				// operators
@@ -305,6 +322,7 @@ var make_parse = function () {
 				if(token){
 					// Assignment statement
 					var prev_token = token;
+					v.line = token.line;
 					switch (token.value){
 						case "=":
 							advance();
@@ -360,11 +378,11 @@ var make_parse = function () {
 	};
 
 /*===================== FUNC CALL ======================= */
-	var func_call = function(t, operator) {
+	var func_call = function(t) {
 		print("parsing func call. "+t.value);
 		var a = new_node();
 		a.tag = "application";
-		a.operator = operator || new_var_node(t.value);
+		a.operator = new_var_node(t.value, "variable", t.line);
 		var operands = [];
 		advance("(");
 		if (!isClosingBracketToken(token)) {
@@ -398,6 +416,7 @@ var make_parse = function () {
 		
 		var t = new_node();
 		t.tag = "assignment";
+		t.line = left.line;
 		var right_var_node = null;
 		
 		if (left.tag === "application"){
@@ -405,18 +424,18 @@ var make_parse = function () {
 			t.left = left;
 			right_var_node = left;
 		} else if (left.type !== "variable") {
-			throw new Error("Expected a new variable name, but '"+left.value+"' found.");
+			throwTokenError("a variable name", left);
 		} else {
 			// assign to variable
 			t.variable = left.name;
-			right_var_node = new_var_node(left.name, "variable");
+			right_var_node = new_var_node(left.name, "variable", left.line);
 		}
 
 		if (operator){
 			// Compound Assignment
 			var apply_node = {};
 			apply_node.tag = "application";
-			apply_node.operator = new_var_node(operator.slice(0, -1), "operator");
+			apply_node.operator = new_var_node(operator.slice(0, -1), "operator", token.line);
 			apply_node.operands = array_to_list([
 										right_var_node,
 										value || expression()]);
@@ -442,14 +461,14 @@ var make_parse = function () {
 		} else if (isOpeningBracketToken(token)) {
 			// anonymous function
 		} else {
-			throw new Error("Invalid function name.");
+			throwError(token, "Invalid function name.");
 		}
 
 		advance("(");
 		if (!isClosingBracketToken(token)) {
 			while (true) {
 				if (!isVarNameToken(token)) {
-					throw new Error("Expected a parameter name, but '"+token.value+"' found.");
+					throwTokenError("a variable name", token);
 				}
 				args.push(token.value);
 				advance();
@@ -465,7 +484,7 @@ var make_parse = function () {
 			// inheritance
 			advance("extends");
 			if (!isVarNameToken(token)){
-				throw new Error("Expected a function name, but '"+token.value+"' found.");
+				throwTokenError("a variable name", token);
 			}
 			funcbody.parent = token.value;
 			advance(); // parent name
@@ -495,7 +514,7 @@ var make_parse = function () {
 		while (true) {
 			n = token;
 			if (!isVarNameToken(n)) {
-				throw new Error("Expected a valid variable name, but '" + n.value + "' found.");
+				throwTokenError("a variable name", token);
 			}
 			advance();
 			if (token.value === "=") {
@@ -555,14 +574,14 @@ var make_parse = function () {
 				var case_node = new_node();
 				var case_value = [];
 				if(!isConstantToken(token)){
-					throw new Error("Expected a constant value, but '"+token.value+"' encountered.");
+					throwTokenError("a constant value", token);
 				}
 				case_value.push(token.value);
 				advance(); // advance value
 				while (token.value === ",") {
 					advance(",");
 					if(!isConstantToken(token)){
-					throw new Error("Expected a constant value, but '"+token.value+"' encountered.");
+						throwTokenError("a constant value", token);
 					}
 					case_value.push(token.value);
 					advance(); // advance value
@@ -576,7 +595,7 @@ var make_parse = function () {
 				advance(":");
 				n.default = statements();
 			} else {
-				throw new Error("Expected case/default, but '"+token.value+"' encountered.");
+				throwTokenError("'case' or 'default'", token);
 			}
 			
 		}
@@ -616,9 +635,9 @@ var make_parse = function () {
 		n.tag = "for";
 		// variable
 		if (!isVarNameToken(token)) {
-			throw new Error("Expected a variable name after for, but '"+token.value+"' found.");
+			throwTokenError("a variable name", token);
 		}
-		n.variable = new_var_node(token.value, "variable");
+		n.variable = new_var_node(token.value, "variable", token.line);
 		advance();
 		// range
 		n.range = parse_range();
@@ -724,8 +743,8 @@ var make_parse = function () {
 	}
 	
 	function tokenize(source){
-		var program_string_without_comments = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
-		return program_string_without_comments.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
+		//var program_string_without_comments = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
+		return source.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
 	}
 	
 	function loadLibraries(libs, compiled, parse_callback, evaluate_callback) {
@@ -772,7 +791,7 @@ var make_parse = function () {
 		if (syntax_tree) {
 			return syntax_tree;
 		} else {
-			throw new Error("Invalid source code.");
+			throwError(null, "Invalid source code.");
 		}
 		
 	}
@@ -781,7 +800,7 @@ var make_parse = function () {
 		tokens = tokenize(source);
 		
 		if (!tokens || tokens.length === 0) {
-			throw new Error("Empty source code.");
+			throwError(null, "Empty source code.");
 		}
 		
 		/* parse import */
@@ -795,7 +814,7 @@ var make_parse = function () {
 				advance(); // library name
 				advance(";");
 			} else {
-				throw new Error("Invalid library '"+token.value()+"'.");
+				throwError(null, "Invalid library '"+token.value()+"'.");
 			}
 		}
 		tokens = tokens.slice(token_nr);

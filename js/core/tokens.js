@@ -30,6 +30,8 @@ String.prototype.tokens = function (prefix, suffix) {
 	var n;					  // The number value.
 	var q;					  // The quote character.
 	var str;					// The string value.
+	
+	var line = 1;				// The line number
 
 	var result = [];			// An array to hold the results.
 
@@ -40,6 +42,7 @@ String.prototype.tokens = function (prefix, suffix) {
 		return {
 			type: type,
 			value: value,
+			line: line,
 			from: from,
 			to: i,
 			error: function (message, t) {
@@ -72,6 +75,11 @@ String.prototype.tokens = function (prefix, suffix) {
 	c = this.charAt(i);
 	while (c) {
 		from = i;
+
+// increase line number
+		if (c === '\n') {
+			line += 1;
+		}
 
 // Ignore whitespace.
 
@@ -234,7 +242,22 @@ String.prototype.tokens = function (prefix, suffix) {
 			result.push(make('string', str));
 			c = this.charAt(i);
 
-// comment.
+// block comment
+
+		}else if (c === '/' && this.charAt(i + 1) === '*') {
+			i += 2;
+			for (;;) {
+				c = this.charAt(i);
+				if (c === '\n') { line += 1; }
+				if (c === '*' && this.charAt(i + 1) === '/') {
+					i += 2;
+					break;
+				}
+				i += 1;
+			}
+			c = this.charAt(i);
+
+// single line comment
 
 		} else if (c === '/' && this.charAt(i + 1) === '/') {
 			i += 1;
