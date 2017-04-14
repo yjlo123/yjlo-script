@@ -62,7 +62,7 @@ function assignment_value(stmt) {
 	return stmt.value;
 }
 	
-function set_variable_value(stmt, variable,value,env) {
+function set_variable_value(stmt, variable, value, env) {
 	function env_loop(env) {
 		if (is_empty_environment(env))
 			throwError(stmt.line?stmt.line:"?", "Cannot find variable: "+variable);
@@ -279,7 +279,7 @@ function evaluate_for_stmtement_clause(stmt, env) {
 			return null;
 		}
 		// increment
-		set_variable_value(for_variable(stmt).name,
+		set_variable_value(stmt, for_variable(stmt).name,
 						variable_value + increment_value,
 						env);
 		return evaluate_for_stmtement_clause(stmt, env);
