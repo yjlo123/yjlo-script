@@ -44,7 +44,7 @@ function enclose_by(frame,env) {
 function lookup_variable_value(stmt, variable, env) {
 	function env_loop(env) {
 		if (is_empty_environment(env))
-			throwError(stmt.line?stmt.line:"?", "Cannot find variable: "+variable);
+			throwError(stmt&&stmt.line?stmt.line:"?", "Cannot find variable: "+variable);
 		else if (has_binding_in_frame(variable,first_frame(env)))
 			return first_frame(env)[variable];
 		else return env_loop(enclosing_environment(env));
@@ -65,7 +65,7 @@ function assignment_value(stmt) {
 function set_variable_value(stmt, variable, value, env) {
 	function env_loop(env) {
 		if (is_empty_environment(env))
-			throwError(stmt.line?stmt.line:"?", "Cannot find variable: "+variable);
+			throwError(stmt&&stmt.line?stmt.line:"?", "Cannot find variable: "+variable);
 		else if (has_binding_in_frame(variable,first_frame(env)))
 			add_binding_to_frame(variable,value,first_frame(env));
 		else env_loop(enclosing_environment(env));

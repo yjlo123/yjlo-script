@@ -142,8 +142,8 @@ var make_parse = function () {
 			// , ; {
 			&& !/^[,;{]$/.test(token.value)
 			&& token.value !== "="
-			// compound assignment += -= *= /= /.= &= |= ^= <<= >>= >>>=
-			&& !/^([+\-\*\/%&|^]|\/\.|[<>]{2}|[>]{3})=$/.test(token.value)
+			// compound assignment += -= *= /= %=  &= |= ^= /.= **= <<= >>= >>>=
+			&& !/^([+\-\*\/%&|^]|\*\*|\/\.|[<>]{2}|[>]{3})=$/.test(token.value)
 			&& token.value !== "++" && token.value !== "--") {
 			if(isClosingBracketToken(token) && bracket_count === 0) {
 				// end of current expression
