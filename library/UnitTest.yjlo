@@ -1,0 +1,41 @@
+func UnitTest() {
+	var counter = 0;
+	var pass = 0;
+	var all_pass = true;
+
+	func setup(title) {
+		counter = 0;
+		pass = 0;
+		print(" ===== " + title + " ===== ");
+	}
+
+	func printResult() {
+		if counter == pass {
+			print("    === [All passed] === ");
+			return true;
+		} else {
+			print("    === [" + (counter-pass) + " failed] ===");
+			all_pass = false;
+			return false;
+		}
+	}
+
+	func assertEquals (a, b) {
+		counter++;
+		if a == b {
+			print("[" + counter + "]" + " Pass");
+			pass++;
+		} else {
+			print("[" + counter + "]" + " Fail " + "[Expect] " + a +" [Actual] " + b);
+		}
+	}
+
+	func assertTrue(a) {
+		assertEquals(a, true);
+	}
+
+	func assertFalse(a){
+		assertEquals(a, false);
+	}
+	return func(){};
+}
