@@ -289,8 +289,8 @@ function evaluate_for_stmtement_clause(stmt, env) {
 function is_continue_statement(stmt) {
 	return is_tagged_object(stmt,"continue");
 }
-function make_continue_value() {
-	return { tag: "continue_value"};
+function make_continue_value(stmt, env) {
+	return { tag: "continue_value", line: stmt.line };
 }
 function is_continue_value(value) {
 	return is_tagged_object(value,"continue_value");
@@ -299,8 +299,8 @@ function is_continue_value(value) {
 function is_break_statement(stmt) {
 	return is_tagged_object(stmt,"break");
 }
-function make_break_value() {
-	return { tag: "break_value"};
+function make_break_value(stmt, env) {
+	return { tag: "break_value", line: stmt.line };
 }
 function is_break_value(value) {
 	return is_tagged_object(value,"break_value");
@@ -309,8 +309,8 @@ function is_break_value(value) {
 function is_fallthrough_statement(stmt) {
 	return is_tagged_object(stmt,"fallthrough");
 }
-function make_fallthrough_value() {
-	return { tag: "fallthrough_value"};
+function make_fallthrough_value(stmt, env) {
+	return { tag: "fallthrough_value", line: stmt.line };
 }
 function is_fallthrough_value(value) {
 	return is_tagged_object(value,"fallthrough_value");
@@ -439,7 +439,7 @@ function extend_environment(vars,vals,base_env) {
 	if (length(vars) >= length(vals))
 		return enclose_by(make_frame(vars,vals),base_env);
 	else if (length(vars) < length(vals))
-		throw new Error("Too many arguments supplied: "+vars+" "+vals);
+		throwError("?", "Too many arguments supplied: expect "+length(vars)+", but "+length(vals)+" given");
 }
 	 
 function is_return_statement(stmt) {
@@ -449,8 +449,8 @@ function return_statement_expression(stmt) {
 	return stmt.expression;
 }
 	
-function make_return_value(content) {
-	return { tag: "return_value", content: content };
+function make_return_value(line, content) {
+	return { tag: "return_value", content: content, line: line};
 }
 function is_return_value(value) {
 	return is_tagged_object(value,"return_value");
@@ -470,7 +470,9 @@ function apply(fun, args) {
 											function_value_environment(fun)));
 		if (is_return_value(result)) 
 			return return_value_content(result);
-	} else throw new Error("Unknown function type - APPLY: "+fun);
+	} else {
+		throwError("?", "Unknown function type - APPLY: " + fun);
+	}
 }
 
 function apply_logic(fun_raw, args, env) {
@@ -490,7 +492,7 @@ function is_reference(stmt) {
 }
 function refer(fun, member) {
 	if (member.charAt(0) === "_"){
-		throw new Error("Referencing private members is not allowed.");
+		throwError("?", "Referencing private members is not allowed.");
 	}
 	if (is_compound_function_value(fun)) {
 		var func_env = extend_environment([],[],function_value_environment(fun));
@@ -499,7 +501,9 @@ function refer(fun, member) {
 			evaluate(function_value_body(fun), func_env);
 		}
 		return lookup_variable_value(null, member,func_env);
-	} else throw new Error("Unknown function type - REFER: "+fun);
+	} else {
+		throwError("?", "Unknown function type - REFER: "+fun);
+	}
 }
 
 function list_of_values(exps,env) {
@@ -577,11 +581,11 @@ function setup_environment() {
 function evaluate_toplevel(stmt,env) {
 	var value = evaluate(stmt,env);
 	if (is_return_value(value))
-		throw new Error("return not allowed outside of function definition.");
+		throwError(value.line, "return not allowed outside of function definition.");
 	if (is_continue_value(value))
-		throw new Error("Invalid continue statement.");
+		throwError(value.line, "Invalid continue statement.");
 	if (is_break_value(value))
-		throw new Error("Invalid break statement.");
+		throwError(value.line, "Invalid break statement.");
 	else return value;
 }
 
@@ -634,10 +638,12 @@ function evaluate(stmt,env) {
 		} else {
 			return apply(evaluate(optr,env), list_of_values(operands(stmt),env));
 		}
-	} else if (is_return_statement(stmt))
-		return make_return_value(
+	} else if (is_return_statement(stmt)) {
+		return make_return_value(stmt.line, 
 					 evaluate(return_statement_expression(stmt), env));
-	else throw new Error("Unknown expression type - - evaluate: "+stmt);
+	} else {
+		throwError("?", "Unknown expression type - evaluate: "+stmt);
+	}
 }
 
 function parse_program(program_string, program_parser, evaluate_callback) {
@@ -668,20 +674,23 @@ function add_constant(name, value) {
 	an_empty_frame[name] = value;
 }
 
+function initConstantValues() {
+	add_constant('null', null);
+	add_constant('PI', 3.141592653589793);
+}
+
 function setup_global_environment() {
 	an_empty_frame = {};
 	the_global_environment = setup_environment();
 	
-	add_constant('null', null);
-	add_constant('pi', 3.141592653589793);
+	initConstantValues();
 }
 
 function setup_console_environment() {
 	an_empty_frame = {};
 	the_console_environment = setup_environment();
 	
-	add_constant('null', null);
-	add_constant('pi', 3.141592653589793);
+	initConstantValues();
 }
 
 function get_console_environment() {
