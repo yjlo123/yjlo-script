@@ -521,14 +521,17 @@ var make_parse = function () {
 			if (!isVarNameToken(n)) {
 				throwTokenError("a variable name", token);
 			}
-			advance();
+			advance(); // var name
+			t = new_node();
+			t.tag = "var_definition";
+			t.variable = n.value;
 			if (token.value === "=") {
-				t = new_node();
-				advance();
-				t.variable = n.value;
+				advance("=");
 				t.value = expression();
-				
-				t.tag = "var_definition";
+				a.push(t);
+			} else {
+				// default initial value
+				t.value = new_var_node("null", "variable", n.line);
 				a.push(t);
 			}
 			if (token.value !== ",") {
@@ -537,7 +540,7 @@ var make_parse = function () {
 			advance(",");
 		}
 		advance(";");
-		return a.length === 0 ? null : a.length === 1 ? a[0] : a;
+		return a.length === 0 ? null : array_to_list(a);
 	};
 
 /*===================== IF ======================= */
