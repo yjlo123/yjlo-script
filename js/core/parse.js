@@ -64,42 +64,45 @@ var make_parse = function () {
 	var precedence = function(operator) {
 		switch(operator){
 		case ".": // reference
-			return 13;
+			return 14;
 		case "**": // power
-			return 12;
+			return 13;
 		case "_-": // negative
 		case "_!": // not
 		case "_~":
-			return 11;
+			return 12;
 		case "*":
 		case "/":
 		case "/.":
 		case "%":
-			return 10;
+			return 11;
 		case "+":
 		case "-":
-			return 9;
+			return 10;
 		case "<<":
 		case ">>":
 		case ">>>":
-			return 8;
+			return 9;
 		case "<":
 		case "<=":
 		case ">":
 		case ">=":
-			return 7;
+			return 8;
 		case "==":
 		case "!=":
-			return 6;
+			return 7;
 		case "&":
-			return 5;
+			return 6;
 		case "^":
-			return 4;
+			return 5;
 		case "|":
-			return 3;
+			return 4;
 		case "&&":
-			return 2;
+			return 3;
 		case "||":
+			return 2;
+		case "?":
+		case ":":
 			return 1;
 		default:
 			return 0;
@@ -253,11 +256,23 @@ var make_parse = function () {
 			if (expression_nodes_postfix[i].type === 'operator' || expression_nodes_postfix[i].type === 'reference'){
 				var apply_node = {};
 				var operands = [];
+				
+				if (expression_nodes_postfix[i].name === "?") {
+					// ternary operator, wait for one more operand
+					continue;
+				}
+				
 				operands.unshift(tree_stack.pop());
 				if (expression_nodes_postfix[i].name.charAt(0) !== '_'){
 					// not a unary operator
 					operands.unshift(tree_stack.pop());
 				}
+				
+				if (expression_nodes_postfix[i].name === ":") {
+					// ternary operator, pop third operand
+					operands.unshift(tree_stack.pop());
+				}
+				
 				apply_node.tag = "application";
 				apply_node.operator = expression_nodes_postfix[i];
 				apply_node.operands = array_to_list(operands);

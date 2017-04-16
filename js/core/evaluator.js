@@ -487,6 +487,21 @@ function apply_logic(fun_raw, args, env) {
 	return apply_in_underlying_javascript(primitive_implementation(fun), arg_list);
 }
 
+function apply_ternary(fun_raw, args, env) {
+	if (length(args) !== 3) {
+		throwError("?", "Invalid conditional expression");
+	}
+	var condition = head(args);
+	var expTrue = head(tail(args));
+	var expFalse = head(tail(tail(args)));
+	
+	if (evaluate(condition, env)) {
+		return evaluate(expTrue, env);
+	} else {
+		return evaluate(expFalse, env);
+	}
+}
+
 function is_reference(stmt) {
 	return is_tagged_object(stmt,"reference");
 }
@@ -554,7 +569,7 @@ var primitive_functions = {
 		"_!": function(x) { return ! x; }, // not
 		"&&": function(x,y) { return x && y; },
 		"||": function(x,y) { return x || y; },
-
+		
 		"&": function(x,y) { return x & y; },
 		"|": function(x,y) { return x | y; },
 		"_~": function(x) { return ~x; }, // NOT
@@ -635,6 +650,9 @@ function evaluate(stmt,env) {
 			} else {
 				return refer(evaluate(fun,env), member.name);
 			}
+		} else if (optr.name === ":") {
+			// ternary operator
+			return apply_ternary(optr, operands(stmt), env);
 		} else {
 			return apply(evaluate(optr,env), list_of_values(operands(stmt),env));
 		}

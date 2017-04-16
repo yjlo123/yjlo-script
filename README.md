@@ -122,11 +122,26 @@ print( a );	// output 10
 >#### **Caveat** 
 >All assignment operations return values, but they are not allowed to be used as any part of expressions. For example, `i++` can only be an assignment statement instead of a part of an expression.
 
+
+### Conditional (ternary) Operator
+```
+condition ? expr1 : expr2 
+```
+If condition is true, the operator returns the value of expr1; otherwise, it returns the value of expr2
+
+```swift
+var a = 2;
+var b = a*2 > 5 ? a : 5;	// a*2 > 5 is false => b = 5
+print(b < 10 ? "A" : "B");	// b < 10 is true => print "A"
+
+// output A
+```
+
 ## Type
 [TODO]
 
 ## Function
-Functions can be passed as function parameters or returned by a function. A functions is only visible after its definition.
+Functions can be passed as function parameters or returned by a function. A function is only visible after its definition.
 ```swift
 func foo() {
 	var a = 5;
