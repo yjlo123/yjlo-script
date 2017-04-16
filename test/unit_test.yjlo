@@ -133,10 +133,8 @@ func main() {
 	testComparision();
 	testAssignment();
 	print();
-	if (ut.all_pass)
-		print("[Success]");
-	else
-		print("[Failed]");
+	
+	print(ut.all_pass?"[Success]":"[Failed]");
 }
 
 main();
