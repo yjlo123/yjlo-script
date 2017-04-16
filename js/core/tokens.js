@@ -20,6 +20,13 @@
 // will match any of these:
 //	  <=  >>  >>>  <>  >=  +: -: &: &&: &&
 
+/**
+ * Modified by Liu Siwei
+ * Modification includs:
+ *   add line number to tokens
+ *   support block comments
+ *   support names start with '_' and '$'
+ */
 
 
 String.prototype.tokens = function (prefix, suffix) {
