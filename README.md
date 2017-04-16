@@ -497,7 +497,7 @@ func Circle() extends Shape {
 	setName("Circle");
 	var _radius = 1;
 	func setRadius(radius) { _radius = radius; }
-	func getArea() { return $round(pi * _radius ** 2, 2); }
+	func getArea() { return $round(PI * _radius ** 2, 2); }
 	return func(){};
 }
 

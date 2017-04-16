@@ -409,6 +409,7 @@ var make_parse = function () {
 	var return_stmt = function() {
 		print("parsing return. "+token.value);
 		var n = new_node();
+		n.line = token.line;
 		n.tag = "return_statement";
 		n.expression = expression();
 		advance(";");
@@ -712,6 +713,7 @@ var make_parse = function () {
 	var continue_stmt = function() {
 		print("parsing continue. "+token.value);
 		var n = new_node();
+		n.line = token.line;
 		n.tag = "continue";
 		advance(";");
 		return n;
@@ -721,6 +723,7 @@ var make_parse = function () {
 	var break_stmt = function() {
 		print("parsing break. "+token.value);
 		var n = new_node();
+		n.line = token.line;
 		n.tag = "break";
 		advance(";");
 		return n;
@@ -730,6 +733,7 @@ var make_parse = function () {
 	var fallthrough_stmt = function() {
 		print("parsing fallthrough. "+token.value);
 		var n = new_node();
+		n.line = token.line;
 		n.tag = "fallthrough";
 		advance(";");
 		return n;
