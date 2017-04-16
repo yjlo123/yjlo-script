@@ -1,4 +1,6 @@
 var make_parse = function () {
+	var sources;
+	var loadingQueue;
 	var token;
 	var next_token;
 	var tokens;
@@ -26,7 +28,7 @@ var make_parse = function () {
 		node.tag = "constant";
 		node.value = value;
 		return node;
-	}
+	};
 
 	var isConstantToken = function (t) {
 		return t.type === "string" || t.type === "number";
@@ -120,6 +122,7 @@ var make_parse = function () {
 		return token;
 	};
 
+/*===================== EXPRESSION ======================= */
 	var expression = function () {
 		print("parsing expression: "+token.value);
 
@@ -266,6 +269,7 @@ var make_parse = function () {
 		return tree_stack[0];
 	};
 
+/*===================== STATEMENT ======================= */
 	var statement = function () {
 		var n = token, v;
 
@@ -357,6 +361,7 @@ var make_parse = function () {
 		return v;
 	};
 
+/*===================== STATEMENTS ======================= */
 	var statements = function () {
 		print("parsing statements.");
 		var stmts = [], stmt;
@@ -727,7 +732,7 @@ var make_parse = function () {
 		return n;
 	};
 
-/* helper functions */
+/* ================= helper functions ============ */
 	function print(msg){
 		if(debug){
 			console.log(msg);
@@ -741,73 +746,34 @@ var make_parse = function () {
 		}
 		return lst;
 	}
-	
+/* =============  end of helper functions =========== */
+
 	function tokenize(source){
-		//var program_string_without_comments = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
+		// var program_string_without_comments 
+		// = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
 		return source.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
 	}
+
+	var newSourceObj = function(name) {
+		var obj = {};
+		obj.name = name; // string
+		obj.tokens = []; // array
+		obj.dependency = null; // list
+		return obj;
+	};
 	
-	function loadLibraries(libs, compiled, parse_callback, evaluate_callback) {
-		if (is_empty(libs)) {
-			var lib_tokens = tokenize(compiled);
-			tokens = lib_tokens.concat(tokens);
-			//print(tokens)
-			try {
-				evaluate_callback(parse_callback());
-			} catch (error) {
-				if (debug) {
-					console.error(error);
-				} else {
-					jqconsole.Write(error.message + '\n', 'console-error');
-				}
-			}
-			return true;
-		}
-		
-		$.ajax({
-			url: "library/"+head(libs)+".yjlo",
-			dataType: 'text',
-			type: 'GET'
-		}).done(function(data){
-			loadLibraries(tail(libs), compiled+" "+data, parse_callback, evaluate_callback);
-		}).fail(function(){
-			var err_msg = "Importing '"+head(libs)+"' failed.";
-			jqconsole.Write(err_msg + '\n', 'console-error');
-			//$("#program-result").append('<p class="output-error">'+err_msg.replace(/\n/g, "<br />")+'</p>');
-		});
-	}
-
-	function startParsing() {
-		print("start parsing.");
-		token_nr = 0;
-		token = tokens[token_nr];
-		next_token = tokens[token_nr+1];
-		var syntax_tree = statements();
-		
-		// Finished parsing, clear output
-		// prepare for evaluation output
-		//$("#program-result").empty();
-		
-		if (syntax_tree) {
-			return syntax_tree;
-		} else {
-			throwError(null, "Invalid source code.");
-		}
-		
-	}
-
-	return function (source, evaluate_callback) {
+	var processSource = function(source, name) {
 		tokens = tokenize(source);
-		
 		if (!tokens || tokens.length === 0) {
 			throwError(null, "Empty source code.");
 		}
+		var thisSourceObj = newSourceObj(name);
 		
-		/* parse import */
+		// parse imports
 		token_nr = 0;
 		token = tokens[token_nr];
-		var libs = list(); //list("Stack", "LinkedList");
-		while (token.value === "import") {
+		var libs = list();
+		while (token && token.value === "import") {
 			advance();
 			if (token && isVarNameToken(token)) {
 				libs = pair(token.value, libs);
@@ -817,7 +783,134 @@ var make_parse = function () {
 				throwError(null, "Invalid library '"+token.value()+"'.");
 			}
 		}
-		tokens = tokens.slice(token_nr);
-		loadLibraries(libs, "", startParsing, evaluate_callback);
+		thisSourceObj.dependency = libs;
+		thisSourceObj.tokens = tokens.slice(token_nr);
+		return thisSourceObj;
+	};
+	
+	var startParsing = function() {
+		print("start parsing.");
+		
+		token_nr = 0;
+		token = tokens[token_nr];
+		next_token = tokens[token_nr+1];
+		var syntax_tree = statements();
+		
+		// Finished parsing
+		if (syntax_tree) {
+			return syntax_tree;
+		} else {
+			throwError(null, "Invalid source code.");
+		}
+	};
+	
+	var loadSources = function(evaluate_callback) {
+		var nextSourceName = head(loadingQueue);
+		
+		$.ajax({
+			url: "library/" + nextSourceName + ".yjlo",
+			dataType: 'text',
+			type: 'GET'
+		}).done(function(data){
+			if (is_empty(loadingQueue)) {
+				return;
+			}
+			loadingQueue = tail(loadingQueue);
+			var thisSourceObj = processSource(data, nextSourceName);
+			sources.push(thisSourceObj);
+			
+			// add new dependencies to queue
+			var newDependency = thisSourceObj.dependency;
+			while (!is_empty(newDependency)) {
+				loadingQueue = pair(head(newDependency), loadingQueue);
+				newDependency = tail(newDependency);
+			}
+			
+			if(!is_empty(loadingQueue)){
+				// load next
+				loadSources(evaluate_callback);
+			}else{
+				// finished all loading
+				tokens = resolveDependency();
+				try {
+					evaluate_callback(startParsing());
+				} catch (error) {
+					if (debug) {
+						console.error(error);
+					} else {
+						jqconsole.Write(error.message + '\n', 'console-error');
+					}
+				}
+			}
+		}).fail(function(){
+			throwError(null, "Importing '" + nextSourceName + "' failed.");
+		});
+	};
+	
+	/* Resolve dependencies in sources
+	 * return concatenated tokens
+	 */
+	var resolveDependency = function() {
+		var dependencyNode = function(data) {
+			this.data = data;
+			this.dependency = [];
+		};
+		
+		// build dependency graph
+		var dependencyGraph = {};
+		for (var i in sources) {
+			if (!dependencyGraph.hasOwnProperty(sources[i].name)){
+				dependencyGraph[sources[i].name] = new dependencyNode(sources[i]);
+				dependencyGraph[sources[i].name].dependency = sources[i].dependency;
+			}
+		}
+		
+		var resolve = function (node, unresolved){
+			unresolved.push(node);
+			var dependencies = dependencyGraph[node].dependency;
+			while (!is_empty(dependencies)) {
+				var edge = head(dependencies);
+				if (resolved.indexOf(edge) === -1) {
+					if (unresolved.indexOf(edge) !== -1) {
+						throwError(null, 'Circular dependency detected: '+node+' -> '+edge);
+					}
+					resolve(edge, unresolved);
+				}
+				dependencies = tail(dependencies);
+			}
+			resolved.push(node);
+			// remove from unresolved
+			var index = unresolved.indexOf(node);
+			if (index > -1) {
+				unresolved.splice(index, 1);
+			}
+		};
+		var resolved = [];
+		resolve("self", []);
+
+		var resolvedTokens = [];
+		for (var i in resolved){
+			// append source tokens
+			resolvedTokens = resolvedTokens.concat(dependencyGraph[resolved[i]].data.tokens);
+		}
+		return resolvedTokens;
+	};
+
+	return function (source, evaluate_callback) {
+		// current source code is identified as "self"
+		var selfSourceObj = processSource(source, "self");
+		tokens = selfSourceObj.tokens;
+		
+		sources = [];
+		loadingQueue = list();
+		loadingQueue = selfSourceObj.dependency;
+		sources.push(selfSourceObj);
+		
+		if (length(loadingQueue) === 0) {
+			// no library imported
+			evaluate_callback(startParsing());
+		} else {
+			loadSources(evaluate_callback);
+		}
 	};
 };
