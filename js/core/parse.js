@@ -733,13 +733,21 @@ var make_parse = function () {
 	};
 
 /* ================= helper functions ============ */
-	function print(msg){
-		if(debug){
+	function print(msg) {
+		if (debug) {
 			console.log(msg);
 		}
 	}
 	
-	function array_to_list(arr){
+	function outputError(error) {
+		if (debug) {
+			console.error(error);
+		} else {
+			jqconsole.Write(error.message + '\n', 'console-error');
+		}
+	}
+	
+	function array_to_list(arr) {
 		var lst = list();
 		for(var i = arr.length-1; i >= 0; i--){
 			lst = pair(arr[i], lst);
@@ -835,11 +843,7 @@ var make_parse = function () {
 				try {
 					evaluate_callback(startParsing());
 				} catch (error) {
-					if (debug) {
-						console.error(error);
-					} else {
-						jqconsole.Write(error.message + '\n', 'console-error');
-					}
+					outputError(error);
 				}
 			}
 		}).fail(function(){
@@ -908,8 +912,13 @@ var make_parse = function () {
 		
 		if (length(loadingQueue) === 0) {
 			// no library imported
-			evaluate_callback(startParsing());
+			try {
+				evaluate_callback(startParsing());
+			} catch (error) {
+				outputError(error);
+			}
 		} else {
+			// load libraries and evaluate
 			loadSources(evaluate_callback);
 		}
 	};
