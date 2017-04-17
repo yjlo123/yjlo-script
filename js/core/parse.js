@@ -6,9 +6,11 @@ var make_parse = function () {
 	var tokens;
 	var token_nr;
 	
-	var reservedKeywords = ["var", "func", "import", "true", "false", "null",
+	var reservedKeywords = ["var", "func", "import",
 	"if", "else", "switch", "fallthrough", "case", "default",
 	"continue", "break", "while", "do", "for", "in", "by", "return"];
+
+	var reservedValues = ["true", "false", "null"];
 
 	var new_node = function() {
 		return {};
@@ -127,7 +129,7 @@ var make_parse = function () {
 /*===================== EXPRESSION ======================= */
 	var expression = function () {
 		print("parsing expression: "+token.value);
-
+		
 		var left_node;
 		var expression_nodes_infix = [];
 		var bracket_count = 0;
@@ -432,7 +434,7 @@ var make_parse = function () {
 
 /*===================== ASSIGN ======================= */
 	var assign = function(left, operator, value) {
-		print("parsing assign. " + token.value);
+		print("parsing assign. " + left.name);
 		
 		var t = new_node();
 		t.tag = "assignment";
@@ -455,7 +457,7 @@ var make_parse = function () {
 			// Compound Assignment
 			var apply_node = {};
 			apply_node.tag = "application";
-			apply_node.operator = new_var_node(operator.slice(0, -1), "operator", token.line);
+			apply_node.operator = new_var_node(operator.slice(0, -1), "operator", left.line);
 			apply_node.operands = array_to_list([
 										right_var_node,
 										value || expression()]);
