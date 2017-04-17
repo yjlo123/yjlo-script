@@ -460,9 +460,9 @@ function return_value_content(value) {
 }
  
 function apply(fun, args) {
-	if (is_primitive_function(fun))
+	if (is_primitive_function(fun)) {
 		return apply_primitive_function(fun, args);
-	else if (is_compound_function_value(fun)) {
+	} else if (is_compound_function_value(fun)) {
 		var result =
 			evaluate(function_value_body(fun),
 						extend_environment(function_value_parameters(fun),
@@ -537,7 +537,9 @@ var primitive_functions = {
 		
 		length: length,
 		display: display,
-		print: print,
+		"put": _put,
+		"print": _print,
+		"input": _input,
 		newline: newline,
 		runtime: runtime,
 

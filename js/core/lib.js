@@ -142,16 +142,16 @@ function _char_code(char) {
 }
 
 /*  UI Output */
-function print() {
+function _process_output(args) {
 	//window.latestConsole.display(x);
 	//x = x+"";
 	//x = x.replace(/(?:\r\n|\r|\n)/g, '<br />');
 	
 	var output = "";
 	
-	for (var i = 0; i < arguments.length; i++){
-		var arg = arguments[i];
-		if (arguments[i] && is_list(arguments[i])){
+	for (var i = 0; i < args.length; i++){
+		var arg = args[i];
+		if (args[i] && is_list(args[i])){
 			// print list
 			output += "[";
 			while (!is_empty(arg)){
@@ -169,10 +169,29 @@ function print() {
 			output += arg;
 		}
 	}
-	
-	//$("#program-result").append("<pre>"+output+"</pre>");
-	jqconsole.Write(output + '\n', 'console-default');
-	return undefined;
+	return output;
+}
+
+function _put(){
+	var output_value = _process_output(arguments);
+	jqconsole.Write(output_value, 'console-default');
+}
+
+function _print(){
+	var output_value = _process_output(arguments);
+	jqconsole.Write(output_value + '\n', 'console-default');
+}
+
+function _input(message, value, show_in_console) {
+	var input_value = prompt(message, value||"");
+	if (show_in_console !== false){
+		jqconsole.Write(input_value + '\n', 'jqconsole-old-input');
+	}
+	return input_value;
+	/*
+	jqconsole.Input(function(input) {
+		//jqconsole.Write("=> " + input + '\n', 'console-arrow');
+	});*/
 }
 
 function escapeHTML(s) { 
