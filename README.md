@@ -19,6 +19,17 @@ sum2
 Hello_World
 isValid
 ```
+Declare a variable with an initial value:
+```swift
+var myVar = "Hello";
+```
+
+Declare multiple variables in one line:
+```swift
+var a = 0, b = "abc", c;
+```
+
+All variable's default value is `null` if the initial value is not given.
 
 ### Scope
 Unlike JavaScript (ES5 and older versions), **YJLO Script** is block-scoped. Every pair of braces `{}` defines a new scope. Local variables declared in a scope are visible to its own scope as well as all sub-scopes, but invisible to its parent-scopes.
@@ -127,7 +138,7 @@ print( a );	// output 10
 ```
 condition ? expr1 : expr2 
 ```
-If condition is true, the operator returns the value of expr1; otherwise, it returns the value of expr2
+If `condition` is true, the operator returns the value of `expr1`; otherwise, it returns the value of `expr2`.
 
 ```swift
 var a = 2;
