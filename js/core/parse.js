@@ -6,7 +6,7 @@ var make_parse = function () {
 	var tokens;
 	var token_nr;
 	
-	var reservedKeywords = ["var", "func", "import", 
+	var reservedKeywords = ["var", "func", "import", "true", "false", "null",
 	"if", "else", "switch", "fallthrough", "case", "default",
 	"continue", "break", "while", "do", "for", "in", "by", "return"];
 
@@ -111,8 +111,7 @@ var make_parse = function () {
 
 	var advance = function (value) {
 		if (token_nr >= tokens.length) {
-			token = {};
-			token.value = "(end)";
+			token = null;
 			return;
 		}
 		
@@ -532,7 +531,7 @@ var make_parse = function () {
 	var var_def = function() {
 		print("parsing var def. " + token.value);
 		var a = [], n, t;
-		while (true) {
+		while (token) {
 			n = token;
 			if (!isVarNameToken(n)) {
 				throwTokenError("a variable name", token);
@@ -541,7 +540,7 @@ var make_parse = function () {
 			t = new_node();
 			t.tag = "var_definition";
 			t.variable = n.value;
-			if (token.value === "=") {
+			if (token && token.value === "=") {
 				advance("=");
 				t.value = expression();
 				a.push(t);
@@ -550,7 +549,7 @@ var make_parse = function () {
 				t.value = new_var_node("null", "variable", n.line);
 				a.push(t);
 			}
-			if (token.value !== ",") {
+			if (token && token.value !== ",") {
 				break;
 			}
 			advance(",");
