@@ -1,71 +1,80 @@
 /* The console container element */
 #console {
-    height: 100%;
-    position:relative;
-    margin: 0 auto;
+	height: 100%;
+	position:relative;
+	margin: 0 auto;
 	font-size: 15px;
 }
 /* The inner console element. */
 .jqconsole {
-    padding: 10px 10px 10px 15px;
+	padding: 10px 10px 10px 15px;
 	white-space: -moz-pre-wrap;
-    white-space: -o-pre-wrap;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+	white-space: -o-pre-wrap;
+	white-space: pre-wrap;
+	word-wrap: break-word;
 }
 .ui-layout-east {
-    background-color: #111;
-    padding: 0px;
+	background-color: #111;
+	padding: 0px;
 }
 
 /* The cursor. */
 .jqconsole-cursor {
-    background-color: gray;
+	background-color: gray;
 }
 /* The cursor color when the console looses focus. */
 .jqconsole-blurred .jqconsole-cursor {
-    background-color: #666;
+	background-color: #666;
 }
 
 /* The current prompt text color */
 .jqconsole-prompt {
-    color: #fc0;
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+Cjxzdmcgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiA8IS0tIENyZWF0ZWQgd2l0aCBTVkctZWRpdCAtIGh0dHA6Ly9zdmctZWRpdC5nb29nbGVjb2RlLmNvbS8gLS0+CiA8Zz4KICA8dGl0bGU+TGF5ZXIgMTwvdGl0bGU+CiAgPHJlY3QgZmlsbD0iI2ZmYzkwZSIgc3Ryb2tlPSIjZmY3ZjAwIiBzdHJva2Utd2lkdGg9IjAiIHg9IjAuMiIgeT0iMC4yIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGlkPSJzdmdfMSIvPgogIDxyZWN0IGlkPSJzdmdfMyIgZmlsbD0iI2ZmYzkwZSIgc3Ryb2tlPSIjZmY3ZjAwIiBzdHJva2Utd2lkdGg9IjAiIHg9IjQ5LjgwMDAwMiIgeT0iNTAuMDAwMDAyIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiLz4KICA8cmVjdCBpZD0ic3ZnXzQiIGZpbGw9IiNmZmM5MGUiIHN0cm9rZT0iI2ZmN2YwMCIgc3Ryb2tlLXdpZHRoPSIwIiB4PSIwLjE5OTk5OSIgeT0iOTkuNiIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIi8+CiA8L2c+Cjwvc3ZnPg==) no-repeat;
-    background-size: 6px 9px;
-    background-position: 2px 4px;
+	color: #fc0;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+Cjxzdmcgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiA8IS0tIENyZWF0ZWQgd2l0aCBTVkctZWRpdCAtIGh0dHA6Ly9zdmctZWRpdC5nb29nbGVjb2RlLmNvbS8gLS0+CiA8Zz4KICA8dGl0bGU+TGF5ZXIgMTwvdGl0bGU+CiAgPHJlY3QgZmlsbD0iI2ZmYzkwZSIgc3Ryb2tlPSIjZmY3ZjAwIiBzdHJva2Utd2lkdGg9IjAiIHg9IjAuMiIgeT0iMC4yIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGlkPSJzdmdfMSIvPgogIDxyZWN0IGlkPSJzdmdfMyIgZmlsbD0iI2ZmYzkwZSIgc3Ryb2tlPSIjZmY3ZjAwIiBzdHJva2Utd2lkdGg9IjAiIHg9IjQ5LjgwMDAwMiIgeT0iNTAuMDAwMDAyIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiLz4KICA8cmVjdCBpZD0ic3ZnXzQiIGZpbGw9IiNmZmM5MGUiIHN0cm9rZT0iI2ZmN2YwMCIgc3Ryb2tlLXdpZHRoPSIwIiB4PSIwLjE5OTk5OSIgeT0iOTkuNiIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIi8+CiA8L2c+Cjwvc3ZnPg==) no-repeat;
+	background-size: 8px 12px;
+	background-position: 2px 2px;
 }
 
 /* The command history */
 .jqconsole-old-prompt {
-    color: #ff9028;
-    font-weight: normal;
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+Cjxzdmcgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiA8IS0tIENyZWF0ZWQgd2l0aCBTVkctZWRpdCAtIGh0dHA6Ly9zdmctZWRpdC5nb29nbGVjb2RlLmNvbS8gLS0+CiA8Zz4KICA8dGl0bGU+TGF5ZXIgMTwvdGl0bGU+CiAgPHJlY3QgZmlsbD0iI2ZmN2YwMCIgc3Ryb2tlPSIjZmY3ZjAwIiBzdHJva2Utd2lkdGg9IjAiIHg9IjAuMiIgeT0iMC4yIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGlkPSJzdmdfMSIvPgogIDxyZWN0IGlkPSJzdmdfMyIgZmlsbD0iI2ZmN2YwMCIgc3Ryb2tlPSIjZmY3ZjAwIiBzdHJva2Utd2lkdGg9IjAiIHg9IjQ5LjgwMDAwMiIgeT0iNTAuMDAwMDAyIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiLz4KICA8cmVjdCBpZD0ic3ZnXzQiIGZpbGw9IiNmZjdmMDAiIHN0cm9rZT0iI2ZmN2YwMCIgc3Ryb2tlLXdpZHRoPSIwIiB4PSIwLjE5OTk5OSIgeT0iOTkuNiIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIi8+CiA8L2c+Cjwvc3ZnPg==) no-repeat;
-    background-size: 6px 9px;
-    background-position: 2px 4px;
+	color: #ff9028;
+	font-weight: normal;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+Cjxzdmcgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiA8IS0tIENyZWF0ZWQgd2l0aCBTVkctZWRpdCAtIGh0dHA6Ly9zdmctZWRpdC5nb29nbGVjb2RlLmNvbS8gLS0+CiA8Zz4KICA8dGl0bGU+TGF5ZXIgMTwvdGl0bGU+CiAgPHJlY3QgZmlsbD0iI2ZmN2YwMCIgc3Ryb2tlPSIjZmY3ZjAwIiBzdHJva2Utd2lkdGg9IjAiIHg9IjAuMiIgeT0iMC4yIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGlkPSJzdmdfMSIvPgogIDxyZWN0IGlkPSJzdmdfMyIgZmlsbD0iI2ZmN2YwMCIgc3Ryb2tlPSIjZmY3ZjAwIiBzdHJva2Utd2lkdGg9IjAiIHg9IjQ5LjgwMDAwMiIgeT0iNTAuMDAwMDAyIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiLz4KICA8cmVjdCBpZD0ic3ZnXzQiIGZpbGw9IiNmZjdmMDAiIHN0cm9rZT0iI2ZmN2YwMCIgc3Ryb2tlLXdpZHRoPSIwIiB4PSIwLjE5OTk5OSIgeT0iOTkuNiIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIi8+CiA8L2c+Cjwvc3ZnPg==) no-repeat;
+	background-size: 8px 12px;
+	background-position: 2px 2px;
 }
 /* The text color when in input mode. */
 .jqconsole-input {
-    color: #dd0;
+	color: #4fc3f7;
+	font-weight: normal;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+Cjxzdmcgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiA8IS0tIENyZWF0ZWQgd2l0aCBTVkctZWRpdCAtIGh0dHA6Ly9zdmctZWRpdC5nb29nbGVjb2RlLmNvbS8gLS0+CiA8Zz4KICA8dGl0bGU+TGF5ZXIgMTwvdGl0bGU+CiAgPHJlY3QgaWQ9InN2Z18xIiBoZWlnaHQ9IjUwIiB3aWR0aD0iNTAiIHk9IjAuMiIgeD0iMC4yIiBzdHJva2Utd2lkdGg9IjAiIHN0cm9rZT0iI2ZmN2YwMCIgZmlsbD0iIzRmYzNmNyIvPgogIDxyZWN0IGhlaWdodD0iNTAiIHdpZHRoPSI1MCIgeT0iNTAuMDAwMDAyIiB4PSI0OS44MDAwMDIiIHN0cm9rZS13aWR0aD0iMCIgc3Ryb2tlPSIjZmY3ZjAwIiBmaWxsPSIjNGZjM2Y3IiBpZD0ic3ZnXzMiLz4KICA8cmVjdCBoZWlnaHQ9IjUwIiB3aWR0aD0iNTAiIHk9Ijk5LjYiIHg9IjAuMTk5OTk5IiBzdHJva2Utd2lkdGg9IjAiIHN0cm9rZT0iI2ZmN2YwMCIgZmlsbD0iIzRmYzNmNyIgaWQ9InN2Z180Ii8+CiA8L2c+Cjwvc3ZnPg==) no-repeat;
+	background-size: 8px 12px;
+	background-position: 2px 2px;
+	padding-left: 9px;
 }
 /* Previously entered input. */
 .jqconsole-old-input {
-    color: #bb0;
-    font-weight: normal;
+	color: #2196f3;
+	font-weight: normal;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+Cjxzdmcgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiA8IS0tIENyZWF0ZWQgd2l0aCBTVkctZWRpdCAtIGh0dHA6Ly9zdmctZWRpdC5nb29nbGVjb2RlLmNvbS8gLS0+CiA8Zz4KICA8dGl0bGU+TGF5ZXIgMTwvdGl0bGU+CiAgPHJlY3QgaWQ9InN2Z18xIiBoZWlnaHQ9IjUwIiB3aWR0aD0iNTAiIHk9IjAuMiIgeD0iMC4yIiBzdHJva2Utd2lkdGg9IjAiIHN0cm9rZT0iI2ZmN2YwMCIgZmlsbD0iIzIxOTZmMyIvPgogIDxyZWN0IGhlaWdodD0iNTAiIHdpZHRoPSI1MCIgeT0iNTAuMDAwMDAyIiB4PSI0OS44MDAwMDIiIHN0cm9rZS13aWR0aD0iMCIgc3Ryb2tlPSIjZmY3ZjAwIiBmaWxsPSIjMjE5NmYzIiBpZD0ic3ZnXzMiLz4KICA8cmVjdCBoZWlnaHQ9IjUwIiB3aWR0aD0iNTAiIHk9Ijk5LjYiIHg9IjAuMTk5OTk5IiBzdHJva2Utd2lkdGg9IjAiIHN0cm9rZT0iI2ZmN2YwMCIgZmlsbD0iIzIxOTZmMyIgaWQ9InN2Z180Ii8+CiA8L2c+Cjwvc3ZnPg==) no-repeat;
+	background-size: 8px 12px;
+	background-position: 2px 2px;
+	padding-left: 18px;
 }
 /* The text color of the output. */
 .console-default {
-    color: white;
+	color: white;
 }
 
 .console-arrow {
-    color: #7f7;
-    margin-left: -9px;
+	color: #7f7;
+	margin-left: -9px;
 }
 
 .console-gray {
-    color: gray;
+	color: gray;
 }
 
 .console-error {
-    color: #F06;
+	color: #F06;
 }
