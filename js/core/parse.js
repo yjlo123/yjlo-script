@@ -6,11 +6,11 @@ var make_parse = function () {
 	var tokens;
 	var token_nr;
 	
-	var reservedKeywords = ["var", "func", "import",
+	const reservedKeywords = ["var", "func", "import",
 	"if", "else", "switch", "fallthrough", "case", "default",
 	"continue", "break", "while", "do", "for", "in", "by", "return"];
 
-	var reservedValues = ["true", "false", "null"];
+	const reservedValues = ["true", "false", "null"];
 
 	var new_node = function() {
 		return {};
@@ -253,7 +253,7 @@ var make_parse = function () {
 		
 		// build syntax tree
 		var tree_stack = [];
-		for (var i = 0; i < expression_nodes_postfix.length; i++) {
+		for (let i = 0; i < expression_nodes_postfix.length; i++) {
 			if (expression_nodes_postfix[i].type === 'operator' || expression_nodes_postfix[i].type === 'reference'){
 				var apply_node = {};
 				var operands = [];
@@ -885,12 +885,12 @@ var make_parse = function () {
 		
 		// build dependency graph
 		var dependencyGraph = {};
-		for (var i in sources) {
-			if (!dependencyGraph.hasOwnProperty(sources[i].name)){
-				dependencyGraph[sources[i].name] = new dependencyNode(sources[i]);
-				dependencyGraph[sources[i].name].dependency = sources[i].dependency;
+		sources.forEach(function(source){
+			if (!dependencyGraph.hasOwnProperty(source.name)){
+				dependencyGraph[source.name] = new dependencyNode(source);
+				dependencyGraph[source.name].dependency = source.dependency;
 			}
-		}
+		});
 		
 		var resolve = function (node, unresolved){
 			unresolved.push(node);
@@ -916,7 +916,7 @@ var make_parse = function () {
 		resolve("self", []);
 
 		var resolvedTokens = [];
-		for (var i in resolved){
+		for (let i in resolved){
 			// append source tokens
 			resolvedTokens = resolvedTokens.concat(dependencyGraph[resolved[i]].data.tokens);
 		}
