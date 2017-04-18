@@ -15,22 +15,43 @@ var make_parse = function () {
 	var new_node = function() {
 		return {};
 	};
-
-	var new_var_node = function(name, type, line) {
-		var node = new_node();
-		node.tag = "variable";
-		node.name = name;
-		node.type = type;
-		node.line = line;
-		return node;
-	};
 	
-	var new_constant_node = function(value) {
-		var node = new_node();
-		node.tag = "constant";
-		node.value = value;
-		return node;
-	};
+	class Node {
+		constructor(tag, line) {
+			this.tag = tag;
+			this.line = line;
+		}
+	}
+
+	// Includs variable, operator, boolean
+	class VariableNode extends Node {
+		constructor(name, type, line) {
+			super("variable", line);
+			this.name = name;
+			this.type = type;
+		}
+	}
+	
+	class ConstantNode extends Node {
+		constructor(value, line) {
+			super("constant", line);
+			this.value = value;
+		}
+	}
+	
+	class ApplicationNode extends Node {
+		constructor(line) {
+			super("application", line);
+		}
+
+		setOperator(value) {
+			this.operator = value;
+		}
+
+		setOperands(value) {
+			this.operands = value;
+		}
+	}
 
 	var isConstantToken = function (t) {
 		return t.type === "string" || t.type === "number";
@@ -128,7 +149,7 @@ var make_parse = function () {
 
 /*===================== EXPRESSION ======================= */
 	var expression = function () {
-		print("parsing expression: "+token.value);
+		log("parsing expression: "+token.value);
 		
 		var left_node;
 		var expression_nodes_infix = [];
@@ -145,21 +166,21 @@ var make_parse = function () {
 		}
 
 		// read in the tokens in this expression
-		while (token
+		while (token &&
 			// , ; {
-			&& !/^[,;{]$/.test(token.value)
-			&& token.value !== "="
+			!/^[,;{]$/.test(token.value) &&
+			token.value !== "=" &&
 			// compound assignment += -= *= /= %=  &= |= ^= /.= **= <<= >>= >>>=
-			&& !/^([+\-\*\/%&|^]|\*\*|\/\.|[<>]{2}|[>]{3})=$/.test(token.value)
-			&& token.value !== "++" && token.value !== "--") {
-			if(isClosingBracketToken(token) && bracket_count === 0) {
+			!/^([+\-\*\/%&|^]|\*\*|\/\.|[<>]{2}|[>]{3})=$/.test(token.value) &&
+			token.value !== "++" && token.value !== "--") {
+			if (isClosingBracketToken(token) && bracket_count === 0) {
 				// end of current expression
 				break;
 			}
 
-			if(isOpeningBracketToken(token)) bracket_count += 1;
-			if(isClosingBracketToken(token)) bracket_count -= 1;
-			if (isVarNameToken(token) && isOpeningBracketToken(next_token)){
+			if (isOpeningBracketToken(token)) bracket_count += 1;
+			if (isClosingBracketToken(token)) bracket_count -= 1;
+			if (isVarNameToken(token) && isOpeningBracketToken(next_token)) {
 				// function call in expression
 				var func_token = token;
 				advance();
@@ -167,14 +188,14 @@ var make_parse = function () {
 				continue;
 			} else if (isConstantToken(token)) {
 				// constant
-				left_node = new_constant_node(token.value);
-			} else if(isVarNameToken(token)) {
+				left_node = new ConstantNode(token.value, token.line);
+			} else if (isVarNameToken(token)) {
 				// variable
-				var is_boolean = (token.value=="true") || (token.value=="false");
-				left_node = new_var_node(token.value, is_boolean ? "boolean" : "variable", token.line);
-			} else if(isOperatorToken(token)) {
+				var is_boolean = (token.value == "true") || (token.value == "false");
+				left_node = new VariableNode(token.value, is_boolean ? "boolean" : "variable", token.line);
+			} else if (isOperatorToken(token)) {
 				// operator
-				left_node = new_var_node(token.value, "operator", token.line);
+				left_node = new VariableNode(token.value, "operator", token.line);
 			} else {
 				throwTokenError("expression", token);
 			}
@@ -199,25 +220,25 @@ var make_parse = function () {
 		
 		// empty expression
 		if (expression_nodes_infix.length === 0) {
-			return new_var_node("null", "variable", token.line);
+			return new VariableNode("null", "variable", token.line);
 		}
 		
 		// convert in-fix order to post-fix order
-		var expression_nodes_postfix = [];
-		var temp_stack = [];
-		for (var i = 0; i < expression_nodes_infix.length; i++) {
-			var prevNode = i>0?expression_nodes_infix[i-1]:null;
-			var thisNode = expression_nodes_infix[i];
-			if(thisNode.name === '('){
+		let expression_nodes_postfix = [];
+		let temp_stack = [];
+		for (let i = 0; i < expression_nodes_infix.length; i++) {
+			let prevNode = i > 0 ? expression_nodes_infix[i - 1] : null;
+			let thisNode = expression_nodes_infix[i];
+			if (thisNode.name === '(') {
 				temp_stack.push(thisNode);
-			} else if (thisNode.type === 'variable' || thisNode.tag === 'application') {
+			} else if (thisNode.type === 'variable' || thisNode instanceof ApplicationNode) {
 				expression_nodes_postfix.push(thisNode);
-			} else if (thisNode.type === 'boolean' ) {
-				expression_nodes_postfix.push(thisNode.name==="true" ? true : false);
+			} else if (thisNode.type === 'boolean') {
+				expression_nodes_postfix.push(thisNode.name === "true" ? true : false);
 			} else if (thisNode.tag === 'constant') {
 				expression_nodes_postfix.push(thisNode.value);
 			} else if (thisNode.name === ')') {
-				while (temp_stack.length > 0 && temp_stack[temp_stack.length-1].name !== '(') {
+				while (temp_stack.length > 0 && temp_stack[temp_stack.length - 1].name !== '(') {
 					expression_nodes_postfix.push(temp_stack.pop());
 				}
 				if (temp_stack.length > 0) {
@@ -228,17 +249,17 @@ var make_parse = function () {
 			} else {
 				// operators
 				/* prefix all unary operators with '_' ! */
-				if (thisNode.name === '-'
-					&& (expression_nodes_postfix.length === 0 || (prevNode && prevNode.name === '('))) {
-						// negative operator
-						thisNode.name = '_-';
-					}
+				if (thisNode.name === '-' &&
+					(expression_nodes_postfix.length === 0 || (prevNode && prevNode.name === '('))) {
+					// negative operator
+					thisNode.name = '_-';
+				}
 				if (thisNode.name === '!' || thisNode.name === '~') {
 					thisNode.name = '_' + thisNode.name;
 				}
-				while (temp_stack.length > 0 
-						&& precedence(thisNode.name) <= precedence(temp_stack[temp_stack.length-1].name)) {
-							expression_nodes_postfix.push(temp_stack.pop());
+				while (temp_stack.length > 0 &&
+					precedence(thisNode.name) <= precedence(temp_stack[temp_stack.length - 1].name)) {
+					expression_nodes_postfix.push(temp_stack.pop());
 				}
 				temp_stack.push(thisNode);
 			}
@@ -252,11 +273,11 @@ var make_parse = function () {
 		}
 		
 		// build syntax tree
-		var tree_stack = [];
+		let tree_stack = [];
 		for (let i = 0; i < expression_nodes_postfix.length; i++) {
 			if (expression_nodes_postfix[i].type === 'operator' || expression_nodes_postfix[i].type === 'reference'){
-				var apply_node = {};
-				var operands = [];
+				//let apply_node = new_node();
+				let operands = [];
 				
 				if (expression_nodes_postfix[i].name === "?") {
 					// ternary operator, wait for one more operand
@@ -273,10 +294,10 @@ var make_parse = function () {
 					// ternary operator, pop third operand
 					operands.unshift(tree_stack.pop());
 				}
-				
-				apply_node.tag = "application";
-				apply_node.operator = expression_nodes_postfix[i];
-				apply_node.operands = array_to_list(operands);
+
+				let apply_node = new ApplicationNode(expression_nodes_postfix[i].line);
+				apply_node.setOperator(expression_nodes_postfix[i]);
+				apply_node.setOperands(array_to_list(operands));
 				tree_stack.push(apply_node);
 			}else{
 				tree_stack.push(expression_nodes_postfix[i]);
@@ -379,31 +400,31 @@ var make_parse = function () {
 
 /*===================== STATEMENTS ======================= */
 	var statements = function () {
-		print("parsing statements.");
-		var stmts = [], stmt;
+		log("parsing statements.");
+		var stmts = [],
+			stmt;
 		while (true) {
-			if (token_nr === tokens.length 
-				|| token.value === '}'
-				|| token.value === 'case'
-				|| token.value === 'default') {
-				print("end of statement list");
+			if (token_nr === tokens.length ||
+				token.value === '}' ||
+				token.value === 'case' ||
+				token.value === 'default') {
+				log("end of statement list");
 				break;
 			}
 			stmt = statement();
-			
+
 			if (stmt) {
 				stmts.push(stmt);
 			}
 		}
-		return stmts.length === 0? null : array_to_list(stmts);
+		return stmts.length === 0 ? null : array_to_list(stmts);
 	};
 
 /*===================== FUNC CALL ======================= */
 	var func_call = function(t) {
-		print("parsing func call. "+t.value);
-		var a = new_node();
-		a.tag = "application";
-		a.operator = new_var_node(t.value, "variable", t.line);
+		log("parsing func call. "+t.value);
+		let apply_node = new ApplicationNode(t.line);
+		apply_node.setOperator(new VariableNode(t.value, "variable", t.line));
 		var operands = [];
 		advance("(");
 		if (!isClosingBracketToken(token)) {
@@ -417,13 +438,13 @@ var make_parse = function () {
 			}
 		}
 		advance(")");
-		a.operands = array_to_list(operands);
-		return a;
+		apply_node.setOperands(array_to_list(operands));
+		return apply_node;
 	};
 
 /*===================== RETURN ======================= */
 	var return_stmt = function() {
-		print("parsing return. "+token.value);
+		log("parsing return. "+token.value);
 		var n = new_node();
 		n.line = token.line;
 		n.tag = "return_statement";
@@ -434,14 +455,14 @@ var make_parse = function () {
 
 /*===================== ASSIGN ======================= */
 	var assign = function(left, operator, value) {
-		print("parsing assign. " + left.name);
+		log("parsing assign. " + left.name);
 		
 		var t = new_node();
 		t.tag = "assignment";
 		t.line = left.line;
 		var right_var_node = null;
 		
-		if (left.tag === "application"){
+		if (left instanceof ApplicationNode){
 			// assign to reference
 			t.left = left;
 			right_var_node = left;
@@ -450,17 +471,16 @@ var make_parse = function () {
 		} else {
 			// assign to variable
 			t.variable = left.name;
-			right_var_node = new_var_node(left.name, "variable", left.line);
+			right_var_node = new VariableNode(left.name, "variable", left.line);
 		}
 
 		if (operator){
 			// Compound Assignment
-			var apply_node = {};
-			apply_node.tag = "application";
-			apply_node.operator = new_var_node(operator.slice(0, -1), "operator", left.line);
-			apply_node.operands = array_to_list([
+			let apply_node = new ApplicationNode(left.line);
+			apply_node.setOperator(new VariableNode(operator.slice(0, -1), "operator", left.line));
+			apply_node.setOperands(array_to_list([
 										right_var_node,
-										value || expression()]);
+										value || expression()]));
 			t.value = apply_node;
 		}else{
 			t.value = expression();
@@ -471,7 +491,7 @@ var make_parse = function () {
 
 /*===================== FUNC ======================= */
 	var func = function() {
-		print("parsing function. "+token.value);
+		log("parsing function. "+token.value);
 		var args = [];
 		var funcbody = {};
 		var t = new_node();
@@ -531,7 +551,7 @@ var make_parse = function () {
 
 /*===================== VAR DEF ======================= */
 	var var_def = function() {
-		print("parsing var def. " + token.value);
+		log("parsing var def. " + token.value);
 		var a = [], n, t;
 		while (token) {
 			n = token;
@@ -548,7 +568,7 @@ var make_parse = function () {
 				a.push(t);
 			} else {
 				// default initial value
-				t.value = new_var_node("null", "variable", n.line);
+				t.value = new VariableNode("null", "variable", n.line);
 				a.push(t);
 			}
 			if (token && token.value !== ",") {
@@ -557,12 +577,12 @@ var make_parse = function () {
 			advance(",");
 		}
 		advance(";");
-		return a.length === 0 ? null : array_to_list(a);
+		return array_to_list(a);
 	};
 
 /*===================== IF ======================= */
 	var if_stmt = function() {
-		print("parsing if.");
+		log("parsing if.");
 		var n = new_node();
 		n.tag = "if";
 		n.predicate = condition();
@@ -584,8 +604,8 @@ var make_parse = function () {
 	};
 	
 /*===================== SWITCH ======================= */
-	var switch_stmt = function() {
-		print("parsing switch.");
+	var switch_stmt = function () {
+		log("parsing switch.");
 		var n = new_node();
 		n.tag = "switch";
 		n.variable = expression();
@@ -598,14 +618,14 @@ var make_parse = function () {
 				advance("case");
 				var case_node = new_node();
 				var case_value = [];
-				if(!isConstantToken(token)){
+				if (!isConstantToken(token)) {
 					throwTokenError("a constant value", token);
 				}
 				case_value.push(token.value);
 				advance(); // advance value
 				while (token.value === ",") {
 					advance(",");
-					if(!isConstantToken(token)){
+					if (!isConstantToken(token)) {
 						throwTokenError("a constant value", token);
 					}
 					case_value.push(token.value);
@@ -622,7 +642,7 @@ var make_parse = function () {
 			} else {
 				throwTokenError("'case' or 'default'", token);
 			}
-			
+
 		}
 		advance("}");
 		n.cases = array_to_list(cases);
@@ -630,8 +650,8 @@ var make_parse = function () {
 	};
 
 /*===================== WHILE ======================= */
-	var while_stmt = function() {
-		print("parsing while.");
+	var while_stmt = function () {
+		log("parsing while.");
 		var n = new_node();
 		n.tag = "while";
 		n.predicate = condition();
@@ -640,8 +660,8 @@ var make_parse = function () {
 	};
 
 /*===================== DO WHILE ======================= */
-	var do_while_stmt = function() {
-		print("parsing do.");
+	var do_while_stmt = function () {
+		log("parsing do.");
 		var n = new_node();
 		n.tag = "do";
 		n.consequent = block();
@@ -652,33 +672,33 @@ var make_parse = function () {
 	};
 
 /*===================== FOR ======================= */
-	var for_stmt = function() {
-		print("parsing for.");
+	var for_stmt = function () {
+		log("parsing for.");
 		var hasBracket = isOpeningBracketToken(token);
-		if (hasBracket) { advance("("); }
+		if (hasBracket) advance("(");
 		var n = new_node();
 		n.tag = "for";
 		// variable
 		if (!isVarNameToken(token)) {
 			throwTokenError("a variable name", token);
 		}
-		n.variable = new_var_node(token.value, "variable", token.line);
+		n.variable = new VariableNode(token.value, "variable", token.line);
 		advance();
 		// range
 		n.range = parse_range();
 		// increment
 		n.increment = parse_increment();
-		if (hasBracket) { advance(")"); }
+		if (hasBracket) advance(")");
 		n.consequent = block();
 		return n;
 	};
 
-	var parse_range = function() {
+	var parse_range = function () {
 		var range = {};
 		advance("in");
 		advance("(");
 		var first_value = expression();
-		if(isClosingBracketToken(token)) {
+		if (isClosingBracketToken(token)) {
 			range.from = 0;
 			range.to = first_value;
 		} else {
@@ -690,8 +710,8 @@ var make_parse = function () {
 		return range;
 	};
 
-	var parse_increment = function() {
-		if (token && token.value !== "by"){
+	var parse_increment = function () {
+		if (token && token.value !== "by") {
 			return null;
 		}
 		advance("by");
@@ -699,9 +719,9 @@ var make_parse = function () {
 	};
 
 /*===================== BLOCK ======================= */
-	var block = function() {
+	var block = function () {
 		var block_stmts = null;
-		if (token.value !== '{'){
+		if (token.value !== '{') {
 			// single statement block
 			block_stmts = array_to_list([statement()]);
 		} else {
@@ -713,9 +733,9 @@ var make_parse = function () {
 	};
 
 /*===================== CONDITION ======================= */
-	var condition = function() {
+	var condition = function () {
 		var condition_expression = null;
-		if (!isOpeningBracketToken(token)){
+		if (!isOpeningBracketToken(token)) {
 			condition_expression = expression();
 		} else {
 			advance("(");
@@ -726,42 +746,36 @@ var make_parse = function () {
 	};
 
 /*===================== CONTINUE ======================= */
-	var continue_stmt = function() {
-		print("parsing continue. "+token.value);
-		var n = new_node();
-		n.line = token.line;
-		n.tag = "continue";
+	var continue_stmt = function () {
+		log("parsing continue. " + token.value);
+		let node = new Node("continue", token.line);
 		advance(";");
-		return n;
+		return node;
 	};
 
 /*===================== BREAK ======================= */
-	var break_stmt = function() {
-		print("parsing break. "+token.value);
-		var n = new_node();
-		n.line = token.line;
-		n.tag = "break";
+	var break_stmt = function () {
+		log("parsing break. " + token.value);
+		let node = new Node("break", token.line);
 		advance(";");
-		return n;
+		return node;
 	};
 
 /*===================== FALLTHROUGH ======================= */
-	var fallthrough_stmt = function() {
-		print("parsing fallthrough. "+token.value);
-		var n = new_node();
-		n.line = token.line;
-		n.tag = "fallthrough";
+	var fallthrough_stmt = function () {
+		log("parsing fallthrough. " + token.value);
+		let node = new Node("fallthrough", token.line);
 		advance(";");
-		return n;
+		return node;
 	};
 
 /* ================= helper functions ============ */
-	function print(msg) {
+	function log(msg) {
 		if (debug) {
 			console.log(msg);
 		}
 	}
-	
+
 	function outputError(error) {
 		if (debug) {
 			console.error(error);
@@ -769,10 +783,10 @@ var make_parse = function () {
 			jqconsole.Write(error.message + '\n', 'console-error');
 		}
 	}
-	
+
 	function array_to_list(arr) {
-		var lst = list();
-		for(var i = arr.length-1; i >= 0; i--){
+		let lst = list();
+		for (let i = arr.length - 1; i >= 0; i--) {
 			lst = pair(arr[i], lst);
 		}
 		return lst;
@@ -820,7 +834,7 @@ var make_parse = function () {
 	};
 	
 	var startParsing = function() {
-		print("start parsing.");
+		log("start parsing.");
 		
 		token_nr = 0;
 		token = tokens[token_nr];
