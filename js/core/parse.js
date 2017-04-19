@@ -64,6 +64,13 @@
 				this.operands = value;
 			}
 		}
+		
+		class ReturnStatementNode extends Node {
+			constructor(line, expression) {
+				super("return_statement", line);
+				this.expression = expression;
+			}
+		}
 
 		var isConstantToken = t => t && (t.type === "string" || t.type === "number");
 
@@ -447,12 +454,9 @@
 	/*===================== RETURN ======================= */
 		var return_stmt = function() {
 			log("parsing return. "+token.value);
-			var n = new_node();
-			n.line = token.line;
-			n.tag = "return_statement";
-			n.expression = expression();
+			let node = new ReturnStatementNode(token.line, expression());
 			advance(";");
-			return n;
+			return node;
 		};
 
 	/*===================== ASSIGN ======================= */
