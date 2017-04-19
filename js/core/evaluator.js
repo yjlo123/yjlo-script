@@ -4,7 +4,7 @@ var the_empty_environment = [];
 var an_empty_frame = {};
 
 function throwError(line, message) {
-	throw new Error("[line "+ line + "] " + message);
+	throw new Error(`[line ${line}] ${message}`);
 }
 
 function is_tagged_object(stmt,the_tag) {
@@ -554,33 +554,33 @@ var primitive_functions = {
 		true: true,
 		false: false,
 		
-		"_-": function(x) { return -x; }, // negative
-		"**": function(x,y) { return Math.pow(x,y)}, // power 
-		"+": function(x,y) { return x + y; },
-		"-": function(x,y) { return x - y; },
-		"*": function(x,y) { return x * y; },
-		"/": function(x,y) { return Math.trunc(x / y); },
-		"/.": function(x,y) { return x / y; },
-		"%": function(x,y) { return x % y; },
-		"==": function(x,y) { return x === y; },
-		"!=": function(x,y) { return x !== y; },
-		"<": function(x,y) { return x < y; },
-		"<=": function(x,y) { return x <= y; },
-		">": function(x,y) { return x > y; },
-		">=": function(x,y) { return x >= y; },
-		"_!": function(x) { return ! x; }, // not
-		"&&": function(x,y) { return x && y; },
-		"||": function(x,y) { return x || y; },
+		"_-": (x) => -x, // negative
+		"**": (x,y) => Math.pow(x,y), // power 
+		"+": (x,y) => x + y,
+		"-": (x,y) => x - y,
+		"*": (x,y) => x * y,
+		"/": (x,y) => Math.trunc(x / y),
+		"/.": (x,y) => x / y,
+		"%": (x,y) => x % y,
+		"==": (x,y) => x === y,
+		"!=": (x,y) => x !== y,
+		"<": (x,y) => x < y,
+		"<=": (x,y) => x <= y,
+		">": (x,y) => x > y,
+		">=": (x,y) => x >= y,
+		"_!": (x) => ! x, // not
+		"&&": (x,y) => x && y,
+		"||": (x,y) => x || y,
 		
-		"&": function(x,y) { return x & y; },
-		"|": function(x,y) { return x | y; },
-		"_~": function(x) { return ~x; }, // NOT
-		"^": function(x,y) { return x ^ y; },
-		"<<": function(x,y) { return x << y; },
-		">>": function(x,y) { return x >> y; },
-		">>>": function(x,y) { return x >>> y; },
+		"&": (x,y) => x & y,
+		"|": (x,y) => x | y,
+		"_~": (x) => ~x, // NOT
+		"^": (x,y) => x ^ y,
+		"<<": (x,y) => x << y,
+		">>": (x,y) => x >> y,
+		">>>": (x,y) => x >>> y,
 		
-		"throw": function(x) { throw Error(x); }
+		"throw": (x) => Error(x)
 };
 	
 function setup_environment() {

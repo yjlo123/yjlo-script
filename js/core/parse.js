@@ -15,47 +15,45 @@ var make_parse = function () {
 	var new_node = function() {
 		return {};
 	};
-	
-	class Node {
-		constructor(tag, line) {
-			this.tag = tag;
-			this.line = line;
-		}
+
+class Node {
+	constructor(tag, line) {
+		this.tag = tag;
+		this.line = line;
+	}
+}
+
+// Includs variable, operator, boolean
+class VariableNode extends Node {
+	constructor(name, type, line) {
+		super("variable", line);
+		this.name = name;
+		this.type = type;
+	}
+}
+
+class ConstantNode extends Node {
+	constructor(value, line) {
+		super("constant", line);
+		this.value = value;
+	}
+}
+
+class ApplicationNode extends Node {
+	constructor(line) {
+		super("application", line);
 	}
 
-	// Includs variable, operator, boolean
-	class VariableNode extends Node {
-		constructor(name, type, line) {
-			super("variable", line);
-			this.name = name;
-			this.type = type;
-		}
-	}
-	
-	class ConstantNode extends Node {
-		constructor(value, line) {
-			super("constant", line);
-			this.value = value;
-		}
-	}
-	
-	class ApplicationNode extends Node {
-		constructor(line) {
-			super("application", line);
-		}
-
-		setOperator(value) {
-			this.operator = value;
-		}
-
-		setOperands(value) {
-			this.operands = value;
-		}
+	setOperator(value) {
+		this.operator = value;
 	}
 
-	var isConstantToken = function (t) {
-		return t.type === "string" || t.type === "number";
-	};
+	setOperands(value) {
+		this.operands = value;
+	}
+}
+
+	var isConstantToken = t => t && (t.type === "string" || t.type === "number");
 
 	var isVarNameToken = function (t) {
 		if (reservedKeywords.indexOf(t.value) != -1){
@@ -64,24 +62,16 @@ var make_parse = function () {
 		return t.type === "name";
 	};
 
-	var isOperatorToken = function (t) {
-		return t.type === 'operator';
-	};
-
-	var isOpeningBracketToken = function (t) {
-		return t && isOperatorToken(t) && t.value === "(";
-	};
-
-	var isClosingBracketToken = function (t) {
-		return t && isOperatorToken(t) && t.value === ")";
-	};
+	var isOperatorToken = t => t && t.type === 'operator';
+	var isOpeningBracketToken = t => t && isOperatorToken(t) && t.value === "(";
+	var isClosingBracketToken = t => t && isOperatorToken(t) && t.value === ")";
 	
 	var throwError = function (token, message) {
-		throw new Error((token?"[line "+token.line + "] ":"") + message);
+		throw new Error((token?`[line ${token.line}] `:"") + message);
 	};
 	
 	var throwTokenError = function (expect, token) {
-		throwError(token, "Expected "+expect+". But '" + token.value + "' found.");
+		throwError(token, `Expected ${expect}. But ${token.value} found.`);
 	};
 
 	var precedence = function(operator) {
@@ -364,7 +354,7 @@ var make_parse = function () {
 					// Assignment statement
 					var prev_token = token;
 					v.line = token.line;
-					switch (token.value){
+					switch (token.value) {
 						case "=":
 							advance();
 							v = assign(v, null);
