@@ -26,6 +26,7 @@
  *   add line number to tokens
  *   support block comments
  *   support names start with '_' and '$'
+ *   support multi-line string with ``
  */
 
 
@@ -187,13 +188,13 @@ String.prototype.tokens = function (prefix, suffix) {
 
 // string
 
-		} else if (c === '\'' || c === '"') {
+		} else if (c === '\'' || c === '"' || c === '`') {
 			str = '';
 			q = c;
 			i += 1;
 			for (;;) {
 				c = this.charAt(i);
-				if (c < ' ' && c !== '	') {
+				if (c < ' ' && c !== '	' && q !== '`') {
 					make('string', str).error(c === '\n' || c === '\r' || c === '' ?
 						"Unterminated string." :
 						"Control character in string.", make('', str));
