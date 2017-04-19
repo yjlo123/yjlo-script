@@ -153,9 +153,9 @@
 		var expression = function () {
 			log("parsing expression: "+token.value);
 			
-			var left_node;
-			var expression_nodes_infix = [];
-			var bracket_count = 0;
+			let left_node;
+			let expression_nodes_infix = [];
+			let bracket_count = 0;
 
 			if (token && token.value === "func"){
 				// function expression, should be anonymous
@@ -184,7 +184,7 @@
 				if (isClosingBracketToken(token)) bracket_count -= 1;
 				if (isVarNameToken(token) && isOpeningBracketToken(next_token)) {
 					// function call in expression
-					var func_token = token;
+					let func_token = token;
 					advance();
 					expression_nodes_infix.push(func_call(func_token));
 					continue;
@@ -193,7 +193,7 @@
 					left_node = new ConstantNode(token.value, token.line);
 				} else if (isVarNameToken(token)) {
 					// variable
-					var is_boolean = (token.value == "true") || (token.value == "false");
+					let is_boolean = (token.value == "true") || (token.value == "false");
 					left_node = new VariableNode(token.value, is_boolean ? "boolean" : "variable", token.line);
 				} else if (isOperatorToken(token)) {
 					// operator
@@ -205,9 +205,9 @@
 				advance();
 			}
 			
-			var expression_length = expression_nodes_infix.length;
+			let expression_length = expression_nodes_infix.length;
 			if (expression_length > 0) {
-				var last_node = expression_nodes_infix[expression_length-1];
+				let last_node = expression_nodes_infix[expression_length-1];
 				if (last_node.type === "operator" && last_node.name !== ")"){
 					throwError(token, "Invalid expression.");
 				}
