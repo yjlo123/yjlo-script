@@ -1,6 +1,6 @@
 var debug = false;
 var version = "v0.2.5";
-var current_parser = make_parse();
+var current_parser = YjloParser();
 	
 var hello_world = 'var a = 2;\n\nfunc double(n) {\n\treturn n * 2;\n}\n\nfunc hello(n) {\n\tprint("Hello World! " + n);\n}\n\n// Recursive function\nfunc repeat(f, n) {\n\tif n {\n\t\tf(n);\n\t\trepeat(f, n-1);\n\t} else {\n\t\tprint("Done!");\n\t}\n}\n\nrepeat(hello, double(a));';
 var leap_year = 'func isLeapYear(year){\n\treturn ((year % 4 == 0) && (year % 100 != 0))\n\t\t\t|| (year % 400 == 0);\n}\n\nprint(isLeapYear(2020));';
