@@ -1,0 +1,59 @@
+/* Heap
+ * @author Liu Siwei (liusiwei.yjlo@gmail.com)
+ * An abstract heap
+ */
+
+func Heap() {
+	
+	func _Node() {
+		var value = null;
+		var left = null;
+		var right = null;
+		return func(){};
+	}
+
+	var _root = _Node();
+
+	/**
+	 * given an index, return the path from root 
+	 * 1: go left
+	 * 0: go right
+	 */
+	func _getPathByIndex(n) {
+		var pathList = $list();
+		if n == 0 { return pathList; }
+		pathList = $pair(n % 2, pathList);
+		n = (n - 1) / 2;
+		while n != 0 {
+			pathList = $pair(n % 2, pathList);
+			n = (n - 1) / 2;
+		}
+		return pathList;
+	}
+
+	/**
+	 * In create mode, unexisting nodes will be created
+	 * while going through the path
+	 */
+	func _getNodeByPath(path, create, root, node_def) {
+		if $is_empty(path) { return root; }
+		var current = root;
+		while !$is_empty(path) && current != null {
+			if $head(path) == 1 {
+				if current.left == null && create {
+					current.left = node_def();
+				}
+				current = current.left;
+			} else {
+				if current.right == null && create {
+					current.right = node_def();
+				}
+				current = current.right;
+			}
+			path = $tail(path);
+		}
+		return current;
+	}
+
+	return func(){};
+}

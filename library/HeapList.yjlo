@@ -1,50 +1,13 @@
 /* HeapList
  * @author Liu Siwei (liusiwei.yjlo@gmail.com)
- * A heap that works like an array list.
+ * A heap that works like an array list
  */
 
-func HeapList() {
-	func _Node() {
-		var value = null;
-		var left = null;
-		var right = null;
-		return func(){};
-	}
+import Heap;
 
-	var _root = _Node();
+func HeapList() extends Heap {
+
 	var _size = 0;
-
-	func _getPathByIndex(n) {
-		var pathList = $list();
-		if n == 0 { return pathList; }
-		pathList = $pair(n % 2, pathList);
-		n = (n - 1) / 2;
-		while n != 0 {
-			pathList = $pair(n % 2, pathList);
-			n = (n - 1) / 2;
-		}
-		return pathList;
-	}
-
-	func _getNodeByPath(path, create) {
-		if $is_empty(path) { return _root; }
-		var current = _root;
-		while !$is_empty(path) && current != null {
-			if $head(path) == 1 {
-				if current.left == null && create {
-					current.left = _Node();
-				}
-				current = current.left;
-			} else {
-				if current.right == null && create {
-					current.right = _Node();
-				}
-				current = current.right;
-			}
-			path = $tail(path);
-		}
-		return current;
-	}
 
 	func init(lst) {
 		_root = _Node();
@@ -58,7 +21,7 @@ func HeapList() {
 	}
 
 	func put(index, value) {
-		_getNodeByPath(_getPathByIndex(index), true).value = value;
+		_getNodeByPath(_getPathByIndex(index), true, _root, _Node).value = value;
 		if index + 1 > _size {
 			_size = index + 1;
 		}
@@ -67,7 +30,7 @@ func HeapList() {
 	func get(index) {
 		index /= 1;
 		if !(index >= 0) { return null; }
-		var target = _getNodeByPath(_getPathByIndex(index), false);
+		var target = _getNodeByPath(_getPathByIndex(index), false, _root, _Node);
 		if target {
 			return target.value;
 		} else {

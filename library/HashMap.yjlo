@@ -1,5 +1,14 @@
-func HashMap(capacity) {
+/* HashMap
+ * @author Liu Siwei (liusiwei.yjlo@gmail.com)
+ * A hash map implemented using heap
+ */
+
+import Heap;
+
+func HashMap(capacity) extends Heap {
+	
 	/* for building heap */
+	// Override
 	func _Node() {
 		var entry = $list();
 		var left = null;
@@ -27,6 +36,8 @@ func HashMap(capacity) {
 	}
 	
 	var _CAPACITY = 63;
+	
+	// Override
 	var _root = _Node();
 	
 	/* initialization */
@@ -36,48 +47,7 @@ func HashMap(capacity) {
 		}
 	}
 	_init();
-	
-	/**
-	 * given an index, return the path from root 
-	 * 1: go left
-	 * 0: go right
-	 */
-	func _getPathByIndex(n) {
-		var pathList = $list();
-		if n == 0 { return pathList; }
-		pathList = $pair(n % 2, pathList);
-		n = (n - 1) / 2;
-		while n != 0 {
-			pathList = $pair(n % 2, pathList);
-			n = (n - 1) / 2;
-		}
-		return pathList;
-	}
 
-	/**
-	 * In create mode, unexisting nodes will be created
-	 * while going through the path
-	 */
-	func _getNodeByPath(path, create) {
-		if $is_empty(path) { return _root; }
-		var current = _root;
-		while !$is_empty(path) && current != null {
-			if $head(path) == 1 {
-				if current.left == null && create {
-					current.left = _Node();
-				}
-				current = current.left;
-			} else {
-				if current.right == null && create {
-					current.right = _Node();
-				}
-				current = current.right;
-			}
-			path = $tail(path);
-		}
-		return current;
-	}
-	
 	func hashCode(str) {
 		var hash = 0;
 		var chars = $string_to_char_list(str);
@@ -101,7 +71,7 @@ func HashMap(capacity) {
 	 */
 	func put(key, value) {
 		var index = hashCode(key);
-		var target = _getNodeByPath(_getPathByIndex(index), true);
+		var target = _getNodeByPath(_getPathByIndex(index), true, _root, _Node);
 		var entries = target.entry;
 		while !$is_empty(entries) {
 			var entry = $head(entries);
@@ -120,7 +90,7 @@ func HashMap(capacity) {
 
 	func get(key) {
 		var index = hashCode(key);
-		var target = _getNodeByPath(_getPathByIndex(index), false);
+		var target = _getNodeByPath(_getPathByIndex(index), false, _root, _Node);
 		if target {
 			var list = target.entry;
 			while !$is_empty(list) {
@@ -144,7 +114,7 @@ func HashMap(capacity) {
 			}
 		}
 		var index = hashCode(key);
-		var target = _getNodeByPath(_getPathByIndex(index), false);
+		var target = _getNodeByPath(_getPathByIndex(index), false, _root, _Node);
 		if target {
 			var list = target.entry;
 			var foundEntry = null;
@@ -164,7 +134,7 @@ func HashMap(capacity) {
 	func toString() {
 		var str = "";
 		for i in (0, _CAPACITY) {
-			var node = _getNodeByPath(_getPathByIndex(i), false);
+			var node = _getNodeByPath(_getPathByIndex(i), false, _root, _Node);
 			if node != null && !$is_empty(node.entry) {
 				str += (i + ": " + node.toString() + "\n");
 			}
