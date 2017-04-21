@@ -35,18 +35,18 @@ func Heap() {
 	 * In create mode, unexisting nodes will be created
 	 * while going through the path
 	 */
-	func _getNodeByPath(path, create, root, node_def) {
-		if $is_empty(path) { return root; }
-		var current = root;
+	func _getNodeByPath(path, create) {
+		if $is_empty(path) { return _root; }
+		var current = _root;
 		while !$is_empty(path) && current != null {
 			if $head(path) == 1 {
 				if current.left == null && create {
-					current.left = node_def();
+					current.left = _Node();
 				}
 				current = current.left;
 			} else {
 				if current.right == null && create {
-					current.right = node_def();
+					current.right = _Node();
 				}
 				current = current.right;
 			}

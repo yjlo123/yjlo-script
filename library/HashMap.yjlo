@@ -71,7 +71,7 @@ func HashMap(capacity) extends Heap {
 	 */
 	func put(key, value) {
 		var index = hashCode(key);
-		var target = _getNodeByPath(_getPathByIndex(index), true, _root, _Node);
+		var target = _getNodeByPath(_getPathByIndex(index), true);
 		var entries = target.entry;
 		while !$is_empty(entries) {
 			var entry = $head(entries);
@@ -90,7 +90,7 @@ func HashMap(capacity) extends Heap {
 
 	func get(key) {
 		var index = hashCode(key);
-		var target = _getNodeByPath(_getPathByIndex(index), false, _root, _Node);
+		var target = _getNodeByPath(_getPathByIndex(index), false);
 		if target {
 			var list = target.entry;
 			while !$is_empty(list) {
@@ -114,7 +114,7 @@ func HashMap(capacity) extends Heap {
 			}
 		}
 		var index = hashCode(key);
-		var target = _getNodeByPath(_getPathByIndex(index), false, _root, _Node);
+		var target = _getNodeByPath(_getPathByIndex(index), false);
 		if target {
 			var list = target.entry;
 			var foundEntry = null;
@@ -134,7 +134,7 @@ func HashMap(capacity) extends Heap {
 	func toString() {
 		var str = "";
 		for i in (0, _CAPACITY) {
-			var node = _getNodeByPath(_getPathByIndex(i), false, _root, _Node);
+			var node = _getNodeByPath(_getPathByIndex(i), false);
 			if node != null && !$is_empty(node.entry) {
 				str += (i + ": " + node.toString() + "\n");
 			}

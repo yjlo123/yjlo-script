@@ -21,7 +21,7 @@ func HeapList() extends Heap {
 	}
 
 	func put(index, value) {
-		_getNodeByPath(_getPathByIndex(index), true, _root, _Node).value = value;
+		_getNodeByPath(_getPathByIndex(index), true).value = value;
 		if index + 1 > _size {
 			_size = index + 1;
 		}
@@ -30,7 +30,7 @@ func HeapList() extends Heap {
 	func get(index) {
 		index /= 1;
 		if !(index >= 0) { return null; }
-		var target = _getNodeByPath(_getPathByIndex(index), false, _root, _Node);
+		var target = _getNodeByPath(_getPathByIndex(index), false);
 		if target {
 			return target.value;
 		} else {
