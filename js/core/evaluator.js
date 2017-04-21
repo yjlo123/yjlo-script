@@ -329,7 +329,7 @@ function function_definition_parent(stmt) {
 	return stmt.parent;
 }
 
-function evaluate_function_definition(stmt,env) {
+function evaluate_function_definition(stmt, env) {
 	if (function_definition_parent(stmt)) {
 		// extends parent
 		var parent = lookup_variable_value(null, function_definition_parent(stmt), env);
@@ -338,18 +338,19 @@ function evaluate_function_definition(stmt,env) {
 		return make_function_value(
 				 function_definition_parameters(stmt),
 				 function_definition_body(stmt),
-				 parent_env);
+				 parent_env, true);
 	}
 	return make_function_value(
 				 function_definition_parameters(stmt),
 				 function_definition_body(stmt),
-				 env);
+				 env, false);
 }
-function make_function_value(parameters,body,env) {
+function make_function_value(parameters, body, env, hasParent) {
 	return { tag: "function_value",
 				parameters: parameters,
 				body: body,
-				environment: env };
+				environment: env,
+				has_parent: hasParent };
 }
 function is_compound_function_value(f) {
 	return is_tagged_object(f,"function_value");
@@ -435,9 +436,19 @@ function apply_primitive_function(fun,argument_list) {
 														argument_list);
 }
 
-function extend_environment(vars,vals,base_env) {
+function extend_environment(vars, vals, base_env) {
 	if (length(vars) >= length(vals))
 		return enclose_by(make_frame(vars,vals),base_env);
+	else if (length(vars) < length(vals))
+		throwError("?", "Too many arguments supplied: expect "+length(vars)+", but "+length(vals)+" given");
+}
+
+function update_environment(vars, vals, base_env) {
+	if (!is_empty(vars) && length(vars) >= length(vals)){
+		// add var-val pair to env
+		first_frame(base_env)[head(vars)] = is_empty(vals) ? null : head(vals);
+		return update_environment(tail(vars), tail(vals), base_env);
+	}
 	else if (length(vars) < length(vals))
 		throwError("?", "Too many arguments supplied: expect "+length(vars)+", but "+length(vals)+" given");
 }
@@ -463,11 +474,18 @@ function apply(fun, args) {
 	if (is_primitive_function(fun)) {
 		return apply_primitive_function(fun, args);
 	} else if (is_compound_function_value(fun)) {
-		var result =
-			evaluate(function_value_body(fun),
-						extend_environment(function_value_parameters(fun),
+		let func_env = null;
+		if (fun.has_parent) {
+			// override parent environment
+			func_env = function_value_environment(fun);
+			update_environment(function_value_parameters(fun), args, func_env);
+		} else {
+			// create self (new) environment
+			func_env = extend_environment(function_value_parameters(fun),
 											args,
-											function_value_environment(fun)));
+											function_value_environment(fun));
+		}
+		var result = evaluate(function_value_body(fun), func_env);
 		if (is_return_value(result)) 
 			return return_value_content(result);
 	} else {
