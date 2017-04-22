@@ -183,5 +183,16 @@ func LinkedList() {
 		return -1;
 	}
 	
+	/* Return built-in list type */
+	func toList() {
+		func help(node) {
+			if node == null {
+				return $list();
+			}
+			return $pair(node.item, help(node.next));
+		}
+		return help(_first);
+	}
+	
 	return func(){};
 }
