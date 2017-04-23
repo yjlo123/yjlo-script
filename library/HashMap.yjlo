@@ -40,6 +40,8 @@ func HashMap(capacity) extends Heap {
 	// Override
 	var _root = _Node();
 	
+	var _size = 0;
+	
 	/* initialization */
 	func _init() {
 		if capacity {
@@ -53,12 +55,17 @@ func HashMap(capacity) extends Heap {
 		var chars = $string_to_char_list(str);
 		if $is_empty(chars) { return hash; }
 		while !$is_empty(chars) {
-			var chr   = $head(chars);
-			hash  = ((hash << 5) - hash) + $char_code(chr);
+			var chr = $head(chars);
+			hash = ((hash << 5) - hash) + $char_code(chr);
 			hash = hash & hash; // Convert to 32bit integer
 			chars = $tail(chars);
 		}
 		return hash % _CAPACITY;
+	}
+	
+	func clear() {
+		_root = _Node();
+		_size = 0;
 	}
 
 	/**
@@ -85,6 +92,7 @@ func HashMap(capacity) extends Heap {
 		}
 		// new key
 		target.entry = $pair(_Entry(key, value), target.entry);
+		_size++;
 		return null;
 	}
 
@@ -108,6 +116,7 @@ func HashMap(capacity) extends Heap {
 		func deleteFromList(list, key) {
 			if $is_empty(list) { return list; }
 			if $head(list).key == key {
+				_size--;
 				return deleteFromList($tail(list), key);
 			} else {
 				return $pair($head(list), deleteFromList($tail(list), key));
@@ -129,6 +138,10 @@ func HashMap(capacity) extends Heap {
 			return null;
 		}
 		return null;
+	}
+	
+	func size() {
+		return _size;
 	}
 	
 	func toString() {
