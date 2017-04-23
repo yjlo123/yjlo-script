@@ -598,7 +598,7 @@ var primitive_functions = {
 		">>": (x,y) => x >> y,
 		">>>": (x,y) => x >>> y,
 		
-		"throw": (x) => Error(x)
+		"throw": (x) => { throw Error(x); }
 };
 	
 function setup_environment() {
