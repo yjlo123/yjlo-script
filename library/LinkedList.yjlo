@@ -12,7 +12,8 @@ func LinkedList() {
 		return func(){};
 	}
 	
-	var EMPTY_LIST_EXCEPTION_MESSAGE = "Exception: empty list.";
+	var _EMPTY_LIST_EXCEPTION_MESSAGE = "Exception: empty list.";
+	var _INDEX_OUT_OF_BOUNDS_EXCEPTION_MESSAGE = "Exception: index out of bounds.";
 	
 	var _size = 0;
 	
@@ -84,11 +85,40 @@ func LinkedList() {
 		_size = 0;
 	}
 	
+	func _checkElementIndex(index) {
+		if !(index >= 0 && index < _size) {
+			throw(_INDEX_OUT_OF_BOUNDS_EXCEPTION_MESSAGE);
+		}
+	}
+	
+	/* Returns the (non-null) Node at the specified element index. */
+	func _node(index) {
+		if (index < (_size >> 1)) {
+			var x = _first;
+			for i in (0, index) {
+				x = x.next;
+			}
+			return x;
+		} else {
+			var x = _last;
+			for i in (size - 1, index) by -1 {
+				x = x.prev;
+			}
+			return x;
+		}
+	}
+	
+	/* Returns the element at the specified position in this list. */
+	func get(index) {
+		_checkElementIndex(index);
+		return _node(index).item;
+	}
+	
 	/* Returns the first element in this list. */
 	func getFirst() {
 		var f = _first;
 		if f == null {
-			throw(EMPTY_LIST_EXCEPTION_MESSAGE);
+			throw(_EMPTY_LIST_EXCEPTION_MESSAGE);
 		}
 		return f.item;
 	}
@@ -97,7 +127,7 @@ func LinkedList() {
 	func getLast() {
 		var l = _last;
 		if l == null {
-			throw(EMPTY_LIST_EXCEPTION_MESSAGE);
+			throw(_EMPTY_LIST_EXCEPTION_MESSAGE);
 		}
 		return l.item;
 	}
@@ -106,7 +136,7 @@ func LinkedList() {
 	func removeFirst() {
 		var f = _first;
 		if f == null {
-			throw(EMPTY_LIST_EXCEPTION_MESSAGE);
+			throw(_EMPTY_LIST_EXCEPTION_MESSAGE);
 		}
 		return _unlinkFirst(f);
 	}
@@ -115,7 +145,7 @@ func LinkedList() {
 	func removeLast() {
 		var l = _last;
 		if l == null {
-			throw(EMPTY_LIST_EXCEPTION_MESSAGE);
+			throw(_EMPTY_LIST_EXCEPTION_MESSAGE);
 		}
 		return _unlinkLast(l);
 	}
