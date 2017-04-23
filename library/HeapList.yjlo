@@ -41,7 +41,12 @@ func HeapList() extends Heap {
 	func size() {
 		return _size;
 	}
-
+	
+	func clear() {
+		_root = _Node();
+		_size = 0;
+	}
+	
 	return func(){};
 }
 
