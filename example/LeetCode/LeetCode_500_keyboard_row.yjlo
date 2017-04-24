@@ -1,0 +1,53 @@
+/* LeetCode 500. Keyboard Row
+Given a List of words, return the words that can be typed
+using letters of alphabet on only one row's of American keyboard
+like below.
+
+q w e r t y u i o p
+ a s d f g h j k l
+  z x c v b n m
+
+Input: ["Hello", "Alaska", "Dad", "Peace"]
+Output: ["Alaska", "Dad"]
+*/
+
+import HeapList;
+import LinkedList;
+
+// keyboard row numbers for 26 English letters
+var map = HeapList();
+map.init($list(2,3,3,2,1,2,2,2,1,2,2,2,3,3,1,1,1,1,2,1,1,3,1,3,1,3));
+
+func letterToRowNumber(char) {
+	var code = $char_code(char);
+	// to lower case
+	if code < 97 { code += 32; }
+	return map.get(code - 97);
+}
+
+func findWords(words) {
+	var result = LinkedList();
+	while !$is_empty(words) {
+		var thisWord = $head(words);
+		var letters = $string_to_char_list(thisWord);
+		// previous letter row number
+		var row = letterToRowNumber($head(letters));
+		letters = $tail(letters);
+		var same = true;
+		while !$is_empty(letters) {
+			if letterToRowNumber($head(letters)) != row {
+				same = false;
+				break;
+			}
+			letters = $tail(letters);
+		}
+		if same {
+			result.add(thisWord);
+		}
+		words = $tail(words);
+	}
+	return result;
+}
+
+var words = findWords($list("Hello", "Alaska", "Dad", "Peace"));
+print(words.toList());
