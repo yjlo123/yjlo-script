@@ -1,0 +1,68 @@
+/* LeetCode 2. Add Two Numbers
+You are given two non-empty linked lists representing two
+non-negative integers. The digits are stored in reverse 
+order and each of their nodes contain a single digit.
+Add the two numbers and return it as a linked list.
+
+You may assume the two numbers do not contain any leading
+zero, except the number 0 itself.
+
+Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
+Output: 7 -> 0 -> 8
+*/
+
+// Definition for singly-linked list
+func ListNode(x) {
+	var val = x;
+	var next = null;
+	return func(){};
+}
+
+// (1,2,3) => 1->2->3
+func listToLinkedList(list) {
+	if $is_empty(list) { return null; }
+	var head = ListNode($head(list));
+	head.next = listToLinkedList($tail(list));
+	return head;
+}
+
+// 1->2->3 => (1,2,3)
+func linkedListToList(linkedList) {
+	if linkedList == null { return  $list(); }
+	return $pair(linkedList.val, linkedListToList(linkedList.next));
+}
+
+// print list elements in reversed order
+func printNumber(list) {
+	var result = "";
+	while !$is_empty(list) {
+		result = $head(list) + result;
+		list = $tail(list);
+	}
+	print(result);
+}
+
+func addTwoNumbersCarry(l1, l2, carry) {
+	if l1 == null && l2 == null && carry == 0 {
+		return null;
+	} 
+	var value = (l1==null ? 0 : l1.val) + (l2==null ? 0 : l2.val) + carry;
+	var head = ListNode( value % 10 );
+	head.next = addTwoNumbersCarry(l1==null ? null : l1.next,
+								   l2==null ? null : l2.next,
+								   value / 10);
+	return head;
+}
+
+// number 582626823
+var num1 = listToLinkedList($list(3,2,8,6,2,6,2,8,5));
+// number 92802991
+var num2 = listToLinkedList($list(1,9,9,2,0,8,2,9));
+
+put("Num1: ");
+printNumber(linkedListToList(num1));
+put("Num2: ");
+printNumber(linkedListToList(num2));
+
+put("Sum:  ");
+printNumber(linkedListToList(addTwoNumbersCarry(num1, num2, 0)));
