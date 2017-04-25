@@ -66,6 +66,9 @@ $(document).ready(function() {
 					case ":reset":
 						setup_console_environment();
 						break;
+					case ":run":
+						run();
+						break;
 					default:
 						driver_loop(input, current_parser, get_console_environment(), function(result){
 							jqconsole.Write("=> " + result + '\n', 'console-arrow');
@@ -88,7 +91,7 @@ function exec(){
 	setup_global_environment();
 	var source = myCodeMirror.getValue();
 	driver_loop(source, current_parser, the_global_environment, function(){
-		//$("#program-result").append('<br/><p class="output-finish">[Finished]</p>');
+		// evaluation finished
 		//jqconsole.Write("=> [Finished]\n", 'console-arrow');
 	});
 	
