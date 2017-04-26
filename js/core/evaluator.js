@@ -688,9 +688,9 @@ function parse_program(program_string, program_parser, evaluate_callback) {
 	if (program_string === null) {
 		return {tag: "exit"};
 	} else {
-		if(program_parser){
-			program_parser(program_string, evaluate_callback);
-		}else{
+		if(program_parser) {
+			program_parser(program_string, evaluate_callback, true);
+		} else {
 			alert("No parser available.");
 		}
 	}
@@ -699,7 +699,7 @@ function parse_program(program_string, program_parser, evaluate_callback) {
 function driver_loop(program_string, program_parser, environment, finish_callback) {
 
 	parse_program(program_string, program_parser, function(syntax_tree){
-		if(debug){
+		if(debug) {
 			console.log(JSON.stringify(syntax_tree,null,4));
 		}
 		if (is_tagged_object(syntax_tree,"exit")) return "interpreter completed";

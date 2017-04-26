@@ -34,12 +34,12 @@ var myCodeMirror = CodeMirror(document.getElementById("editor-area"), {
 	theme: "lesser-dark"
 });
 
-myCodeMirror.setSize("100%", "100%");
-
+var syntaxTreeStr = "";
 var jqconsole = $('#console').jqconsole();
 
 $(document).ready(function() {
 	$("#version").text(version);
+	myCodeMirror.setSize("100%", "100%");
 	registerEventListeners();
 	
 	jqconsole.Write('YJLO Script\n', 'console-gray');
@@ -58,7 +58,13 @@ $(document).ready(function() {
 						jqconsole.Write(version+'\n', 'console-gray');
 						break;
 					case ":help":
-						jqconsole.Write(':ver\n  show version\n:clear\n  clear console\n:reset\n  reset console enviroment\n', 'console-gray');
+						jqconsole.Write(`
+							:run\n  run the current program
+							:ver\n  show version\n
+							:clear\n  clear console\n
+							:reset\n  reset console enviroment\n
+							:tree\n  output the current program's syntaxtree
+							`, 'console-gray');
 						break;
 					case ":clear":
 						jqconsole.Reset();
@@ -68,6 +74,9 @@ $(document).ready(function() {
 						break;
 					case ":run":
 						run();
+						break;
+					case ":tree":
+						printSyntaxTree(myCodeMirror.getValue(), current_parser);
 						break;
 					default:
 						driver_loop(input, current_parser, get_console_environment(), function(result){
@@ -107,6 +116,62 @@ function run() {
 		} else {
 			jqconsole.Write(error.message + '\n', 'console-error');
 		}
+	}
+}
+
+function printSyntaxTree(program_string, program_parser) {
+	try {
+		program_parser(program_string, function(syntax_tree){
+			if(debug){
+				console.log(JSON.stringify(syntax_tree,null,4));
+			}
+			printprintSyntaxTreeNode(syntax_tree, "");
+			jqconsole.Write(syntaxTreeStr+`\n`, 'console-default');
+		}, false);
+	} catch (error) {
+		if (debug) {
+			console.error(error);
+		} else {
+			jqconsole.Write(error.message + '\n', 'console-error');
+		}
+	}
+}
+
+function printprintSyntaxTreeNode(node, indent) {
+	if (is_list(node) && is_empty(node)) return;
+	if (is_list(node)) {
+		// print head and tail in the same level
+		printprintSyntaxTreeNode(head(node), indent);
+		printprintSyntaxTreeNode(tail(node), indent);
+	} else if (typeof node === "object"){
+		if (!node) {
+			// null
+			syntaxTreeStr += (indent + node + `\n`);
+			return;
+		}
+		if ("tag" in node) {
+			// print tag first
+			syntaxTreeStr += (indent + `${node.tag}\n`);
+			indent += "  ";
+		}
+		for (let attr in node) {
+			if (attr === "line" || attr === "tag") continue;
+			// member name
+			syntaxTreeStr += (indent + `|-${attr}: `);
+			// member value
+			if (!node[attr] ||
+					(!is_list(node[attr]) && typeof node[attr] !== "object")){
+				// print simple value in the same line
+				syntaxTreeStr += (`${node[attr]}\n`);
+			} else {
+				// print complex value in a new line
+				syntaxTreeStr += (`\n`);
+				printprintSyntaxTreeNode(node[attr], indent+"    ");
+			}
+		}
+	} else {
+		// function argument name or constant
+		syntaxTreeStr += (indent+`"${node}"\n`);
 	}
 }
 

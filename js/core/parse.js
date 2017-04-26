@@ -623,6 +623,7 @@
 				if (token.value === "case") {
 					advance("case");
 					var case_node = new_node();
+					case_node.tag = "case";
 					var case_value = [];
 					if (!isConstantToken(token)) {
 						throwTokenError("a constant value", token);
@@ -943,7 +944,7 @@
 			return resolvedTokens;
 		};
 
-		return function (source, evaluate_callback) {
+		return function (source, parsed_callback, import_lib=true) {
 			// current source code is identified as "self"
 			var selfSourceObj = processSource(source, "self");
 			tokens = selfSourceObj.tokens;
@@ -953,16 +954,16 @@
 			loadingQueue = selfSourceObj.dependency;
 			sources.push(selfSourceObj);
 			
-			if (length(loadingQueue) === 0) {
+			if (length(loadingQueue) === 0 || !import_lib) {
 				// no library imported
 				try {
-					evaluate_callback(startParsing());
+					parsed_callback(startParsing());
 				} catch (error) {
 					outputError(error);
 				}
 			} else {
 				// load libraries and evaluate
-				loadSources(evaluate_callback);
+				loadSources(parsed_callback);
 			}
 		};
 	}
