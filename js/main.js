@@ -58,13 +58,14 @@ $(document).ready(function() {
 						jqconsole.Write(version+'\n', 'console-gray');
 						break;
 					case ":help":
-						jqconsole.Write(`
-							:run\n  run the current program
-							:ver\n  show version\n
-							:clear\n  clear console\n
-							:reset\n  reset console enviroment\n
-							:tree\n  output the current program's syntaxtree
-							`, 'console-gray');
+						jqconsole.Write(
+`:run\n  run the current program
+:ver\n  show version
+:clear\n  clear console
+:reset\n  reset console enviroment
+:tree\n  output the current program's syntax tree
+`,
+						'console-gray');
 						break;
 					case ":clear":
 						jqconsole.Reset();
