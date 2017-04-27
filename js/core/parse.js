@@ -29,6 +29,14 @@
 		var new_node = function() {
 			return {};
 		};
+		
+		class Token {
+			constructor(type, value, line) {
+				this.type = type;
+				this.value = value;
+				this.line = line;
+			}
+		}
 
 		class Node {
 			constructor(tag, line) {
@@ -800,10 +808,27 @@
 		}
 	/* ============= end of helper functions =========== */
 
-		function tokenize(source){
+		function tokenizeAndDesugaring(source){
 			// var program_string_without_comments 
 			// = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
-			return source.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
+			let original_tokens = source.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
+			let desugared_tokens = [];
+			
+			// desugaring
+			original_tokens.forEach(function(t){
+				switch (t.value) {
+					case '[':
+						desugared_tokens.push(new Token('name', '$list', t.line));
+						desugared_tokens.push(new Token('operator', '(', t.line));
+						break;
+					case ']':
+						desugared_tokens.push(new Token('operator', ')', t.line));
+						break;
+					default:
+						desugared_tokens.push(t);
+				}
+			});
+			return desugared_tokens;
 		}
 
 		var newSourceObj = function(name) {
@@ -815,7 +840,7 @@
 		};
 		
 		var processSource = function(source, name) {
-			tokens = tokenize(source);
+			tokens = tokenizeAndDesugaring(source);
 			if (!tokens || tokens.length === 0) {
 				throwError(null, "Empty source code.");
 			}
