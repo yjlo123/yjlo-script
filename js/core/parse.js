@@ -916,7 +916,11 @@
 					}
 				}
 			}).fail(function(){
-				throwError(null, "Importing '" + nextSourceName + "' failed.");
+				try {
+					throwError(null, "Importing '" + nextSourceName + "' failed.");
+				} catch (error) {
+						outputError(error);
+				}
 			});
 		};
 		
