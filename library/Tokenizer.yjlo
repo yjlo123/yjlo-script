@@ -5,7 +5,7 @@
 
 func Tokenizer() {
 	
-	var tokens = $list();
+	var tokens = [];
 	
 	func Token(type_, value_) {
 		var type = type_;
@@ -25,9 +25,9 @@ func Tokenizer() {
 	}
 
 	func tokenize(str) {
-		var result = $list();
+		var result = [];
 		var chars = $string_to_char_list(str);
-		var reversed_tokens = $list();
+		var reversed_tokens = [];
 
 		var current = "";
 		while !$is_empty(chars) {

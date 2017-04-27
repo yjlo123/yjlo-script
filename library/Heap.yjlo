@@ -20,7 +20,7 @@ func Heap() {
 	 * 0: go right
 	 */
 	func _getPathByIndex(n) {
-		var pathList = $list();
+		var pathList = [];
 		if n == 0 { return pathList; }
 		pathList = $pair(n % 2, pathList);
 		n = (n - 1) / 2;

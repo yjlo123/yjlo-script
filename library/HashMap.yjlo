@@ -10,7 +10,7 @@ func HashMap(capacity) extends Heap {
 	/* for building heap */
 	// Override
 	func _Node() {
-		var entry = $list();
+		var entry = [];
 		var left = null;
 		var right = null;
 		func toString() {

@@ -217,7 +217,7 @@ func LinkedList() {
 	func toList() {
 		func help(node) {
 			if node == null {
-				return $list();
+				return [];
 			}
 			return $pair(node.item, help(node.next));
 		}

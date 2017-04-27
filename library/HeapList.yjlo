@@ -53,7 +53,7 @@ func HeapList() extends Heap {
 /*
 var arr = HeapList();
 
-arr.init($list("zero", "one", "two", "three", "four", "five", "six"));
+arr.init(["zero", "one", "two", "three", "four", "five", "six"]);
 arr.put(7, "seven");
 
 print(arr.size());

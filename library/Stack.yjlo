@@ -2,7 +2,7 @@ func Stack() {
 	var _list = null;
 	var _size = 0;
 	
-	_list = $list();
+	_list = [];
 	
 	/* Pushes an item onto the top of this stack. */
 	func push(n) {
@@ -38,7 +38,7 @@ func Stack() {
 	
 	/* Removes all of the elements from this stack. */
 	func clear() {
-		_list = $list();
+		_list = [];
 		_size = 0;
 	}
 	
