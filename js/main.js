@@ -1,7 +1,7 @@
 var debug = false;
 var version = "v0.2.5";
 var current_parser = YjloParser();
-	
+
 var hello_world = 'var a = 2;\n\nfunc double(n) {\n\treturn n * 2;\n}\n\nfunc hello(n) {\n\tprint("Hello World! " + n);\n}\n\n// Recursive function\nfunc repeat(f, n) {\n\tif n {\n\t\tf(n);\n\t\trepeat(f, n-1);\n\t} else {\n\t\tprint("Done!");\n\t}\n}\n\nrepeat(hello, double(a));';
 var leap_year = 'func isLeapYear(year){\n\treturn ((year % 4 == 0) && (year % 100 != 0))\n\t\t\t|| (year % 400 == 0);\n}\n\nprint(isLeapYear(2020));';
 var fabonacci_code = '/*\n\tThe Fibonacci sequence is a series of numbers\n\twhere a number is found by adding up the two\n\tnumbers before it.\n\t1, 1, 2, 3, 5, 8, 13, 21, 34, and so forth.\n*/\n\nfunc fib(n) {\n\tif (n < 2)\n\t\treturn n;\n\telse\n\t\treturn fib(n - 1) + fib(n - 2);\n}\n\n// The naive version\n// Don\'t try numbers larger than 25\nprint("Fib(9) = " + fib(9));';
@@ -14,15 +14,16 @@ var inheritance = 'func Shape() {\n\tvar _name = "Shape";\n\tfunc getType() { re
 var memento_pattern = '/* Memento Design Pattern in YJLO Script\n * @author Liu Siwei\n * Original blog by Pankaj:\n * http://www.journaldev.com/1734/memento-design-pattern-java\n */\n\n/* Memento Pattern Originator Class */\nfunc FileWriterUtil(file) {\n\tfunc _Memento(file_, content_) {\n\t\tvar fileName = file_;\n\t\tvar content = content_;\n\t\treturn func(){};\n\t}\n\t\n\tvar _fileName = file;\n\tvar _content = "";\n\t\n\tfunc toString() { return _content; }\n\tfunc write(str) { _content += str; }\n\tfunc save() { return _Memento(_fileName, _content); }\n\tfunc undoToLastSave(obj) {\n\t\tvar memento = obj;\n\t\t_fileName = memento.fileName;\n\t\t_content = memento.content;\n\t}\n\t\n\treturn func(){};\n}\n\n/* Memento Pattern Caretaker Class */\nfunc FileWriterCaretaker() {\n\tvar _obj = null;\n\t\n\tfunc save(fileWriter) { _obj = fileWriter.save(); }\n\tfunc undo(fileWriter) { fileWriter.undoToLastSave(_obj); }\n\t\n\treturn func(){};\n}\n\n\n/* Test */\nvar caretaker = FileWriterCaretaker();\nvar fileWriter = FileWriterUtil("data.txt");\n\nfileWriter.write("First Set of Data\\n");\nprint(fileWriter.toString()+"\\n");\n\n// Save the file\ncaretaker.save(fileWriter);\n// Write something else\nfileWriter.write("Second Set of Data\\n");\n\n// Check file contents\nprint(fileWriter.toString()+"\\n");\n\n// Undo to last save\ncaretaker.undo(fileWriter);\n\n// Check file content again\nprint(fileWriter.toString());';
 
 var samplecodes = [hello_world,
-					leap_year,
-					fabonacci_code,
-					find_factors,
-					decimal_binary,
-					insertion_sort,
-					list_manipulation,
-					linked_list,
-					inheritance,
-					memento_pattern];
+	leap_year,
+	fabonacci_code,
+	find_factors,
+	decimal_binary,
+	insertion_sort,
+	list_manipulation,
+	linked_list,
+	inheritance,
+	memento_pattern
+];
 
 var myCodeMirror = CodeMirror(document.getElementById("editor-area"), {
 	value: hello_world,
@@ -37,13 +38,13 @@ var myCodeMirror = CodeMirror(document.getElementById("editor-area"), {
 var syntaxTreeStr = "";
 var jqconsole = $('#console').jqconsole();
 
-$(document).ready(function() {
+$(document).ready(function () {
 	$("#version").text(version);
 	myCodeMirror.setSize("100%", "100%");
 	registerEventListeners();
-	
+
 	jqconsole.Write('YJLO Script\n', 'console-gray');
-	jqconsole.Write(version+"\n", 'console-gray');
+	jqconsole.Write(version + "\n", 'console-gray');
 	jqconsole.Write("Type :help to see available commands.\n", 'console-gray');
 	jqconsole.SetPromptLabel('  ');
 
@@ -55,17 +56,17 @@ $(document).ready(function() {
 			if (input) {
 				switch (input) {
 					case ":ver":
-						jqconsole.Write(version+'\n', 'console-gray');
+						jqconsole.Write(version + '\n', 'console-gray');
 						break;
 					case ":help":
 						jqconsole.Write(
-`:run\n  run the current program
+							`:run\n  run the current program
 :ver\n  show version
 :clear\n  clear console
 :reset\n  reset console enviroment
 :tree\n  output the current program's syntax tree
 `,
-						'console-gray');
+							'console-gray');
 						break;
 					case ":clear":
 						jqconsole.Reset();
@@ -80,7 +81,7 @@ $(document).ready(function() {
 						printSyntaxTree(myCodeMirror.getValue(), current_parser);
 						break;
 					default:
-						driver_loop(input, current_parser, get_console_environment(), function(result){
+						driver_loop(input, current_parser, get_console_environment(), function (result) {
 							jqconsole.Write("=> " + result + '\n', 'console-arrow');
 							startPrompt();
 							return;
@@ -95,16 +96,16 @@ $(document).ready(function() {
 	startPrompt();
 });
 
-function exec(){
+function exec() {
 	//$("#program-result").html('<p class="output-finish">[Processing]</p>');
 	jqconsole.Write("  \n", 'jqconsole-old-prompt');
 	setup_global_environment();
 	var source = myCodeMirror.getValue();
-	driver_loop(source, current_parser, the_global_environment, function(){
+	driver_loop(source, current_parser, the_global_environment, function () {
 		// evaluation finished
 		//jqconsole.Write("=> [Finished]\n", 'console-arrow');
 	});
-	
+
 }
 
 function run() {
@@ -122,12 +123,12 @@ function run() {
 
 function printSyntaxTree(program_string, program_parser) {
 	try {
-		program_parser(program_string, function(syntax_tree){
-			if(debug){
-				console.log(JSON.stringify(syntax_tree,null,4));
+		program_parser(program_string, function (syntax_tree) {
+			if (debug) {
+				console.log(JSON.stringify(syntax_tree, null, 4));
 			}
 			printSyntaxTreeNode(syntax_tree, "");
-			jqconsole.Write(syntaxTreeStr+`\n`, 'console-default');
+			jqconsole.Write(syntaxTreeStr + `\n`, 'console-default');
 		}, false);
 	} catch (error) {
 		if (debug) {
@@ -144,7 +145,7 @@ function printSyntaxTreeNode(node, indent) {
 		// print head and tail in the same level
 		printSyntaxTreeNode(head(node), indent);
 		printSyntaxTreeNode(tail(node), indent);
-	} else if (typeof node === "object"){
+	} else if (typeof node === "object") {
 		if (!node) {
 			// null
 			syntaxTreeStr += (indent + node + `\n`);
@@ -161,35 +162,37 @@ function printSyntaxTreeNode(node, indent) {
 			syntaxTreeStr += (indent + `|-${attr}: `);
 			// member value
 			if (!node[attr] ||
-					(!is_list(node[attr]) && typeof node[attr] !== "object")){
+				(!is_list(node[attr]) && typeof node[attr] !== "object")) {
 				// print simple value in the same line
 				syntaxTreeStr += (`${node[attr]}\n`);
 			} else {
 				// print complex value in a new line
 				syntaxTreeStr += (`\n`);
-				printSyntaxTreeNode(node[attr], indent+"    ");
+				printSyntaxTreeNode(node[attr], indent + "    ");
 			}
 		}
 	} else {
 		// function argument name or constant
-		syntaxTreeStr += (indent+`"${node}"\n`);
+		syntaxTreeStr += (indent + `"${node}"\n`);
 	}
 }
 
-function registerEventListeners(){
-	$( ".example-option" ).click(function() {
-		var index = $( ".example-option" ).index( this );
+function registerEventListeners() {
+	$(".example-option").click(function () {
+		var index = $(".example-option").index(this);
 		$("#current-example").text($(this).text());
 		myCodeMirror.getDoc().setValue(samplecodes[index]);
 		$("#program-result").empty();
 	});
 }
 
-Mousetrap.bind(['ctrl+enter'], function(e) {
+Mousetrap.bind(['ctrl+enter'], function (e) {
 	run();
 	return false;
 });
 
 myCodeMirror.setOption("extraKeys", {
-	"Ctrl-Enter": function(instance) { run(); }
+	"Ctrl-Enter": function (instance) {
+		run();
+	}
 });
