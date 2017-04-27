@@ -28,7 +28,7 @@ func listToLinkedList(list) {
 
 // 1->2->3 => (1,2,3)
 func linkedListToList(linkedList) {
-	if linkedList == null { return  $list(); }
+	if linkedList == null { return  []; }
 	return $pair(linkedList.val, linkedListToList(linkedList.next));
 }
 
@@ -55,9 +55,9 @@ func addTwoNumbersCarry(l1, l2, carry) {
 }
 
 // number 582626823
-var num1 = listToLinkedList($list(3,2,8,6,2,6,2,8,5));
+var num1 = listToLinkedList([3,2,8,6,2,6,2,8,5]);
 // number 92802991
-var num2 = listToLinkedList($list(1,9,9,2,0,8,2,9));
+var num2 = listToLinkedList([1,9,9,2,0,8,2,9]);
 
 put("Num1: ");
 printNumber(linkedListToList(num1));

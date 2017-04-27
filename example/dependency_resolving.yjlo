@@ -11,7 +11,7 @@
 */
 func Node(n) {
 	var name = n;
-	var edges = $list();
+	var edges = [];
 	func addEdge(node) {
 		func help(node, head) {
 			if $is_empty(head) {
@@ -46,7 +46,7 @@ func isInList(node, list) {
 }
 
 func removeFromList(node, list) {
-	if $is_empty(list) { return $list(); }
+	if $is_empty(list) { return []; }
 	if $head(list).name == node.name { return $tail(list); }
 	return $pair($head(list), removeFromList(node, $tail(list)));
 }
@@ -67,8 +67,8 @@ func depResolve(node, unresolved){
 	resolved = $pair(node, resolved);
 	unresolved = removeFromList(node, unresolved);
 }
-var resolved = $list();
-depResolve(a, $list());
+var resolved = [];
+depResolve(a, []);
 
 func printReverse(list) {
 	if $is_empty(list) {
