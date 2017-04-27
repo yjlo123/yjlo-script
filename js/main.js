@@ -126,7 +126,7 @@ function printSyntaxTree(program_string, program_parser) {
 			if(debug){
 				console.log(JSON.stringify(syntax_tree,null,4));
 			}
-			printprintSyntaxTreeNode(syntax_tree, "");
+			printSyntaxTreeNode(syntax_tree, "");
 			jqconsole.Write(syntaxTreeStr+`\n`, 'console-default');
 		}, false);
 	} catch (error) {
@@ -138,12 +138,12 @@ function printSyntaxTree(program_string, program_parser) {
 	}
 }
 
-function printprintSyntaxTreeNode(node, indent) {
+function printSyntaxTreeNode(node, indent) {
 	if (is_list(node) && is_empty(node)) return;
 	if (is_list(node)) {
 		// print head and tail in the same level
-		printprintSyntaxTreeNode(head(node), indent);
-		printprintSyntaxTreeNode(tail(node), indent);
+		printSyntaxTreeNode(head(node), indent);
+		printSyntaxTreeNode(tail(node), indent);
 	} else if (typeof node === "object"){
 		if (!node) {
 			// null
@@ -167,7 +167,7 @@ function printprintSyntaxTreeNode(node, indent) {
 			} else {
 				// print complex value in a new line
 				syntaxTreeStr += (`\n`);
-				printprintSyntaxTreeNode(node[attr], indent+"    ");
+				printSyntaxTreeNode(node[attr], indent+"    ");
 			}
 		}
 	} else {
