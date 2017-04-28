@@ -509,36 +509,32 @@ print( counter.getCount() );		// output 2
 ```
 ### Inheritance
 ```swift
-func Shape() {
+class Shape {
 	var _name = "Shape";
 	func getType() { return "Shape"; }
 	func setName(name) { _name = name; }
 	func getName() { return _name; }
 	func getArea() { return 0; }
-	return func(){};
 }
 
-
-func Circle() extends Shape {
+class Circle extends Shape {
 	setName("Circle");
 	var _radius = 1;
 	func setRadius(radius) { _radius = radius; }
 	func getArea() { return $round(PI * _radius ** 2, 2); }
-	return func(){};
 }
 
 var c = Circle();
 c.setRadius(2);
 print( c.getName() + " area: " + c.getArea() );
 
-func Rectangle() extends Shape {
+class Rectangle extends Shape {
 	setName("Rectangle");
 	var _width = 0;
 	var _height = 0;
 	func setWidth(width) { _width = width; }
 	func setHeight(height) { _height = height; }
 	func getArea() { return _width * _height; }
-	return func(){};
 }
 
 var r = Rectangle();
@@ -546,10 +542,9 @@ r.setWidth(4);
 r.setHeight(10);
 print( r.getName() + " area: " + r.getArea() );
 
-func Square() extends Rectangle {
+class Square extends Rectangle {
 	setName("Square");
 	func setSide(side) { setWidth(side); setHeight(side); }
-	return func(){};
 }
 
 var s = Square();
