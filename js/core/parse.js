@@ -815,7 +815,10 @@
 			let desugared_tokens = [];
 			
 			// desugaring
-			original_tokens.forEach(function(t){
+			let brace_count = 0;
+			let open_class = false;
+			for (let i = 0; i < original_tokens.length; i++){
+				let t = original_tokens[i];
 				switch (t.value) {
 					case '[':
 						desugared_tokens.push(new Token('name', '$list', t.line));
@@ -824,10 +827,36 @@
 					case ']':
 						desugared_tokens.push(new Token('operator', ')', t.line));
 						break;
+					case 'class':
+						desugared_tokens.push(new Token('name', 'func', t.line));
+						i++;
+						t = original_tokens[i];
+						desugared_tokens.push(t);
+						desugared_tokens.push(new Token('operator', '(', t.line));
+						desugared_tokens.push(new Token('operator', ')', t.line));
+						brace_count += 1;
+						open_class = true;
+						break;
+					case '}':
+						if (open_class && brace_count == 1){
+							// end of class
+							desugared_tokens.push(new Token('name', 'return', t.line));
+							desugared_tokens.push(new Token('name', 'func', t.line));
+							desugared_tokens.push(new Token('operator', '(', t.line));
+							desugared_tokens.push(new Token('operator', ')', t.line));
+							desugared_tokens.push(new Token('operator', '{', t.line));
+							desugared_tokens.push(new Token('operator', '}', t.line));
+							desugared_tokens.push(new Token('operator', ';', t.line));
+							desugared_tokens.push(t);
+							open_class = false;
+						}
+						brace_count--;
+						break;
 					default:
 						desugared_tokens.push(t);
 				}
-			});
+			}
+			console.log(desugared_tokens)
 			return desugared_tokens;
 		}
 

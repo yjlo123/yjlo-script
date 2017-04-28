@@ -41,7 +41,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 			"for": kw("for"), "by": kw("for"), "switch": kw("switch"), "case": kw("case"), "default": kw("default"),
 			"in": kw("for"), //"typeof": operator, "instanceof": operator,
 			"true": atom, "false": atom, "null": kw("null"), "undefined": atom, "NaN": atom, "Infinity": atom,
-			//"this": kw("this"), "class": kw("class"), "super": kw("atom"),
+			"this": kw("this"), "class": kw("class"), "super": kw("atom"),
 			"yield": C, "export": kw("export"), "import": kw("import"), "extends": C,
 			//"await": C, "async": kw("async"),
 			"print": kw3("print"), "put": kw3("put"), "input": kw3("input")
@@ -367,7 +367,8 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		if (type == "default") return cont(expect(":"));
 		if (type == "catch") return cont(pushlex("form"), pushcontext, expect("("), funarg, expect(")"),
 																		 statement, poplex, popcontext);
-		if (type == "class") return cont(pushlex("form"), className, poplex);
+		//if (type == "class") return cont(pushlex("form"), className, poplex);
+		if (type == "class") return cont(functiondef);
 		if (type == "export") return cont(pushlex("stat"), afterExport, poplex);
 		if (type == "import") return cont(pushlex("stat"), afterImport, poplex);
 		if (type == "module") return cont(pushlex("form"), pattern, pushlex("}"), expect("{"), block, poplex, poplex)
