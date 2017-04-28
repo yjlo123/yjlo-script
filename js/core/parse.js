@@ -816,7 +816,8 @@
 			
 			// desugaring
 			let brace_count = 0;
-			let open_class = false;
+			let class_brace = 0;
+			let class_open = false;
 			for (let i = 0; i < original_tokens.length; i++){
 				let t = original_tokens[i];
 				switch (t.value) {
@@ -834,11 +835,15 @@
 						desugared_tokens.push(t);
 						desugared_tokens.push(new Token('operator', '(', t.line));
 						desugared_tokens.push(new Token('operator', ')', t.line));
-						brace_count += 1;
-						open_class = true;
+						class_open = true;
+						class_brace = brace_count;
+						break;
+					case '{':
+						desugared_tokens.push(t);
+						brace_count++;
 						break;
 					case '}':
-						if (open_class && brace_count == 1){
+						if (class_open && brace_count === class_brace+1){
 							// end of class
 							desugared_tokens.push(new Token('name', 'return', t.line));
 							desugared_tokens.push(new Token('name', 'func', t.line));
@@ -848,7 +853,9 @@
 							desugared_tokens.push(new Token('operator', '}', t.line));
 							desugared_tokens.push(new Token('operator', ';', t.line));
 							desugared_tokens.push(t);
-							open_class = false;
+							class_open = false;
+						} else {
+							desugared_tokens.push(t);
 						}
 						brace_count--;
 						break;
@@ -856,7 +863,6 @@
 						desugared_tokens.push(t);
 				}
 			}
-			console.log(desugared_tokens)
 			return desugared_tokens;
 		}
 
