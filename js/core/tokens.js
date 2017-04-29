@@ -97,7 +97,8 @@ String.prototype.tokens = function (prefix, suffix) {
 
 // name.
 
-		} else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c === '_'|| c === '$') {
+		} else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+					c === '_'|| c === '$'|| c === '@') {
 			str = c;
 			i += 1;
 			for (;;) {

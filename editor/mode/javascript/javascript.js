@@ -37,7 +37,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 			"if": kw2("if"), "while": A, "with": A, "else": B, "do": B, "try": B, "finally": B,
 			"return": C, "break": C, "continue": C, "fallthrough": C, "new": kw("new"), "delete": C, "throw": C, "debugger": C,
 			"var": kw("var"), "const": kw("var"), "let": kw("var"),
-			"func": kw("func"), "catch": kw("catch"),
+			"func": kw("func"), "@": kw("for"), "catch": kw("catch"),
 			"for": kw("for"), "by": kw("for"), "switch": kw("switch"), "case": kw("case"), "default": kw("default"),
 			"in": kw("for"), //"typeof": operator, "instanceof": operator,
 			"true": atom, "false": atom, "null": kw("null"), "undefined": atom, "NaN": atom, "Infinity": atom,
@@ -109,6 +109,9 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		} else if (ch == "/" && stream.eat(".")) {
 			// operator /.
 			return ret("operator", "operator", stream.current());
+		} else if (ch == "@") {
+			// constructor @
+			return ret("@", "keyword", stream.current());
 		} else if (ch == "." && stream.match(/^\d+(?:[eE][+\-]?\d+)?/)) {
 			return ret("number", "number");
 		} else if (ch == "." && stream.match("..")) {
@@ -360,6 +363,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		}
 		if (type == "func") return cont(functiondef);
 		if (type == "for") return cont(pushlex("form"), forspec, statement, poplex);
+		if (type == "@") return cont(constructor);
 		if (type == "variable") return cont(pushlex("stat"), maybelabel);
 		if (type == "switch") return cont(pushlex("form"), expression, pushlex("}", "switch"), expect("{"),
 																			block, poplex, poplex);
@@ -391,6 +395,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		var maybeop = noComma ? maybeoperatorNoComma : maybeoperatorComma;
 		if (atomicTypes.hasOwnProperty(type)) return cont(maybeop);
 		if (type == "func") return cont(functiondef, maybeop);
+		if (type == "@") return cont(constructor, maybeop);
 		if (type == "keyword c" || type == "async") return cont(noComma ? maybeexpressionNoComma : maybeexpression);
 		if (type == "(") return cont(pushlex(")"), maybeexpression, expect(")"), poplex, maybeop);
 		if (type == "operator" || type == "spread") return cont(noComma ? expressionNoComma : expression);
@@ -609,6 +614,10 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 	function functiondef(type, value) {
 		if (value == "*") {cx.marked = "keyword"; return cont(functiondef);}
 		if (type == "variable") {register(value); return cont(functiondef);}
+		if (type == "(") return cont(pushcontext, pushlex(")"), commasep(funarg, ")"), poplex, maybetype, statement, popcontext);
+	}
+	function constructor(type, value) {
+		if (value == "*") {cx.marked = "keyword"; return cont(functiondef);}
 		if (type == "(") return cont(pushcontext, pushlex(")"), commasep(funarg, ")"), poplex, maybetype, statement, popcontext);
 	}
 	function funarg(type) {
