@@ -1,9 +1,9 @@
-func UnitTest() {
+class UnitTest {
 	var counter = 0;
 	var pass = 0;
 	var all_pass = true;
 
-	func setup(title) {
+	@(title) {
 		counter = 0;
 		pass = 0;
 		print(" ===== " + title + " ===== ");
@@ -37,5 +37,4 @@ func UnitTest() {
 	func assertFalse(a){
 		assertEquals(a, false);
 	}
-	return func(){};
 }
