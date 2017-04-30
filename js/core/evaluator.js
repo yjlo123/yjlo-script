@@ -8,25 +8,23 @@ function throwError(line, message) {
 }
 
 function is_tagged_object(stmt,the_tag) {
-	return stmt 
-			&& typeof stmt === "object" 
-			&& stmt.tag === the_tag;
+	return stmt && typeof stmt === "object" && stmt.tag === the_tag;
 }
-		
+
 function is_self_evaluating(stmt) {
 	return stmt === [] ||
 	typeof stmt === "number" ||
 	typeof stmt === "string" ||
 	typeof stmt === "boolean";
 }
-		
+
 function is_variable(stmt) {
 	return is_tagged_object(stmt,"variable");
 }
 function variable_name(stmt) {
 	return stmt.name;
 }
-		
+
 function enclosing_environment(env) {
 	return tail(env);
 }
@@ -55,11 +53,11 @@ function lookup_variable_value(stmt, variable, env) {
 function is_assignment(stmt) {
 	return is_tagged_object(stmt,"assignment");
 }
-function assignment_variable(stmt) {
-	return stmt.variable;
+function assignment_left(stmt) {
+	return stmt.left;
 }
-function assignment_value(stmt) {
-	return stmt.value;
+function assignment_right(stmt) {
+	return stmt.right;
 }
 	
 function set_variable_value(stmt, variable, value, env) {
@@ -75,16 +73,21 @@ function set_variable_value(stmt, variable, value, env) {
 }
 	 
 function evaluate_assignment(stmt, env) {
-	var value = evaluate(assignment_value(stmt),env);
-	var left = stmt.left;
-	if (left && is_application(left)){
+	var value = evaluate(assignment_right(stmt),env);
+	var left = assignment_left(stmt);
+	var left_value = stmt.returnLeft ? evaluate(left, env) : null;
+	if (is_application(left)){
+		// member reference
 		var member = head(tail(operands(left))).name;
-		set_variable_value(stmt, member, 
-							value, 
+		set_variable_value(stmt, member, value,
 							function_value_environment(
 								evaluate(head(operands(left)), env)));
 	} else {
-		set_variable_value(stmt, assignment_variable(stmt), value, env);
+		// variable
+		set_variable_value(stmt, left.name, value, env);
+	}
+	if (stmt.returnLeft) {
+		return left_value;
 	}
 	return value;
 }
@@ -470,7 +473,7 @@ function return_value_content(value) {
 	return value.content;
 }
  
-function apply(fun, args) {
+function apply(fun, args, line) {
 	if (is_primitive_function(fun)) {
 		return apply_primitive_function(fun, args);
 	} else if (is_compound_function_value(fun)) {
@@ -489,7 +492,7 @@ function apply(fun, args) {
 		if (is_return_value(result)) 
 			return return_value_content(result);
 	} else {
-		throwError("?", "Unknown function type - APPLY: " + fun);
+		throwError(line, "Unknown function type - APPLY: " + fun);
 	}
 }
 
@@ -666,7 +669,7 @@ function evaluate(stmt,env) {
 			if (is_application(member)) {
 				// reference function member
 				return apply(refer(evaluate(fun, env), operator(member).name),
-						list_of_values(operands(member), env));
+						list_of_values(operands(member), env), stmt.line);
 			} else {
 				return refer(evaluate(fun,env), member.name);
 			}
@@ -674,7 +677,7 @@ function evaluate(stmt,env) {
 			// ternary operator
 			return apply_ternary(optr, operands(stmt), env);
 		} else {
-			return apply(evaluate(optr,env), list_of_values(operands(stmt),env));
+			return apply(evaluate(optr,env), list_of_values(operands(stmt),env), stmt.line);
 		}
 	} else if (is_return_statement(stmt)) {
 		return make_return_value(stmt.line, 

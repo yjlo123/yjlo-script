@@ -73,6 +73,22 @@
 			}
 		}
 		
+		class AssignmentNode extends Node {
+			constructor(line) {
+				super("assignment", line);
+				this.returnLeft = false;
+			}
+			setLeft(value) {
+				this.left = value;
+			}
+			setRight(value) {
+				this.right = value;
+			}
+			setReturnLeft() {
+				this.returnLeft = true;
+			}
+		}
+		
 		class ReturnStatementNode extends Node {
 			constructor(line, expression) {
 				super("return_statement", line);
@@ -110,6 +126,10 @@
 			case "_-": // negative
 			case "_!": // not
 			case "_~":
+			case "++":	// ++i
+			case "_++":	// i++
+			case "--":	// --i
+			case "_--":	// i--
 				return 12;
 			case "*":
 			case "/":
@@ -144,8 +164,10 @@
 			case "?":
 			case ":":
 				return 1;
-			default:
+			case "=": // assignment
 				return 0;
+			default:
+				return -1;
 			}
 		};
 
@@ -183,13 +205,7 @@
 			}
 
 			// read in the tokens in this expression
-			while (token &&
-				// , ; {
-				!/^[,;{]$/.test(token.value) &&
-				token.value !== "=" &&
-				// compound assignment += -= *= /= %= &= |= ^= /.= **= <<= >>= >>>=
-				!/^([+\-\*\/%&|^]|\*\*|\/\.|[<>]{2}|[>]{3})=$/.test(token.value) &&
-				token.value !== "++" && token.value !== "--") {
+			while (token && !/^[,;{]$/.test(token.value)) {
 				if (isClosingBracketToken(token) && bracket_count === 0) {
 					// end of current expression
 					break;
@@ -220,14 +236,6 @@
 				advance();
 			}
 			
-			let expression_length = expression_nodes_infix.length;
-			if (expression_length > 0) {
-				let last_node = expression_nodes_infix[expression_length-1];
-				if (last_node.type === "operator" && last_node.name !== ")"){
-					throwError(token, "Invalid expression.");
-				}
-			}
-
 			// push the rest closing brackets
 			while (bracket_count > 0) {
 				expression_nodes_infix.push(token);
@@ -274,6 +282,15 @@
 					if (thisNode.name === '!' || thisNode.name === '~') {
 						thisNode.name = '_' + thisNode.name;
 					}
+					
+					// increment or decrement
+					if ((thisNode.name === '++' || thisNode.name === '--')) {
+						if (!(expression_nodes_postfix.length === 0 || (prevNode && prevNode.name === '('))) {
+							// if not prefix: i++, i--
+							thisNode.name = '_' + thisNode.name;
+						}
+					}
+					
 					while (temp_stack.length > 0 &&
 						precedence(thisNode.name) <= precedence(temp_stack[temp_stack.length - 1].name)) {
 						expression_nodes_postfix.push(temp_stack.pop());
@@ -292,32 +309,66 @@
 			// build syntax tree
 			let tree_stack = [];
 			for (let i = 0; i < expression_nodes_postfix.length; i++) {
-				if (expression_nodes_postfix[i].type === 'operator' || expression_nodes_postfix[i].type === 'reference'){
-					//let apply_node = new_node();
-					let operands = [];
+				let exp_node = expression_nodes_postfix[i];
+				if (exp_node.type === 'operator') {
 					
-					if (expression_nodes_postfix[i].name === "?") {
-						// ternary operator, wait for one more operand
-						continue;
-					}
-					
-					operands.unshift(tree_stack.pop());
-					if (expression_nodes_postfix[i].name.charAt(0) !== '_'){
-						// not a unary operator
+					if (// _++, _--, ++, --
+						/^_?(\+\+|--)$/.test(exp_node.name) ||
+							// += -= *= /= %= &= |= ^= /.= **= <<= >>= >>>=
+							/^([+\-\*\/%&|^]|\*\*|\/\.|[<>]{2}|[>]{3})=$/.test(exp_node.name)) {
+						let compound_assign = exp_node.name.charAt(exp_node.name.length-1) === '=';
+						let assign_node = new AssignmentNode(exp_node.line);
+						let right = null;
+						let operator = "";
+						if (compound_assign) {
+							right = tree_stack.pop();
+							operator = exp_node.name.slice(0, -1);
+						} else {
+							right = 1;
+							operator = exp_node.name.charAt(1); // + or -
+						}
+						let left = tree_stack.pop();
+						
+						let apply_node = new ApplicationNode(exp_node.line);
+						apply_node.setOperator(new VariableNode(operator, "operator", exp_node.line));
+						apply_node.setOperands(array_to_list([left, right]));
+						
+						assign_node.setLeft(left);
+						assign_node.setRight(apply_node);
+						if (exp_node.name.charAt(0) === '_') {
+							assign_node.setReturnLeft();
+						}
+						tree_stack.push(assign_node);
+					} else if (exp_node.name === '=') {
+						let assign_node = new AssignmentNode(exp_node.line);
+						assign_node.setRight(tree_stack.pop());
+						assign_node.setLeft(tree_stack.pop());
+						tree_stack.push(assign_node);
+					} else {
+						let operands = [];
+						
+						if (exp_node.name === "?") {
+							// ternary operator, wait for one more operand
+							continue;
+						}
+						
 						operands.unshift(tree_stack.pop());
+						if (exp_node.name.charAt(0) !== '_'){
+							// not a unary operator
+							operands.unshift(tree_stack.pop());
+						}
+						
+						if (exp_node.name === ":") {
+							// ternary operator, pop third operand
+							operands.unshift(tree_stack.pop());
+						}
+						let apply_node = new ApplicationNode(exp_node.line);
+						apply_node.setOperator(exp_node);
+						apply_node.setOperands(array_to_list(operands));
+						tree_stack.push(apply_node);
 					}
-					
-					if (expression_nodes_postfix[i].name === ":") {
-						// ternary operator, pop third operand
-						operands.unshift(tree_stack.pop());
-					}
-
-					let apply_node = new ApplicationNode(expression_nodes_postfix[i].line);
-					apply_node.setOperator(expression_nodes_postfix[i]);
-					apply_node.setOperands(array_to_list(operands));
-					tree_stack.push(apply_node);
-				}else{
-					tree_stack.push(expression_nodes_postfix[i]);
+				} else {
+					tree_stack.push(exp_node);
 				}
 			}
 			return tree_stack[0];
@@ -377,40 +428,6 @@
 					break;
 				default:
 					v = expression();
-					if(token){
-						// Assignment statement
-						var prev_token = token;
-						v.line = token.line;
-						switch (token.value) {
-							case "=":
-								advance();
-								v = assign(v, null);
-								break;
-							case "+=":
-							case "-=":
-							case "*=":
-							case "/=":
-							case "/.=":
-							case "%=":
-							case "**=":
-							case "&=":
-							case "|=":
-							case "^=":
-							case "<<=":
-							case ">>=":
-							case ">>>=":
-								advance();
-								v = assign(v, prev_token.value);
-								break;
-							case "++":
-							case "--":
-								advance();
-								v = assign(v, prev_token.value, 1);
-								break;
-							default:
-								advance(";");
-						}
-					}
 			}
 			return v;
 		};
@@ -465,42 +482,6 @@
 			let node = new ReturnStatementNode(token.line, expression());
 			advance(";");
 			return node;
-		};
-
-	/*===================== ASSIGN ======================= */
-		var assign = function(left, operator, value) {
-			log("parsing assign. " + left.name);
-			
-			var t = new_node();
-			t.tag = "assignment";
-			t.line = left.line;
-			var right_var_node = null;
-			
-			if (left instanceof ApplicationNode){
-				// assign to reference
-				t.left = left;
-				right_var_node = left;
-			} else if (left.type !== "variable") {
-				throwTokenError("a variable name", left);
-			} else {
-				// assign to variable
-				t.variable = left.name;
-				right_var_node = new VariableNode(left.name, "variable", left.line);
-			}
-
-			if (operator){
-				// Compound Assignment
-				let apply_node = new ApplicationNode(left.line);
-				apply_node.setOperator(new VariableNode(operator.slice(0, -1), "operator", left.line));
-				apply_node.setOperands(array_to_list([
-											right_var_node,
-											value || expression()]));
-				t.value = apply_node;
-			}else{
-				t.value = expression();
-			}
-			advance(";");
-			return t;
 		};
 
 	/*===================== FUNC ======================= */
@@ -822,6 +803,10 @@
 			let class_constructor_arg_tokens = [];
 			for (let i = 0; i < original_tokens.length; i++) {
 				let t = original_tokens[i];
+				if (t.type !== "operator" && t.type !== "name") {
+					desugared_tokens.push(t);
+					continue;
+				}
 				switch (t.value) {
 					case '[':
 						desugared_tokens.push(new Token('name', '$list', t.line));
