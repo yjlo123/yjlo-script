@@ -155,9 +155,15 @@ function _process_output(args) {
 			// print list
 			output += "[";
 			while (!is_empty(arg)){
-				output += (head(arg)+", ");
+				// nested list
+				if (is_list(head(arg))) {
+					output += (_process_output([head(arg)])+", ");
+				} else {
+					output += (head(arg)+", ");
+				}
 				arg = tail(arg);
 			}
+			// remove ", "
 			if(output.length !== 1){
 				output = output.slice(0, -2);
 			}
