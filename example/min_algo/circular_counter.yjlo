@@ -1,0 +1,34 @@
+/*
+There are people sitting in a circular fashion,
+print every third member while removing them,
+the next counter starts immediately after the member is removed.
+Print till all the members are exhausted.
+For example:
+Input: consider 123456789 members sitting in a circular fashion,
+Output: 369485271
+*/
+
+import LinkedList;
+
+func circularCount(list, skip){
+	var queue = LinkedList();
+	var result = LinkedList();
+	
+	// add list to queue
+	while !$is_empty(list) {
+		queue.add($head(list));
+		list = $tail(list);
+	}
+	
+	while queue.size() > 0 {
+		for i in (skip - 1) {
+			queue.addLast(queue.removeFirst());
+		}
+		result.add(queue.removeFirst());
+	}
+	
+	return result.toList();
+}
+
+var a = ['1','2','3','4','5','6','7','8','9'];
+print( circularCount(a, 3) );
