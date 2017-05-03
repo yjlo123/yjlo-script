@@ -53,8 +53,8 @@ Hello YJLO!
 
 ## Contributing
 Contributions to YJLO Script are welcomed and encouraged!  
-[Open an issue](https://github.com/yjlo123/yjlo-script/issues/new) if you find a bug or have a feature request.
-[Email me](mailto:liusiwei.yjlo@gmail.com) to ask any questions.
+[Open an issue](https://github.com/yjlo123/yjlo-script/issues/new) if you find a bug or have a feature request.  
+[Email me](mailto:liusiwei.yjlo@gmail.com) to ask any questions.  
 Submit a [pull request](https://github.com/yjlo123/yjlo-script/pulls) if you want to contribute.
 
 ## License
