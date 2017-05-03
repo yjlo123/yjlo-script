@@ -482,6 +482,8 @@ function apply(fun, args, line) {
 			// override parent environment
 			func_env = function_value_environment(fun);
 			update_environment(function_value_parameters(fun), args, func_env);
+			// then create self environment
+			func_env = extend_environment([], [], func_env);
 		} else {
 			// create self (new) environment
 			func_env = extend_environment(function_value_parameters(fun),
