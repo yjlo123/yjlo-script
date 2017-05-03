@@ -47,6 +47,14 @@ func HeapList() extends Heap {
 		_size = 0;
 	}
 	
+	func toList() {
+		var list = [];
+		for i in (size()-1, -1) by -1 {
+			list = $pair(get(i), list);
+		}
+		return list;
+	}
+	
 	return func(){};
 }
 
