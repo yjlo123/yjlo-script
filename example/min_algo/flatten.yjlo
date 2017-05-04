@@ -1,0 +1,31 @@
+/*
+Implement Flatten Lists.
+Given an list that may contain nested lists,
+give a single resultant list.
+
+Example:
+Input: [2, 1, [3, [4, 5], 6], 7, [8]];
+Output: [2, 1, 3, 4, 5, 6, 7, 8]
+*/
+
+func flatten(list, res) {
+	if !$is_list(list) { return $pair(list, res); }
+	if $is_empty(list) { return res; }
+	if $is_empty($tail(list)) {
+		return flatten($head(list), res);
+	}
+	return flatten($head(list), flatten($tail(list), res));
+}
+
+var nested_list = [2,1,[3,[4,5],6],7,[8]];
+print(nested_list);
+print(flatten(nested_list, []));
+
+// reversed order flatten
+func flatten_rev(list, res) {
+	if $is_empty(list) { return res; }
+	if $is_list($head(list)) {
+		return flatten_rev($tail(list), flatten_rev($head(list), res));
+	}
+	return flatten_rev($tail(list), $pair($head(list), res));
+}
