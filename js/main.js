@@ -99,11 +99,20 @@ $(document).ready(function () {
 function exec() {
 	//$("#program-result").html('<p class="output-finish">[Processing]</p>');
 	jqconsole.Write("  \n", 'jqconsole-old-prompt');
+	var startDate = new Date();
 	setup_global_environment();
 	var source = myCodeMirror.getValue();
 	driver_loop(source, current_parser, the_global_environment, function () {
 		// evaluation finished
 		//jqconsole.Write("=> [Finished]\n", 'console-arrow');
+		var endDate = new Date();
+		var unit = "ms";
+		var time_used = (endDate.getTime() - startDate.getTime());
+		if (time_used > 1000) {
+			time_used /= 1000;
+			unit = "s";
+		}
+		jqconsole.Write(`[Finished in ${time_used}${unit}]\n`, 'console-gray');
 	});
 
 }
