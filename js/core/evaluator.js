@@ -284,7 +284,7 @@ function evaluate_for_stmtement_clause(stmt, env) {
 	var variable_value = evaluate(for_variable(stmt), env);
 	var range_from_value = evaluate(for_range(stmt).from, env);
 	var range_to_value = evaluate(for_range(stmt).to, env);
-	var increment = for_increment(stmt) || (range_from_value < range_to_value ? 1 : -1);
+	var increment = for_increment(stmt) || 1;
 	var increment_value = evaluate(increment, env);
 
 	if ((increment_value > 0 && variable_value < range_to_value)
