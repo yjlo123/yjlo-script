@@ -556,6 +556,7 @@
 				advance(); // var name
 				t = new_node();
 				t.tag = "var_definition";
+				t.line = n.line;
 				t.variable = n.value;
 				if (token && token.value === "=") {
 					advance("=");
@@ -896,6 +897,13 @@
 						brace_count--;
 						break;
 					default:
+						if (t.type === "name" && t.value && t.value.length > 0) {
+							let firstChar = t.value.charAt(0);
+							if (firstChar === "@") {
+								// prevent defining system generated variables
+								throwError(t, "Invalid variable name: " + t.value);
+							}
+						}
 						desugared_tokens.push(t);
 				}
 			}
