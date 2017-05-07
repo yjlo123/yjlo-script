@@ -21,6 +21,15 @@ function is_self_evaluating(stmt) {
 function is_variable(stmt) {
 	return is_tagged_object(stmt,"variable");
 }
+function isBuiltInVariable(variable) {
+	if (variable && variable.length > 0) {
+		let firstChar = variable.charAt(0);
+		if (firstChar === "$"){
+			return true;
+		}
+	}
+	return false;
+}
 function variable_name(stmt) {
 	return stmt.name;
 }
@@ -61,6 +70,9 @@ function assignment_right(stmt) {
 }
 	
 function set_variable_value(stmt, variable, value, env) {
+	if(isBuiltInVariable(variable)) {
+		throwError(stmt.line, `Invalid variable name: ${variable}`);
+	}
 	function env_loop(env) {
 		if (is_empty_environment(env))
 			throwError(stmt&&stmt.line?stmt.line:"?", "Cannot find variable: "+variable);
@@ -126,8 +138,12 @@ function define_variable(variable,value,env) {
 }
 	 
 function evaluate_var_definition(stmt,env) {
-	define_variable(var_definition_variable(stmt),
-		evaluate(var_definition_value(stmt),env),
+	let variable = var_definition_variable(stmt);
+	if(isBuiltInVariable(variable)) {
+		throwError(stmt.line, `Invalid variable name: ${variable}`);
+	}
+	define_variable(variable,
+		evaluate(var_definition_value(stmt), env),
 		env);
 	return undefined;
 }
@@ -632,7 +648,7 @@ function evaluate_toplevel(stmt,env) {
 function evaluate(stmt,env) {
 	if (is_self_evaluating(stmt)) 
 		return stmt;
-	else if (is_variable(stmt)) 
+	else if (is_variable(stmt))
 		return lookup_variable_value(stmt, variable_name(stmt),env);
 	else if (is_assignment(stmt)) 
 		return evaluate_assignment(stmt,env);
