@@ -1,0 +1,41 @@
+import UnitTest;
+
+func testIf() {
+	ut = UnitTest("Test if");
+	var a = 0;
+	
+	// test basic if
+	if true {
+		a = 2;
+	}
+	ut.assertEquals( 2, a );
+	
+	// test else
+	if false {
+		a = 3;
+	} else {
+		a = 5;
+	}
+	ut.assertEquals( 5, a );
+	
+	// test else if
+	if false {
+		a = 6;
+	} else if false {
+		a = 7;
+	} else if true {
+		a = 8;
+	}
+	ut.assertEquals( 8, a );
+	
+	ut.printResult();
+}
+
+func main() {
+	testIf();
+	print();
+	
+	print(ut.all_pass ? "[Success]" : "[Failed]");
+}
+var ut = null;
+main();
