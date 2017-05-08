@@ -25,7 +25,7 @@
  * Modification includs:
  *   add line number to tokens
  *   support block comments
- *   support names start with '_' and '$'
+ *   support names start with '_' '@' and '$'
  *   support multi-line string with ``
  */
 
@@ -126,6 +126,11 @@ String.prototype.tokens = function (prefix, suffix) {
 
 			for (;;) {
 				c = this.charAt(i);
+				if (c === '_') {
+					i += 1;
+					c = this.charAt(i);
+					continue;
+				}
 				if (c < '0' || c > '9') {
 					break;
 				}
@@ -140,6 +145,11 @@ String.prototype.tokens = function (prefix, suffix) {
 				str += c;
 				for (;;) {
 					c = this.charAt(i);
+					if (c === '_') {
+						i += 1;
+						c = this.charAt(i);
+						continue;
+					}
 					if (c < '0' || c > '9') {
 						break;
 					}

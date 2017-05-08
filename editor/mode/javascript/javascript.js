@@ -130,7 +130,9 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 			stream.eatWhile(/[01]/i);
 			return ret("number", "number");
 		} else if (/\d/.test(ch)) {
-			stream.match(/^\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/);
+			//stream.match(/^\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/);
+			stream.match(/^\d+(_\d+)+(?:\.\d*(_\d+)+)?(?:[eE][+\-]?\d+)?$/);
+			stream.eatWhile(/[\d_\.]/i);
 			return ret("number", "number");
 		} else if (ch == "/") {
 			if (stream.eat("*")) {
