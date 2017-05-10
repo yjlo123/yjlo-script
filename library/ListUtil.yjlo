@@ -1,0 +1,44 @@
+/**
+ * List Util
+ * @author Liu Siwei
+ */
+
+class ListUtil {
+	func set(lst, n, v) {
+		if ($is_empty(lst)) return lst;
+		if (n == 0) return $pair(v, $tail(lst));
+		else return $pair($head(lst), set($tail(lst), n-1, v));
+	}
+
+	func get(lst, n) {
+		if $is_empty(lst) { return null; }
+		if n == 0 { return $head(lst); }
+		else return get($tail(lst), n - 1);
+	}
+	
+	func len(lst) {
+		return $is_empty(lst) ? 0 : 1 + length($tail(lst));
+	}
+	
+	func equal(lst1, lst2) {
+		if !$is_list(lst1) || !$is_list(lst2) { return false; }
+		if $is_empty(lst1) && $is_empty(lst2) { return true; }
+		if $is_empty(lst1) || $is_empty(lst2) { return false; }
+		return $head(lst1) == $head(lst2) && equal($tail(lst1), $tail(lst2));
+	}
+	
+	func sort(lst) {
+		// TODO
+		return lst;
+	}
+	
+	func max(lst) {
+		// TODO
+		return null;
+	}
+	
+	func min(lst) {
+		// TODO
+		return null;
+	}
+}
