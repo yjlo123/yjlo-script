@@ -19,17 +19,27 @@ function is_self_evaluating(stmt) {
 }
 
 function is_variable(stmt) {
-	return is_tagged_object(stmt,"variable");
+	return is_tagged_object(stmt, "variable");
 }
+
 function isBuiltInVariable(variable) {
 	if (variable && variable.length > 0) {
 		let firstChar = variable.charAt(0);
-		if (firstChar === "$"){
+		if (firstChar === "$") {
 			return true;
 		}
 	}
 	return false;
 }
+
+function isValidVariableName(variable) {
+	if (variable && !isBuiltInVariable(variable) &&
+		!/^(true|false|null)$/.test(variable)) {
+		return true;
+	}
+	return false;
+}
+
 function variable_name(stmt) {
 	return stmt.name;
 }
@@ -70,7 +80,7 @@ function assignment_right(stmt) {
 }
 	
 function set_variable_value(stmt, variable, value, env) {
-	if(isBuiltInVariable(variable)) {
+	if(!isValidVariableName(variable)) {
 		throwError(stmt.line, `Invalid variable name: ${variable}`);
 	}
 	function env_loop(env) {
@@ -139,7 +149,7 @@ function define_variable(variable,value,env) {
 	 
 function evaluate_var_definition(stmt,env) {
 	let variable = var_definition_variable(stmt);
-	if(isBuiltInVariable(variable)) {
+	if(!isValidVariableName(variable)) {
 		throwError(stmt.line, `Invalid variable name: ${variable}`);
 	}
 	define_variable(variable,

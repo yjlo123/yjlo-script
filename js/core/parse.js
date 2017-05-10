@@ -675,6 +675,7 @@
 			if (hasBracket) advance("(");
 			var n = new_node();
 			n.tag = "for";
+			n.line = token.line;
 			// variable
 			if (!isVarNameToken(token)) {
 				throwTokenError("a variable name", token);
