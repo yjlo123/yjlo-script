@@ -27,6 +27,16 @@ class ListUtil {
 		return $head(lst1) == $head(lst2) && equal($tail(lst1), $tail(lst2));
 	}
 	
+	func getLast(lst) {
+		if ($is_empty(lst)) {
+			return [];
+		}
+		if ($is_empty($tail(lst))) {
+			return $head(lst);
+		}
+		return getLast($tail(lst));
+	}
+	
 	func sort(lst) {
 		// TODO
 		return lst;
