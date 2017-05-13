@@ -136,6 +136,7 @@ function printSyntaxTree(program_string, program_parser) {
 			if (debug) {
 				// console.log(JSON.stringify(syntax_tree, null, 4));
 			}
+			syntaxTreeStr = "";
 			printSyntaxTreeNode(syntax_tree, "");
 			jqconsole.Write(syntaxTreeStr + `\n`, 'console-default');
 		}, false);
