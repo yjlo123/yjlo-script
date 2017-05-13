@@ -18,6 +18,74 @@ function is_self_evaluating(stmt) {
 	typeof stmt === "boolean";
 }
 
+// =============== ENV ===================
+function enclosing_environment(env) {
+	return tail(env);
+}
+
+function first_frame(env) {
+	return head(env);
+}
+
+function is_empty_environment(env) {
+	return is_empty(env);
+}
+
+function enclose_by(frame,env) {
+	return pair(frame,env);
+}
+
+function make_frame(variables,values) {
+	if (is_empty(variables) && is_empty(values)) 
+		return {};
+	else {
+		var next_tail = is_empty(values) ? values : tail(values);
+		var frame = make_frame(tail(variables),next_tail);
+		frame[head(variables)] = is_empty(values) ? null : head(values);
+		return frame;
+	}
+}
+
+function duplicateFirstFrame(env) {
+	let frame = first_frame(env);
+	let keys = list();
+	let vals = list();
+	for (let key in frame) {
+		// skip loop if the property is from prototype
+		if (!frame.hasOwnProperty(key)) continue;
+		keys = pair(key, keys);
+		vals = pair(frame[key], vals);
+	}
+	
+	// update copied frame's function env
+	let new_env = enclose_by(make_frame(keys,vals), env);
+	let new_frame = first_frame(new_env);
+	for (let key in new_frame) {
+		if (!new_frame.hasOwnProperty(key)) continue;
+		let val = new_frame[key];
+		if (val.tag === "function_value") {
+			val.environment = new_env;
+		}
+	}
+	return new_env;
+}
+
+function add_binding_to_frame(variable,value,frame) {
+	frame[variable] = value; // object field assignment
+	return;
+}
+function has_binding_in_frame(variable,frame) {
+	return frame.hasOwnProperty(variable);
+}
+
+function define_variable(variable,value,env) {
+	var frame = first_frame(env);
+	return add_binding_to_frame(variable,value,frame);
+}
+
+
+// ===================================================
+
 function is_variable(stmt) {
 	return is_tagged_object(stmt, "variable");
 }
@@ -44,20 +112,6 @@ function variable_name(stmt) {
 	return stmt.name;
 }
 
-function enclosing_environment(env) {
-	return tail(env);
-}
-function first_frame(env) {
-	return head(env);
-}
-
-function is_empty_environment(env) {
-	return is_empty(env);
-}
-function enclose_by(frame,env) {
-	return pair(frame,env);
-}
-	 
 function lookup_variable_value(stmt, variable, env) {
 	function env_loop(env) {
 		if (is_empty_environment(env))
@@ -123,30 +177,7 @@ function var_definition_variable(stmt) {
 function var_definition_value(stmt) {
 	return stmt.right;
 }
-		
-function make_frame(variables,values) {
-	if (is_empty(variables) && is_empty(values)) 
-		return {};
-	else {
-		var next_tail = is_empty(values) ? values : tail(values);
-		var frame = make_frame(tail(variables),next_tail);
-		frame[head(variables)] = is_empty(values) ? null : head(values);
-		return frame;
-	}
-}
-function add_binding_to_frame(variable,value,frame) {
-	frame[variable] = value; // object field assignment
-	return;
-}
-function has_binding_in_frame(variable,frame) {
-	return frame.hasOwnProperty(variable);
-}
-	 
-function define_variable(variable,value,env) {
-	var frame = first_frame(env);
-	return add_binding_to_frame(variable,value,frame);
-}
-	 
+
 function evaluate_var_definition(stmt,env) {
 	let variable = var_definition_variable(stmt);
 	if(!isValidVariableName(variable)) {
@@ -294,23 +325,27 @@ function evaluate_for_stmtement_clause(stmt, env) {
 	var variable_value = evaluate(for_variable(stmt), env);
 	var range_from_value = evaluate(for_range(stmt).from, env);
 	var range_to_value = evaluate(for_range(stmt).to, env);
+	var range_closed = for_range(stmt).closed;
 	var increment = for_increment(stmt) || 1;
 	var increment_value = evaluate(increment, env);
-
-	if ((increment_value > 0 && variable_value < range_to_value)
-		|| (increment_value < 0 && variable_value > range_to_value)){
+	if ((increment_value > 0 &&
+			((!range_closed && variable_value < range_to_value) ||
+				range_closed && variable_value <= range_to_value)) ||
+		(increment_value < 0 &&
+			((!range_closed && variable_value > range_to_value) ||
+				(range_closed && variable_value >= range_to_value)))) {
 		var result = evaluate(for_consequent(stmt), env);
-		if (is_return_value(result)){
+		if (is_return_value(result)) {
 			// encounter return statement in for loop
 			return result;
 		}
-		if (is_break_value(result)){
+		if (is_break_value(result)) {
 			return null;
 		}
 		// increment
 		set_variable_value(stmt, for_variable(stmt).name,
-						variable_value + increment_value,
-						env);
+			variable_value + increment_value,
+			env);
 		return evaluate_for_stmtement_clause(stmt, env);
 	}
 }
@@ -507,9 +542,11 @@ function apply(fun, args, line) {
 		if (fun.has_parent) {
 			// override parent environment
 			func_env = function_value_environment(fun);
+			func_env = duplicateFirstFrame(func_env);
+
 			update_environment(function_value_parameters(fun), args, func_env);
 			// then create self environment
-			func_env = extend_environment([], [], func_env);
+			//func_env = extend_environment([], [], func_env);
 		} else {
 			// create self (new) environment
 			func_env = extend_environment(function_value_parameters(fun),
