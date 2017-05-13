@@ -107,6 +107,25 @@
 				this.expression = expression;
 			}
 		}
+		
+		class RangeNode extends Node {
+			constructor(line) {
+				super("range", line);
+				this.closed = false;
+			}
+			
+			setFrom(value) {
+				this.from = value;
+			}
+			
+			setTo(value) {
+				this.to = value;
+			}
+			
+			setClosed() {
+				this.closed = true;
+			}
+		}
 
 		var isConstantToken = t => t && (t.type === "string" || t.type === "number");
 
@@ -218,7 +237,8 @@
 
 			// read in the tokens in this expression
 			while (token && !/^[,;{]$/.test(token.value) &&
-					!/^\.\.[\.<]$/.test(token.value)) {
+					!/^\.\.[\.<>]$/.test(token.value) &&
+					!/^by$/.test(token.value)) {
 				if (isClosingBracketToken(token) && bracket_count === 0) {
 					// end of current expression
 					break;
@@ -700,6 +720,7 @@
 			n.variable = new VariableNode(token.value, "variable", token.line);
 			advance();
 			// range
+			advance("in");
 			n.range = parse_range();
 			// increment
 			n.increment = parse_increment();
@@ -709,28 +730,16 @@
 		};
 
 		var parse_range = function () {
-			var range = {};
-			advance("in");
-			range.from = expression();
-			advance('...');
-			range.to = expression();
-			return range;
-		};
-		
-		var parse_range_old = function () {
-			var range = {};
-			advance("in");
-			advance("(");
-			var first_value = expression();
-			if (isClosingBracketToken(token)) {
-				range.from = 0;
-				range.to = first_value;
+			let range = new RangeNode(token.line);
+			range.setFrom(expression());
+			if (/^\.\.[<>]$/.test(token.value)) {
+				// ..< or ..>
+				advance();
 			} else {
-				range.from = first_value;
-				advance(',');
-				range.to = expression();
+				advance('...');
+				range.setClosed();
 			}
-			advance(")");
+			range.setTo(expression());
 			return range;
 		};
 
@@ -762,6 +771,7 @@
 			if (!isOpeningBracketToken(token)) {
 				condition_expression = expression();
 			} else {
+				// necessary for omitting braces
 				advance("(");
 				condition_expression = expression();
 				advance(")");

@@ -114,8 +114,8 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 			return ret("@", "keyword", stream.current());
 		} else if (ch == "." && stream.match(/^\d+(?:[eE][+\-]?\d+)?/)) {
 			return ret("number", "number");
-		} else if (ch == "." && stream.match("..")) {
-			return ret("spread", "meta");
+		} else if (ch == "." && stream.match(/\.[\.<>]/)) {
+			return ret("operator", "operator");
 		} else if (/[\[\]{}\(\),;\:\.]/.test(ch)) {
 			return ret(ch);
 		} else if (ch == "=" && stream.eat(">")) {
@@ -132,7 +132,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		} else if (/\d/.test(ch)) {
 			//stream.match(/^\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/);
 			stream.match(/^\d+(_\d+)+(?:\.\d*(_\d+)+)?(?:[eE][+\-]?\d+)?$/);
-			stream.eatWhile(/[\d_\.]/i);
+			stream.eatWhile(/[\d_](\.[\d_]+)?/i);
 			return ret("number", "number");
 		} else if (ch == "/") {
 			if (stream.eat("*")) {

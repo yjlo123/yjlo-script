@@ -140,7 +140,7 @@ String.prototype.tokens = function (prefix, suffix) {
 
 // Look for a decimal fraction part.
 
-			if (c === '.' && this.charAt(i) !== '.') {
+			if (c === '.' && this.charAt(i+1) !== '.') {
 				i += 1;
 				str += c;
 				for (;;) {
