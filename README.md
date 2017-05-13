@@ -15,13 +15,13 @@ class Greeting {
 	func sayHelloToAll() {
 		var rest = _targets;
 		while !$is_empty(rest) {
-			print("Hello " + $head(rest) + "!");
+			print("Hello", $head(rest) + "!");
 			rest = $tail(rest);
 		}
 	}
 }
 
-var myGreeting = Greeting(["World", "JS", "YJLO"]);
+myGreeting := Greeting(["World", "JS", "YJLO"]);
 myGreeting.sayHelloToAll();
 
 /* OUTPUT
@@ -39,7 +39,7 @@ Hello YJLO!
 - function member reference
 - classes and inheritance
 - utility libraries
-- online IDE and REPL console
+- online IDE and REPL
 
 ## Online Demo
 * Latest
