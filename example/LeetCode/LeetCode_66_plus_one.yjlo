@@ -13,7 +13,7 @@ func plusOne(num) {
 	var digits = HeapList();
 	digits.init(num);
 	
-	for i in (digits.size()-1, -1) by -1 {
+	for i in digits.size()-1...0 by -1 {
 		if(digits.get(i) < 9) {
 			digits.put(i, digits.get(i) + 1);
 			return digits.toList();
@@ -23,7 +23,7 @@ func plusOne(num) {
 	
 	var newNumber = HeapList();
 	newNumber.put(0, 1);
-	for i in (0, digits.size()) {
+	for i in 0..<digits.size() {
 		newNumber.put(i + 1, 0);
 	}
 	

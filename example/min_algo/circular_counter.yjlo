@@ -21,7 +21,7 @@ func circularCount(list, skip){
 	}
 	
 	while queue.size() > 0 {
-		for i in (skip - 1) {
+		for i in 0..<skip - 1 {
 			queue.addLast(queue.removeFirst());
 		}
 		result.add(queue.removeFirst());
