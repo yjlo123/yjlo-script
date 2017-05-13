@@ -8,9 +8,9 @@ import Heap;
 func HeapList() extends Heap {
 
 	var _size = 0;
+	_root = _Node();
 
 	func init(lst) {
-		_root = _Node();
 		_size = 0;
 		var i = 0;
 		while !$is_empty(lst) {
@@ -49,7 +49,7 @@ func HeapList() extends Heap {
 	
 	func toList() {
 		var list = [];
-		for i in (size()-1, -1) by -1 {
+		for i in size()-1...0 by -1 {
 			list = $pair(get(i), list);
 		}
 		return list;
@@ -63,7 +63,7 @@ var arr = HeapList();
 
 arr.init(["zero", "one", "two", "three", "four", "five", "six"]);
 arr.put(7, "seven");
-
+print(arr.toList());
 print(arr.size());
 print(arr.get(5));
 */

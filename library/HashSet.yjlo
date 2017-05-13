@@ -41,7 +41,7 @@ func HashSet(capacity) {
 	
 	func toString() {
 		var str = "";
-		for i in (0, _CAPACITY) {
+		for i in 0..<_CAPACITY {
 			var node = _getNodeByPath(_getPathByIndex(i), false);
 			if node != null && !$is_empty(node.entry) {
 				str += (i + ": " + node.toString() + "\n");
