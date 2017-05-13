@@ -89,6 +89,22 @@
 			}
 		}
 		
+		class VarDefNode extends Node {
+			constructor(line) {
+				super("assignment", line);
+				this.returnLeft = false;
+			}
+			setLeft(value) {
+				this.left = value;
+			}
+			setRight(value) {
+				this.right = value;
+			}
+			setReturnLeft() {
+				this.returnLeft = true;
+			}
+		}
+		
 		class ReturnStatementNode extends Node {
 			constructor(line, expression) {
 				super("return_statement", line);
@@ -205,7 +221,8 @@
 			}
 
 			// read in the tokens in this expression
-			while (token && !/^[,;{]$/.test(token.value)) {
+			while (token && !/^[,;{]$/.test(token.value) &&
+					!/^\.\.[\.<]$/.test(token.value)) {
 				if (isClosingBracketToken(token) && bracket_count === 0) {
 					// end of current expression
 					break;
@@ -694,6 +711,15 @@
 		var parse_range = function () {
 			var range = {};
 			advance("in");
+			range.from = expression();
+			advance('...');
+			range.to = expression();
+			return range;
+		};
+		
+		var parse_range_old = function () {
+			var range = {};
+			advance("in");
 			advance("(");
 			var first_value = expression();
 			if (isClosingBracketToken(token)) {
@@ -794,7 +820,7 @@
 		function tokenizeAndDesugaring(source){
 			// var program_string_without_comments 
 			// = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
-			let original_tokens = source.tokens('=<>!+-*&|/%^*', '=<>&|*+-.');
+			let original_tokens = source.tokens('=<>!+-*&|/%^*.', '=<>&|*+-.');
 			let desugared_tokens = [];
 			
 			// desugaring
@@ -1057,6 +1083,7 @@
 			// current source code is identified as "self"
 			var selfSourceObj = processSource(source, "self");
 			tokens = selfSourceObj.tokens;
+			//console.log(tokens);
 			
 			sources = [];
 			loadingQueue = list();
