@@ -118,10 +118,10 @@ function is_var_definition(stmt) {
 	return is_tagged_object(stmt,"var_definition");
 }
 function var_definition_variable(stmt) {
-	return stmt.variable;
+	return stmt.left;
 }
 function var_definition_value(stmt) {
-	return stmt.value;
+	return stmt.right;
 }
 		
 function make_frame(variables,values) {

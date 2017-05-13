@@ -91,17 +91,13 @@
 		
 		class VarDefNode extends Node {
 			constructor(line) {
-				super("assignment", line);
-				this.returnLeft = false;
+				super("var_definition", line);
 			}
 			setLeft(value) {
 				this.left = value;
 			}
 			setRight(value) {
 				this.right = value;
-			}
-			setReturnLeft() {
-				this.returnLeft = true;
 			}
 		}
 		
@@ -506,11 +502,10 @@
 			log("parsing function. "+token.value);
 			var args = [];
 			var funcbody = {};
-			var t = new_node();
-
+			let node = null;
 			if (isVarNameToken(token)) {
-				t.variable = token.value;
-				t.tag = "var_definition";
+				node = new VarDefNode(token.line);
+				node.setLeft(token.value);
 				advance(); // func name
 			} else if (isOpeningBracketToken(token)) {
 				// anonymous function
@@ -552,9 +547,9 @@
 			advance("}");
 			funcbody.tag = "function_definition";
 
-			if (t.tag === "var_definition") {
-				t.value = funcbody;
-				return t;
+			if (node) {
+				node.setRight(funcbody);
+				return node;
 			} else {
 				// anonymous function
 				return funcbody;
@@ -564,25 +559,25 @@
 	/*===================== VAR DEF ======================= */
 		var var_def = function() {
 			log("parsing var def. " + token.value);
-			var a = [], n, t;
+			var var_arr = [], n;
+			let node = null;
 			while (token) {
 				n = token;
 				if (!isVarNameToken(n)) {
 					throwTokenError("a variable name", token);
 				}
 				advance(); // var name
-				t = new_node();
-				t.tag = "var_definition";
-				t.line = n.line;
-				t.variable = n.value;
+				
+				node = new VarDefNode(n.line);
+				node.setLeft(n.value);
 				if (token && token.value === "=") {
 					advance("=");
-					t.value = expression();
-					a.push(t);
+					node.setRight(expression());
+					var_arr.push(node);
 				} else {
 					// default initial value
-					t.value = new VariableNode("null", "variable", n.line);
-					a.push(t);
+					node.setRight(new VariableNode("null", "variable", n.line));
+					var_arr.push(node);
 				}
 				if (token && token.value !== ",") {
 					break;
@@ -590,7 +585,7 @@
 				advance(",");
 			}
 			advance(";");
-			return array_to_list(a);
+			return array_to_list(var_arr);
 		};
 
 	/*===================== IF ======================= */
