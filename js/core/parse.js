@@ -357,6 +357,11 @@
 						assign_node.setRight(tree_stack.pop());
 						assign_node.setLeft(tree_stack.pop());
 						tree_stack.push(assign_node);
+					} else if (exp_node.name === ':=') {
+						let var_node = new VarDefNode(exp_node.line);
+						var_node.setRight(tree_stack.pop());
+						var_node.setLeft(tree_stack.pop().name);
+						tree_stack.push(var_node);
 					} else {
 						let operands = [];
 						
@@ -815,7 +820,7 @@
 		function tokenizeAndDesugaring(source){
 			// var program_string_without_comments 
 			// = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
-			let original_tokens = source.tokens('=<>!+-*&|/%^*.', '=<>&|*+-.');
+			let original_tokens = source.tokens('=<>!+-*&|/%^*.:', '=<>&|*+-.');
 			let desugared_tokens = [];
 			
 			// desugaring
