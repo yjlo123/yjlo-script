@@ -172,7 +172,7 @@ function _process_output(args) {
 			if (arg && arg.tag === 'primitive' && typeof(arg.implementation) === 'boolean'){
 				arg = arg.implementation.toString();
 			}
-			output += arg;
+			output += ( (output === "" ? "" : " ") + arg);
 		}
 	}
 	return output;
@@ -198,11 +198,4 @@ function _input(message, value, show_in_console) {
 	jqconsole.Input(function(input) {
 		//jqconsole.Write("=> " + input + '\n', 'console-arrow');
 	});*/
-}
-
-function escapeHTML(s) { 
-	return s.replace(/&/g, '&amp;')
-			.replace(/"/g, '&quot;')
-			.replace(/</g, '&lt;')
-			.replace(/>/g, '&gt;');
 }
