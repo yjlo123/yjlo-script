@@ -38,8 +38,17 @@ class ListUtil {
 	}
 	
 	func sort(lst) {
-		// TODO
-		return lst;
+		func insert(a, l){ // num, list
+			if ($is_empty(l)) return [a];
+			if (a < $head(l)) return $pair(a, l);
+			return $pair($head(l), insert(a, $tail(l)));
+		}
+		func help(l, n){ // left, new
+			if ($is_empty(l)) return n;
+			n = insert($head(l), n);
+			return help($tail(l), n);
+		}
+		return help(lst, []);
 	}
 	
 	func max(lst) {
