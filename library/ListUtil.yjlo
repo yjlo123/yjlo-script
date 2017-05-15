@@ -52,12 +52,28 @@ class ListUtil {
 	}
 	
 	func max(lst) {
-		// TODO
-		return null;
+		if $is_empty(lst) { return null; }
+		var max = $head(lst);
+		lst = $tail(lst);
+		while !$is_empty(lst) {
+			if $head(lst) > max {
+				max = $head(lst);
+			}
+			lst = $tail(lst);
+		}
+		return max;
 	}
 	
 	func min(lst) {
-		// TODO
-		return null;
+		if $is_empty(lst) { return null; }
+		var min = $head(lst);
+		lst = $tail(lst);
+		while !$is_empty(lst) {
+			if $head(lst) < min {
+				min = $head(lst);
+			}
+			lst = $tail(lst);
+		}
+		return min;
 	}
 }
