@@ -308,7 +308,9 @@
 					// operators
 					/* prefix all unary operators with '_' ! */
 					if (thisNode.name === '-' &&
-						(expression_nodes_postfix.length === 0 || (prevNode && prevNode.name === '('))) {
+							(expression_nodes_postfix.length === 0 ||
+							(prevNode && /^([\(=]|:=)$/.test(prevNode.name)))) {
+						// ( , = , :=
 						// negative operator
 						thisNode.name = '_-';
 					}
