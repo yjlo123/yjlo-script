@@ -4,7 +4,7 @@
 (function(mod) {
 	if (typeof exports == "object" && typeof module == "object") // CommonJS
 		mod(require("../../lib/codemirror"));
-	else if (typeof define == "func" && define.amd) // AMD
+	else if (typeof define == "function" && define.amd) // AMD
 		define(["../../lib/codemirror"], mod);
 	else // Plain browser env
 		mod(CodeMirror);
@@ -13,7 +13,7 @@
 
 function expressionAllowed(stream, state, backUp) {
 	return /^(?:operator|sof|keyword c|case|new|[\[{}\(,;:]|=>)$/.test(state.lastType) ||
-		(state.lastType == "quasi" && /\{\s*$/.test(stream.string.slice(0, stream.pos - (backUp || 0))))
+		(state.lastType == "quasi" && /\{\s*$/.test(stream.string.slice(0, stream.pos - (backUp || 0))));
 }
 
 CodeMirror.defineMode("javascript", function(config, parserConfig) {
@@ -84,7 +84,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 
 	function readRegexp(stream) {
 		var escaped = false, next, inSet = false;
-		while ((next = stream.next()) != null) {
+		while ((next = stream.next()) !== null) {
 			if (!escaped) {
 				if (next == "/" && !inSet) return;
 				if (next == "[") inSet = true;
@@ -116,6 +116,8 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 			return ret("number", "number");
 		} else if (ch == "." && stream.match(/\.[\.<>]/)) {
 			return ret("operator", "operator");
+		} else if (ch == ":" && stream.eat("=")) {
+			return ret(":=", "operator");
 		} else if (/[\[\]{}\(\),;\:\.]/.test(ch)) {
 			return ret(ch);
 		} else if (ch == "=" && stream.eat(">")) {
@@ -173,7 +175,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 				state.tokenize = tokenBase;
 				return ret("jsonld-keyword", "meta");
 			}
-			while ((next = stream.next()) != null) {
+			while ((next = stream.next()) !== null) {
 				if (next == quote && !escaped) break;
 				escaped = !escaped && next == "\\";
 			}
@@ -196,7 +198,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 
 	function tokenQuasi(stream, state) {
 		var escaped = false, next;
-		while ((next = stream.next()) != null) {
+		while ((next = stream.next()) !== null) {
 			if (!escaped && (next == "`" || next == "$" && stream.eat("{"))) {
 				state.tokenize = tokenBase;
 				break;
@@ -225,7 +227,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 			var bracket = brackets.indexOf(ch);
 			if (bracket >= 0 && bracket < 3) {
 				if (!depth) { ++pos; break; }
-				if (--depth == 0) { if (ch == "(") sawSomething = true; break; }
+				if (--depth === 0) { if (ch === "(") sawSomething = true; break; }
 			} else if (bracket >= 3 && bracket < 6) {
 				++depth;
 			} else if (wordRE.test(ch)) {
@@ -250,14 +252,14 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		this.type = type;
 		this.prev = prev;
 		this.info = info;
-		if (align != null) this.align = align;
+		if (align !== null) this.align = align;
 	}
 
 	function inScope(state, varname) {
-		for (var v = state.localVars; v; v = v.next)
+		for (let v = state.localVars; v; v = v.next)
 			if (v.name == varname) return true;
-		for (var cx = state.context; cx; cx = cx.prev) {
-			for (var v = cx.vars; v; v = v.next)
+		for (let cx = state.context; cx; cx = cx.prev) {
+			for (let v = cx.vars; v; v = v.next)
 				if (v.name == varname) return true;
 		}
 	}
@@ -266,7 +268,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		var cc = state.cc;
 		// Communicate our context to the combinators.
 		// (Less wasteful than consing up a hundred closures on every call.)
-		cx.state = state; cx.stream = stream; cx.marked = null, cx.cc = cc; cx.style = style;
+		cx.state = state; cx.stream = stream; cx.marked = null; cx.cc = cc; cx.style = style;
 
 		if (!state.lexical.hasOwnProperty("align"))
 			state.lexical.align = true;
@@ -348,10 +350,11 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 			if (type == wanted) return cont();
 			else if (wanted == ";") return pass();
 			else return cont(exp);
-		};
+		}
 		return exp;
 	}
 
+	let prev_variable = null;
 	function statement(type, value) {
 		if (type == "var") return cont(pushlex("vardef", value.length), vardef, expect(";"), poplex);
 		if (type == "keyword a") return cont(pushlex("form"), expression, statement, poplex);
@@ -366,7 +369,10 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		if (type == "func") return cont(functiondef);
 		if (type == "for") return cont(pushlex("form"), forspec, statement, poplex);
 		if (type == "@") return cont(constructor);
-		if (type == "variable") return cont(pushlex("stat"), maybelabel);
+		if (type == "variable") {
+			prev_variable = value;
+			return cont(pushlex("stat"), maybelabel);
+		}
 		if (type == "switch") return cont(pushlex("form"), expression, pushlex("}", "switch"), expect("{"),
 																			block, poplex, poplex);
 		if (type == "case") return cont(expression, expect(":"));
@@ -377,8 +383,9 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		if (type == "class") return cont(functiondef);
 		if (type == "export") return cont(pushlex("stat"), afterExport, poplex);
 		if (type == "import") return cont(pushlex("stat"), afterImport, poplex);
-		if (type == "module") return cont(pushlex("form"), pattern, pushlex("}"), expect("{"), block, poplex, poplex)
-		if (type == "async") return cont(statement)
+		if (type == "module") return cont(pushlex("form"), pattern, pushlex("}"), expect("{"), block, poplex, poplex);
+		if (type == "async") return cont(statement);
+		if (type == ":=") { register(prev_variable); }
 		return pass(pushlex("stat"), expression, expect(";"), poplex);
 	}
 	function expression(type) {
@@ -421,8 +428,8 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		return maybeoperatorNoComma(type, value, false);
 	}
 	function maybeoperatorNoComma(type, value, noComma) {
-		var me = noComma == false ? maybeoperatorComma : maybeoperatorNoComma;
-		var expr = noComma == false ? expression : expressionNoComma;
+		var me = noComma === false ? maybeoperatorComma : maybeoperatorNoComma;
+		var expr = noComma === false ? expression : expressionNoComma;
 		if (type == "=>") return cont(pushcontext, noComma ? arrowBodyNoComma : arrowBody, popcontext);
 		if (type == "operator") {
 			if (/\+\+|--/.test(value)) return cont(me);
@@ -488,13 +495,13 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 		} else if (type == "jsonld-keyword") {
 			return cont(afterprop);
 		} else if (type == "modifier") {
-			return cont(objprop)
+			return cont(objprop);
 		} else if (type == "[") {
 			return cont(expression, expect("]"), afterprop);
 		} else if (type == "spread") {
 			return cont(expression);
 		} else if (type == ":") {
-			return pass(afterprop)
+			return pass(afterprop);
 		}
 	}
 	function getterSetter(type) {
@@ -512,8 +519,8 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 				var lex = cx.state.lexical;
 				if (lex.info == "call") lex.pos = (lex.pos || 0) + 1;
 				return cont(function(type, value) {
-					if (type == end || value == end) return pass()
-					return pass(what)
+					if (type == end || value == end) return pass();
+					return pass(what);
 				}, proceed);
 			}
 			if (type == end || value == end) return cont();
@@ -541,33 +548,33 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 	}
 	function typeexpr(type) {
 		if (type == "variable") {cx.marked = "variable-3"; return cont(afterType);}
-		if (type == "{") return cont(commasep(typeprop, "}"))
-		if (type == "(") return cont(commasep(typearg, ")"), maybeReturnType)
+		if (type == "{") return cont(commasep(typeprop, "}"));
+		if (type == "(") return cont(commasep(typearg, ")"), maybeReturnType);
 	}
 	function maybeReturnType(type) {
-		if (type == "=>") return cont(typeexpr)
+		if (type == "=>") return cont(typeexpr);
 	}
 	function typeprop(type) {
 		if (type == "variable" || cx.style == "keyword") {
-			cx.marked = "property"
-			return cont(typeprop)
+			cx.marked = "property";
+			return cont(typeprop);
 		} else if (type == ":") {
-			return cont(typeexpr)
+			return cont(typeexpr);
 		}
 	}
 	function typearg(type) {
-		if (type == "variable") return cont(typearg)
-		else if (type == ":") return cont(typeexpr)
+		if (type == "variable") return cont(typearg);
+		else if (type == ":") return cont(typeexpr);
 	}
 	function afterType(type, value) {
-		if (value == "<") return cont(commasep(typeexpr, ">"), afterType)
-		if (type == "[") return cont(expect("]"), afterType)
+		if (value == "<") return cont(commasep(typeexpr, ">"), afterType);
+		if (type == "[") return cont(expect("]"), afterType);
 	}
 	function vardef() {
 		return pass(pattern, maybetype, maybeAssign, vardefCont);
 	}
 	function pattern(type, value) {
-		if (type == "modifier") return cont(pattern)
+		if (type == "modifier") return cont(pattern);
 		if (type == "variable") { register(value); return cont(); }
 		if (type == "spread") return cont(pattern);
 		if (type == "[") return contCommasep(pattern, "]");
@@ -739,7 +746,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 			else if (type == "form") return lexical.indented + indentUnit;
 			else if (type == "stat")
 				return lexical.indented + (isContinuedStatement(state, textAfter) ? statementIndent || indentUnit : 0);
-			else if (lexical.info == "switch" && !closing && parserConfig.doubleIndentSwitch != false)
+			else if (lexical.info == "switch" && !closing && parserConfig.doubleIndentSwitch !== false)
 				return lexical.indented + (/^(?:case|default)\b/.test(textAfter) ? indentUnit : 2 * indentUnit);
 			else if (lexical.align) return lexical.column + (closing ? 0 : 1);
 			else return lexical.indented + (closing ? 0 : indentUnit);
@@ -758,8 +765,8 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
 
 		expressionAllowed: expressionAllowed,
 		skipExpression: function(state) {
-			var top = state.cc[state.cc.length - 1]
-			if (top == expression || top == expressionNoComma) state.cc.pop()
+			var top = state.cc[state.cc.length - 1];
+			if (top == expression || top == expressionNoComma) state.cc.pop();
 		}
 	};
 });
