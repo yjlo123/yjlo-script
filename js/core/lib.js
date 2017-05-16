@@ -79,7 +79,6 @@ function apply(f,xs) {
 function map(f) {
 	if (is_empty(arguments[1])) return [];
 	else {
-		var f = arguments[0];
 		var f_args = [];
 		var map_args = [f];
 		for (var i=1; i < arguments.length; i++) {
@@ -88,15 +87,6 @@ function map(f) {
 		}
 		return pair(f.apply(f,f_args),map.apply(map,map_args));
 	}
-}
-
-function display(x) {
-	print(format(x));
-}
-
-function newline() { 
-	print('');
-	return;
 }
 
 function runtime() {
