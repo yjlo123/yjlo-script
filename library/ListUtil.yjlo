@@ -17,7 +17,7 @@ class ListUtil {
 	}
 	
 	func len(lst) {
-		return $is_empty(lst) ? 0 : 1 + length($tail(lst));
+		return $is_empty(lst) ? 0 : 1 + len($tail(lst));
 	}
 	
 	func equal(lst1, lst2) {
@@ -25,6 +25,19 @@ class ListUtil {
 		if $is_empty(lst1) && $is_empty(lst2) { return true; }
 		if $is_empty(lst1) || $is_empty(lst2) { return false; }
 		return $head(lst1) == $head(lst2) && equal($tail(lst1), $tail(lst2));
+	}
+	
+	/* return the index of the first val in a list */
+	func index(lst, val) {
+		var i = 0;
+		while !$is_empty(lst) {
+			if $head(lst) == val {
+				return i;
+			}
+			i++;
+			lst = $tail(lst);
+		}
+		return -1;
 	}
 	
 	func getLast(lst) {
