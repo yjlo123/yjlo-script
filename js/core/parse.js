@@ -196,6 +196,7 @@
 			case ":":
 				return 1;
 			case "=": // assignment
+			case ":=":
 				return 0;
 			default:
 				return -1;
