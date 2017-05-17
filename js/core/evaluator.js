@@ -280,8 +280,8 @@ function is_true(x) {
 	return ! is_false(x);
 }
 function is_false(x) {
-	return x === false || x === 0 || x === "" 
-	|| x === undefined || x === NaN || x === null || x.implementation === false;
+	return x === false || x === 0 || x === "" || 
+		x === undefined || x === NaN || x === null || x.implementation === false;
 }
 
 function evaluate_while_statement(stmt, env) {
@@ -447,9 +447,9 @@ function evaluate_sequence(stmts,env) {
 		return evaluate(first_statement(stmts),env);
 	else {
 		var first_stmt_value = evaluate(first_statement(stmts),env);
-		if (is_return_value(first_stmt_value)
-			|| is_continue_value(first_stmt_value)
-			|| is_break_value(first_stmt_value))
+		if (is_return_value(first_stmt_value) ||
+			is_continue_value(first_stmt_value) ||
+			is_break_value(first_stmt_value))
 			return first_stmt_value;
 		else return evaluate_sequence(rest_statements(stmts),env);
 	}
@@ -500,11 +500,11 @@ function apply_primitive_function(fun,argument_list) {
 														argument_list);
 }
 
-function extend_environment(vars, vals, base_env) {
+function extend_environment(vars, vals, base_env, line) {
 	if (length(vars) >= length(vals))
 		return enclose_by(make_frame(vars,vals),base_env);
 	else if (length(vars) < length(vals))
-		throwError("?", "Too many arguments supplied: expect "+length(vars)+", but "+length(vals)+" given");
+		throwError(line || "?", "Too many arguments supplied: expect "+length(vars)+", but "+length(vals)+" given");
 }
 
 function update_environment(vars, vals, base_env) {
@@ -551,7 +551,7 @@ function apply(fun, args, line) {
 			// create self (new) environment
 			func_env = extend_environment(function_value_parameters(fun),
 											args,
-											function_value_environment(fun));
+											function_value_environment(fun), line);
 		}
 		var result = evaluate(function_value_body(fun), func_env);
 		if (is_return_value(result)) 
@@ -564,8 +564,8 @@ function apply(fun, args, line) {
 function apply_logic(fun_raw, args, env) {
 	var oprnd1 = evaluate(head(args), env);
 	var oprnd2 = false;
-	if ((fun_raw.name === "&&" && oprnd1 === true)
-		|| (fun_raw.name === "||" && oprnd1 === false)) {
+	if ((fun_raw.name === "&&" && oprnd1 === true) ||
+		(fun_raw.name === "||" && oprnd1 === false)) {
 		oprnd2 = evaluate(head(tail(args)), env);
 	}
 	var fun = evaluate(fun_raw, env);
@@ -621,13 +621,9 @@ var primitive_functions = {
 		"$is_list": is_list,
 		"$is_empty": is_empty,
 		
-		length: length,
-		display: display,
 		"put": _put,
 		"print": _print,
 		"input": _input,
-		newline: newline,
-		runtime: runtime,
 
 		"$floor": _floor,
 		"$ceil": _ceil,
@@ -770,7 +766,6 @@ function driver_loop(program_string, program_parser, environment, finish_callbac
 		if(debug) {
 			console.log(JSON.stringify(syntax_tree,null,4));
 		}
-		if (is_tagged_object(syntax_tree,"exit")) return "interpreter completed";
 		var output = evaluate_toplevel(syntax_tree, environment);
 		finish_callback(output);
 	});
