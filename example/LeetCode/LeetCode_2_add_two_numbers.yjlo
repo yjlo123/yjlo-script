@@ -10,59 +10,42 @@ zero, except the number 0 itself.
 Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
 Output: 7 -> 0 -> 8
 */
-
-// Definition for singly-linked list
-func ListNode(x) {
-	var val = x;
-	var next = null;
-	return func(){};
-}
-
-// (1,2,3) => 1->2->3
-func listToLinkedList(list) {
-	if $is_empty(list) { return null; }
-	var head = ListNode($head(list));
-	head.next = listToLinkedList($tail(list));
-	return head;
-}
-
-// 1->2->3 => (1,2,3)
-func linkedListToList(linkedList) {
-	if linkedList == null { return  []; }
-	return $pair(linkedList.val, linkedListToList(linkedList.next));
-}
+import StringUtil;
 
 // print list elements in reversed order
-func printNumber(list) {
+func printNumber(list, width) {
 	var result = "";
 	while !$is_empty(list) {
 		result = $head(list) + result;
 		list = $tail(list);
 	}
+	var space = width-StringUtil.len(result);
+	for i in 0..<space {
+		result = " " + result;
+	}
 	print(result);
 }
 
 func addTwoNumbersCarry(l1, l2, carry) {
-	if l1 == null && l2 == null && carry == 0 {
-		return null;
+	if $is_empty(l1) && $is_empty(l2) && carry == 0 {
+		return [];
 	} 
-	var value = (l1==null ? 0 : l1.val) + (l2==null ? 0 : l2.val) + carry;
-	var head = ListNode( value % 10 );
-	head.next = addTwoNumbersCarry(l1==null ? null : l1.next,
-								   l2==null ? null : l2.next,
-								   value / 10);
-	return head;
+	var value = ($is_empty(l1) ? 0 : $head(l1)) + ($is_empty(l2) ? 0 : $head(l2)) + carry;
+	return $pair(value % 10,
+				 addTwoNumbersCarry($is_empty(l1) ? [] : $tail(l1),
+					$is_empty(l2) ? [] : $tail(l2),
+					value / 10));
 }
 
 // number 582626823
-var num1 = listToLinkedList([3,2,8,6,2,6,2,8,5]);
+var num1 = [3,2,8,6,2,6,2,8,5];
 // number 92802991
-var num2 = listToLinkedList([1,9,9,2,0,8,2,9]);
+var num2 = [1,9,9,2,0,8,2,9];
 
 put("Num1: ");
-printNumber(linkedListToList(num1));
+printNumber(num1, 10);
 put("Num2: ");
-printNumber(linkedListToList(num2));
+printNumber(num2, 10);
 
 put("Sum:  ");
-printNumber(linkedListToList(addTwoNumbersCarry(num1, num2, 0)));
+printNumber(addTwoNumbersCarry(num1, num2, 0), 10);
