@@ -1,0 +1,25 @@
+/**
+ * String Util
+ * @author Liu Siwei
+ */
+ 
+import ListUtil;
+
+class StringUtil {
+	func len(str) {
+		return ListUtil.len($string_to_char_list(str));
+	}
+	
+	func charAt(str, i) {
+		var chars = $string_to_char_list(str);
+		return ListUtil.get(chars, i);
+	}
+	
+	func toLower(str) {
+		
+	}
+	
+	func toUpper(str) {
+		
+	}
+}
