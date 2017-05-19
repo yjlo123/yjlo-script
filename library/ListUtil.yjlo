@@ -40,6 +40,11 @@ class ListUtil {
 		return -1;
 	}
 	
+	func append(lst, val) {
+		if $is_empty(lst) { return $pair(val, lst); }
+		return $pair($head(lst), append($tail(lst), val));
+	}
+	
 	func getLast(lst) {
 		if ($is_empty(lst)) {
 			return [];
