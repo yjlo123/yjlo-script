@@ -1,0 +1,37 @@
+/*
+Rotate a list of n elements to the right by k steps.
+For example, with n = 7 and k = 3,
+the lst [1,2,3,4,5,6,7] is rotated to [5,6,7,1,2,3,4].
+*/
+
+import ListUtil;
+
+func rotate(lst, k) {
+	n := ListUtil.len(lst);
+	k = k % n;
+	var left = [], right = [], res = [];
+	
+	for i in 0..<n-k {
+		left = $pair($head(lst), left);
+		lst = $tail(lst);
+	}
+	
+	for i in n-k..<n {
+		right = $pair($head(lst), right);
+		lst = $tail(lst);
+	}
+
+	while !$is_empty(left) {
+		res = $pair($head(left), res);
+		left = $tail(left);
+	}
+	
+	while !$is_empty(right) {
+		res = $pair($head(right), res);
+		right = $tail(right);
+	}
+	
+	return res;
+}
+
+print(rotate([1,2,3,4,5,6,7], 3));
