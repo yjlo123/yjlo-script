@@ -166,20 +166,38 @@ function printSyntaxTreeNode(node, indent) {
 			syntaxTreeStr += (indent + `${node.tag}\n`);
 			indent += "  ";
 		}
+		
+		let attr_count = Object.keys(node).length;
+		let count = 1;
 		for (let attr in node) {
-			if (attr === "line" || attr === "tag") continue;
+			if (attr === "line" || attr === "tag") {
+				count++;
+				continue;
+			}
 			// member name
 			syntaxTreeStr += (indent + `|-${attr}: `);
 			// member value
-			if (!node[attr] ||
-				(!is_list(node[attr]) && typeof node[attr] !== "object")) {
+			let next_node = node[attr];
+			if (next_node && is_list(next_node) && typeof head(next_node) === "string") {
+				// replace \n with \\n
+				next_node = pair(head(next_node).replace(/\n/g, "\\n"), tail(next_node));
+			}
+			
+			if (!next_node ||
+				(!is_list(next_node) && typeof next_node !== "object")) {
 				// print simple value in the same line
-				syntaxTreeStr += (`${node[attr]}\n`);
+				syntaxTreeStr += (`${next_node}\n`);
 			} else {
 				// print complex value in a new line
 				syntaxTreeStr += (`\n`);
-				printSyntaxTreeNode(node[attr], indent + "    ");
+				if ((is_list(next_node) && length(next_node) > 1 && is_empty(tail(next_node))) ||
+					count === attr_count) {
+					printSyntaxTreeNode(next_node, indent + "    ");
+				} else {
+					printSyntaxTreeNode(next_node, indent + "|   ");
+				}
 			}
+			count++;
 		}
 	} else {
 		// function argument name or constant
