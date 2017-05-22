@@ -569,11 +569,13 @@
 				funcbody.parent = null;
 			}
 
+			funcbody.tag = "function_definition";
 			funcbody.parameters = array_to_list(args);
+			funcbody.line = token.line;
 			advance("{");
 			funcbody.body = statements();
 			advance("}");
-			funcbody.tag = "function_definition";
+			
 
 			if (node) {
 				node.setRight(funcbody);
