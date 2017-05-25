@@ -513,7 +513,7 @@ function update_environment(vars, vals, base_env) {
 		first_frame(base_env)[head(vars)] = is_empty(vals) ? null : head(vals);
 		return update_environment(tail(vars), tail(vals), base_env);
 	}
-	else if (length(vars) < length(vals))
+	else if (is_list(vars) && is_list(vals) && length(vars) < length(vals))
 		throwError("?", "Too many arguments supplied: expect "+length(vars)+", but "+length(vals)+" given");
 }
 	 
