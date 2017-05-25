@@ -1,6 +1,5 @@
-
-function pair(x,xs) {
-	return [x,xs];
+function pair(x, xs) {
+	return [x, xs];
 }
 
 function is_pair(x) {
@@ -28,7 +27,7 @@ function is_in_list(x, xs) {
 function list() {
 	var the_list = [];
 	for (var i = arguments.length - 1; i >= 0; i--)
-		the_list = pair(arguments[i],the_list);
+		the_list = pair(arguments[i], the_list);
 	return the_list;
 }
 
@@ -43,8 +42,8 @@ function array_test(x) {
 function is_empty(xs) {
 	if (array_test(xs)) {
 		if (xs.length === 0) {
-			return true; 
-		}else if (xs.length === 2) {
+			return true;
+		} else if (xs.length === 2) {
 			return false;
 		} else {
 			return false;
@@ -88,7 +87,6 @@ function map(f) {
 		return pair(f.apply(f,f_args),map.apply(map,map_args));
 	}
 }
-
 function runtime() {
 	var d = new Date();
 	return d.getTime();
@@ -117,11 +115,11 @@ function _round(n, d) {
 }
 
 function _string_to_char_list(str) {
-	if (typeof str !== 'string' && !(str instanceof String)){
+	if (typeof str !== 'string' && !(str instanceof String)) {
 		return list();
 	}
 	var char_list = list();
-	for (var i = str.length-1; i >= 0; i--) {
+	for (var i = str.length - 1; i >= 0; i--) {
 		char_list = pair(str.charAt(i), char_list);
 	}
 	return char_list;
@@ -136,51 +134,51 @@ function _process_output(args) {
 	//window.latestConsole.display(x);
 	//x = x+"";
 	//x = x.replace(/(?:\r\n|\r|\n)/g, '<br />');
-	
+
 	var output = "";
-	
-	for (var i = 0; i < args.length; i++){
+
+	for (var i = 0; i < args.length; i++) {
 		var arg = args[i];
-		if (args[i] && is_list(args[i])){
+		if (args[i] && is_list(args[i])) {
 			// print list
 			output += "[";
-			while (!is_empty(arg)){
+			while (!is_empty(arg)) {
 				// nested list
 				if (is_list(head(arg))) {
-					output += (_process_output([head(arg)])+", ");
+					output += (_process_output([head(arg)]) + ", ");
 				} else {
-					output += (head(arg)+", ");
+					output += (head(arg) + ", ");
 				}
 				arg = tail(arg);
 			}
 			// remove ", "
-			if(output.length !== 1){
+			if (output.length !== 1) {
 				output = output.slice(0, -2);
 			}
 			output += "]";
-		}else{
-			if (arg && arg.tag === 'primitive' && typeof(arg.implementation) === 'boolean'){
+		} else {
+			if (arg && arg.tag === 'primitive' && typeof (arg.implementation) === 'boolean') {
 				arg = arg.implementation.toString();
 			}
-			output += ( (output === "" ? "" : " ") + arg);
+			output += ((output === "" ? "" : " ") + arg);
 		}
 	}
 	return output;
 }
 
-function _put(){
+function _put() {
 	var output_value = _process_output(arguments);
 	jqconsole.Write(output_value, 'console-default');
 }
 
-function _print(){
+function _print() {
 	var output_value = _process_output(arguments);
 	jqconsole.Write(output_value + '\n', 'console-default');
 }
 
 function _input(message, value, show_in_console) {
-	var input_value = prompt(message, value||"");
-	if (show_in_console !== false){
+	var input_value = prompt(message, value || "");
+	if (show_in_console !== false) {
 		jqconsole.Write(input_value + '\n', 'jqconsole-old-input');
 	}
 	return input_value;
