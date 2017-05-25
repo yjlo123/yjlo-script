@@ -63,7 +63,7 @@ function is_string(xs) {
 }
 
 function length(xs) {
-	return  (is_empty(xs)) ? 0 : 1 + length(tail(xs));
+	return (is_empty(xs)) ? 0 : 1 + length(tail(xs));
 }
 
 function apply(f,xs) {
