@@ -329,7 +329,11 @@
 					
 					while (temp_stack.length > 0 &&
 						precedence(thisNode.name) <= precedence(temp_stack[temp_stack.length - 1].name)) {
-						expression_nodes_postfix.push(temp_stack.pop());
+							if (thisNode.name === "=" && temp_stack[temp_stack.length - 1].name === "=") {
+								// "=" is right association
+								break;
+							}
+							expression_nodes_postfix.push(temp_stack.pop());
 					}
 					temp_stack.push(thisNode);
 				}
