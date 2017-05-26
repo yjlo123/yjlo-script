@@ -1,0 +1,38 @@
+/* LeetCode 3. Longest Substring Without Repeating Characters
+Given a string, find the length of the longest substring without repeating characters.
+
+Examples:
+Given "abcabcbb", the answer is "abc", which the length is 3.
+Given "bbbbb", the answer is "b", with the length of 1.
+Given "pwwkew", the answer is "wke", with the length of 3.
+Note that the answer must be a substring, "pwke" is a subsequence and not a substring.
+*/
+
+import HashMap;
+
+func lengthOfLongestSubstring(str) {
+	chars := $string_to_char_list(str);
+	hm := HashMap();
+	var longest, preLength, i;
+	longest = preLength = i = 0;
+	while !$is_empty(chars) {
+		c := $head(chars);
+		var length;
+		val := hm.get(c);
+		if val == null || val < i - preLength {
+			length = preLength + 1;
+		} else {
+			length = i - val;
+		}
+		if length > longest {
+			longest = length;
+		}
+		preLength = length;
+		hm.put(c, i);
+		i++;
+		chars = $tail(chars);
+	}
+	return longest;
+}
+
+print(lengthOfLongestSubstring("abcabcbb"));
