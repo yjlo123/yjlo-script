@@ -31,8 +31,55 @@ func testIf() {
 	ut.printResult();
 }
 
+func testSwitch() {
+	ut = UnitTest("Test switch");
+	
+	var a = 4;
+	var res;
+	
+	// basic switch
+	switch a {
+		case 3:
+			res = 33;
+		case 4:
+			res = 44;
+		default:
+			res = 11;
+	}
+	
+	ut.assertEquals( 44, res );
+	
+	// default
+	a = 6;
+	switch a {
+		case 3:
+			res = 33;
+		case 4:
+			res = 44;
+		default:
+			res = 11;
+	}
+	ut.assertEquals( 11, res );
+	
+	// fallthrough
+	a = 4;
+	switch a {
+		case 3:
+			res = 33;
+		case 4:
+			res = 44;
+			fallthrough;
+		default:
+			res = 22;
+	}
+	ut.assertEquals( 22, res );
+	
+	ut.printResult();
+}
+
 func main() {
 	testIf();
+	testSwitch();
 	print();
 	
 	print(ut.all_pass ? "[Success]" : "[Failed]");
