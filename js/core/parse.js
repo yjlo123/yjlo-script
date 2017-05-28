@@ -310,7 +310,7 @@
 					/* prefix all unary operators with '_' ! */
 					if (thisNode.name === '-' &&
 							(expression_nodes_postfix.length === 0 ||
-							(prevNode && /^([\(=]|:=)$/.test(prevNode.name)))) {
+							(prevNode && /^([\(=]|:=|[=><!]=)$/.test(prevNode.name)))) {
 						// ( , = , :=
 						// negative operator
 						thisNode.name = '_-';
@@ -329,7 +329,8 @@
 					
 					while (temp_stack.length > 0 &&
 						precedence(thisNode.name) <= precedence(temp_stack[temp_stack.length - 1].name)) {
-							if (thisNode.name === "=" && temp_stack[temp_stack.length - 1].name === "=") {
+							if ((thisNode.name === "=" && temp_stack[temp_stack.length - 1].name === "=") ||
+								(thisNode.name === ":=" && temp_stack[temp_stack.length - 1].name === ":=")) {
 								// "=" is right association
 								break;
 							}
