@@ -72,7 +72,6 @@ function duplicateFirstFrame(env) {
 
 function add_binding_to_frame(variable,value,frame) {
 	frame[variable] = value; // object field assignment
-	return;
 }
 function has_binding_in_frame(variable,frame) {
 	return frame.hasOwnProperty(variable);
@@ -80,7 +79,8 @@ function has_binding_in_frame(variable,frame) {
 
 function define_variable(variable,value,env) {
 	var frame = first_frame(env);
-	return add_binding_to_frame(variable,value,frame);
+	add_binding_to_frame(variable,value,frame);
+	return value;
 }
 
 
@@ -183,10 +183,9 @@ function evaluate_var_definition(stmt,env) {
 	if(!isValidVariableName(variable)) {
 		throwError(stmt.line, `Invalid variable name: ${variable}`);
 	}
-	define_variable(variable,
+	return define_variable(variable,
 		evaluate(var_definition_value(stmt), env),
 		env);
-	return undefined;
 }
 	 
 function is_if_statement(stmt) {
@@ -554,11 +553,13 @@ function apply(fun, args, line) {
 											function_value_environment(fun), line);
 		}
 		var result = evaluate(function_value_body(fun), func_env);
-		if (is_return_value(result)) 
+		if (is_return_value(result)) {
 			return return_value_content(result);
+		}
 	} else {
 		throwError(line, "Unknown function type - APPLY: " + fun);
 	}
+	return null;
 }
 
 function apply_logic(fun_raw, args, env) {
@@ -689,6 +690,7 @@ function evaluate_toplevel(stmt,env) {
 }
 
 function evaluate(stmt,env) {
+	// console.log(`[EVAL] ${stmt.line}`);
 	if (is_self_evaluating(stmt)) 
 		return stmt;
 	else if (is_variable(stmt))
