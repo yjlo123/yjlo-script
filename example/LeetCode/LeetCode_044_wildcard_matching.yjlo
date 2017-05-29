@@ -1,0 +1,78 @@
+/* LeetCode 44. Wildcard Matching
+Implement wildcard pattern matching with support for '?' and '*'.
+
+'?' Matches any single character.
+'*' Matches any sequence of characters (including the empty sequence).
+
+The matching should cover the entire input string (not partial).
+
+The function prototype should be:
+bool isMatch(const char *s, const char *p)
+
+Some examples:
+isMatch("aa","a") → false
+isMatch("aa","aa") → true
+isMatch("aaa","aa") → false
+isMatch("aa", "*") → true
+isMatch("aa", "a*") → true
+isMatch("ab", "?*") → true
+isMatch("aab", "c*a*b") → false
+*/
+
+func isMatch(str, pattern) {
+	str = $string_to_char_list(str);
+	pattern = $string_to_char_list(pattern);
+	var star_pattern, star_str;
+	while !$is_empty(str) {
+		// advancing both pointers
+		if !$is_empty(pattern) && ($head(pattern) == '?' || $head(str) == $head(pattern)) {
+			// print($head(str), $head(pattern));
+			str = $tail(str);
+			pattern = $tail(pattern);
+		}
+		// * found, only advancing pattern pointer
+		else if !$is_empty(pattern) && $head(pattern) == '*' {
+			// print("*");
+			star_pattern = pattern;
+			star_str = str;
+			pattern = $tail(pattern);
+		}
+		// last pattern pointer was *, advancing string pointer
+		else if star_pattern != null {
+			// print($head(str), "*");
+			pattern = $tail(star_pattern);
+			star_str = $tail(star_str);
+			str = star_str;
+		}
+		//current pattern pointer is not star, last patter pointer was not *
+		//characters do not match
+		else { return false; }
+	}
+
+	//check for remaining characters in pattern
+	while !$is_empty(pattern) && $head(pattern) == '*' {
+		pattern = $tail(pattern);
+	}
+
+	return $is_empty(pattern);
+}
+
+func test(str, pattern, result) {
+	if isMatch(str, pattern) == result {
+		print("Pass");
+	} else {
+		print("Fail [", str, pattern, "] expected:", result);
+	}
+}
+
+test("aa", "a", false);
+test("aa", "aa", true);
+test("aaa", "aa", false);
+test("aa", "*", true);
+test("aa", "a*", true);
+test("aa", "?*", true);
+test("aab", "c*a*b", false);
+test("abc", "*c", true);
+test("aabbcc", "a*c", true);
+test("aabbcc", "a*bc", false);
+test("wabc", "wa*f*", false);
