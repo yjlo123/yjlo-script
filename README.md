@@ -47,9 +47,15 @@ Hello YJLO!
 * Stable
   * <https://yjlo.xyz/js>
 
-## Resources
-* Documentation
+## Documentation
   * <https://github.com/yjlo123/yjlo-script/wiki>
+
+## Example codes
+* <https://github.com/yjlo123/yjlo-script/tree/master/example>
+  * LeetCode (In progress, current target: 50)
+    * <https://github.com/yjlo123/yjlo-script/tree/master/example/LeetCode>
+  * Minimal examples of data structures and algorithms (In progress)
+    * <https://github.com/yjlo123/yjlo-script/tree/master/example/min_algo>
 
 ## Contributing
 Contributions to YJLO Script are welcomed and encouraged!  
