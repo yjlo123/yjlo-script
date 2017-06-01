@@ -1,0 +1,28 @@
+import UnitTest;
+
+func testFuncReturn() {
+	ut = UnitTest("Test function return");
+	
+	// no return
+	func testFun1() {
+		var a = 2;
+	}
+	ut.assertEquals( null, testFun1() );
+	
+	// return value
+	func testFun2() {
+		return 3;
+	}
+	ut.assertEquals( 3, testFun2() );
+	
+	ut.printResult();
+}
+
+func main() {
+	testFuncReturn();
+	print();
+	
+	print(ut.all_pass ? "[Success]" : "[Failed]");
+}
+var ut = null;
+main();
