@@ -1,0 +1,60 @@
+/* LeetCode 61. Rotate List
+Given a list, rotate the list to the right by k places, where k is non-negative.
+
+For example:
+Given 1->2->3->4->5->NULL and k = 2,
+return 4->5->1->2->3->NULL.
+*/
+class ListNode {
+	var val;
+	var next;
+	@(x) { val = x; }
+}
+
+func listToLinkedList(lst) {
+	if $is_empty(lst) { return null; }
+	var head = ListNode($head(lst));
+	lst = $tail(lst);
+	var current = head;
+	while !$is_empty(lst) {
+		current.next = ListNode($head(lst));
+		current = current.next;
+		lst = $tail(lst);
+	}
+	return head;
+}
+
+func linkedListToList(ll) {
+	if ll == null { return []; }
+	return $pair(ll.val, linkedListToList(ll.next));
+}
+
+func rotateRight(head, k) {
+	if head == null { return head; }
+
+	len := 1; // number of nodes
+	var newH, tail;
+	tail = head;
+	
+	while tail.next != null {
+		// get the number of nodes in the list
+		tail = tail.next;
+		len++;
+	}
+	tail.next = head; // circle the link
+
+	k %= len;
+	if k != 0 {
+		for i in 0..<len-k {
+			// the tail node is the (len-k)-th node (1st node is head)
+			tail = tail.next;
+		}
+	}
+	newH = tail.next; 
+	tail.next = null;
+	return newH;
+}
+
+var list = [1,2,3,4,5];
+var result = rotateRight(listToLinkedList(list), 12);
+print(linkedListToList(result));
