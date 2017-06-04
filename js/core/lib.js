@@ -139,7 +139,7 @@ function _process_output(args) {
 
 	for (var i = 0; i < args.length; i++) {
 		var arg = args[i];
-		if (args[i] && is_list(args[i])) {
+		if (arg && is_list(arg)) {
 			// print list
 			output += "[";
 			while (!is_empty(arg)) {
@@ -156,6 +156,8 @@ function _process_output(args) {
 				output = output.slice(0, -2);
 			}
 			output += "]";
+		} else if (arg && arg.tag === "function_value") {
+			output += apply(refer(arg, "toString"),list(),"?");
 		} else {
 			if (arg && arg.tag === 'primitive' && typeof (arg.implementation) === 'boolean') {
 				arg = arg.implementation.toString();
