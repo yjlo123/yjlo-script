@@ -106,6 +106,7 @@ class ListUtil {
 	}
 	
 	func concat(lst1, lst2) {
-		// todo
+		if $is_empty(lst1) { return lst2; }
+		return $pair($head(lst1), concat($tail(lst1), lst2));
 	}
 }
