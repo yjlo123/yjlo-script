@@ -94,4 +94,18 @@ class ListUtil {
 		}
 		return min;
 	}
+	
+	func reverse(lst) {
+		if $is_empty(lst) { return lst; }
+		var reversed = $list();
+		while !$is_empty(lst) {
+			reversed = $pair($head(lst), reversed);
+			lst = $tail(lst);
+		}
+		return reversed;
+	}
+	
+	func concat(lst1, lst2) {
+		// todo
+	}
 }
