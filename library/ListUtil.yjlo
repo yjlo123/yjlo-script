@@ -56,12 +56,16 @@ class ListUtil {
 	}
 	
 	func sort(lst) {
-		func insert(a, l){ // num, list
-			if ($is_empty(l)) return [a];
-			if (a < $head(l)) return $pair(a, l);
+		return sortBy(lst, func(x){ return x; });
+	}
+	
+	func sortBy(lst, fun) {
+		func insert(a, l) { // num, list
+			if $is_empty(l) { return [a]; }
+			if fun(a) < fun($head(l)) { return $pair(a, l); }
 			return $pair($head(l), insert(a, $tail(l)));
 		}
-		func help(l, n){ // left, new
+		func help(l, n) { // left, new
 			if ($is_empty(l)) return n;
 			n = insert($head(l), n);
 			return help($tail(l), n);
