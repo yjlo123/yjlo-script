@@ -1,0 +1,14 @@
+/**
+ * Math
+ * @author Liu Siwei
+ */
+
+class Math {
+	func max(a, b) {
+		return a > b ? a : b;
+	}
+	
+	func min(a, b) {
+		return a < b ? a : b;
+	}
+}
