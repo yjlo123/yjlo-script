@@ -147,7 +147,7 @@ function _process_output(args) {
 				if (is_list(head(arg))) {
 					output += (_process_output([head(arg)]) + ", ");
 				} else {
-					output += (head(arg) + ", ");
+					output += (_process_output([head(arg)]) + ", ");
 				}
 				arg = tail(arg);
 			}
