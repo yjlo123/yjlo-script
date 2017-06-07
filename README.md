@@ -1,6 +1,6 @@
 # YJLO Script
 
-**YJLO Script** is a simple programming language written in JavaScript. It is a scripting language with numerous convenient features.
+**YJLO Script** is a scripting programming language written in JavaScript with numerous convenient features.
 
 ## Example
 ```swift
