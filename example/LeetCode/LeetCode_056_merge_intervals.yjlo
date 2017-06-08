@@ -1,0 +1,50 @@
+/* LeetCode 56. Merge Intervals
+Given a collection of intervals, merge all overlapping intervals.
+
+For example,
+Given [1,3],[2,6],[8,10],[15,18],
+return [1,6],[8,10],[15,18].
+*/
+
+import ListUtil;
+
+class Interval {
+	var start = 0;
+	var end = 0;
+	@(s, e) { start = s; end = e; }
+	func toString() {
+		return "["+start+", "+end+"]";
+	}
+}
+
+func merge(intervals) {
+	if $is_empty(intervals) { return []; }
+	current := $head(intervals);
+	start := current.start;
+	end := current.end;
+	intervals = $tail(intervals);
+	while !$is_empty(intervals) && $head(intervals).start <= end {
+		if $head(intervals).end > end {
+			end = $head(intervals).end;
+		}
+		intervals = $tail(intervals);
+	}
+	return $pair(Interval(start, end), merge(intervals));
+}
+
+func list_to_intervals(lst) {
+	if $is_empty(lst) { return []; }
+	head := $head(lst);
+	start := $head(head);
+	end := $head($tail(head));
+	return $pair(Interval(start, end), list_to_intervals($tail(lst)));
+}
+
+intervals := [[8,10],[1,3],[15,18],[2,6]];
+intervals = list_to_intervals(intervals);
+
+// sort intervals by start
+intervals = ListUtil.sortBy(intervals, func(interval){return interval.start;});
+
+// print merge result
+print(merge(intervals));
