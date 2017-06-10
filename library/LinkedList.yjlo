@@ -93,7 +93,7 @@ func LinkedList() {
 	
 	/* Returns the (non-null) Node at the specified element index. */
 	func _node(index) {
-		if (index < (_size >> 1)) {
+		if index < (_size >> 1) {
 			var x = _first;
 			for i in 0..<index {
 				x = x.next;
