@@ -5,15 +5,15 @@
 
 class ListUtil {
 	func set(lst, n, v) {
-		if ($is_empty(lst)) return lst;
-		if (n == 0) return $pair(v, $tail(lst));
+		if $is_empty(lst) { return lst; }
+		if n == 0 { return $pair(v, $tail(lst)); }
 		else return $pair($head(lst), set($tail(lst), n-1, v));
 	}
 
 	func get(lst, n) {
 		if $is_empty(lst) { return null; }
 		if n == 0 { return $head(lst); }
-		else return get($tail(lst), n - 1);
+		else { return get($tail(lst), n - 1); }
 	}
 	
 	func len(lst) {
@@ -46,10 +46,10 @@ class ListUtil {
 	}
 	
 	func getLast(lst) {
-		if ($is_empty(lst)) {
+		if $is_empty(lst) {
 			return [];
 		}
-		if ($is_empty($tail(lst))) {
+		if $is_empty($tail(lst)) {
 			return $head(lst);
 		}
 		return getLast($tail(lst));
@@ -66,7 +66,7 @@ class ListUtil {
 			return $pair($head(l), insert(a, $tail(l)));
 		}
 		func help(l, n) { // left, new
-			if ($is_empty(l)) return n;
+			if $is_empty(l) { return n; }
 			n = insert($head(l), n);
 			return help($tail(l), n);
 		}
