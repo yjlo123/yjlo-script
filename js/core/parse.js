@@ -777,16 +777,7 @@
 
 	/*===================== CONDITION ======================= */
 		var condition = function () {
-			var condition_expression = null;
-			if (!isOpeningBracketToken(token)) {
-				condition_expression = expression();
-			} else {
-				// necessary for omitting braces
-				advance("(");
-				condition_expression = expression();
-				advance(")");
-			}
-			return condition_expression;
+			return condition_expression = expression();
 		};
 
 	/*===================== CONTINUE ======================= */
