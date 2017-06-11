@@ -54,7 +54,13 @@ function duplicateFirstFrame(env) {
 		// skip loop if the property is from prototype
 		if (!frame.hasOwnProperty(key)) continue;
 		keys = pair(key, keys);
-		vals = pair(frame[key], vals);
+		let value = frame[key];
+		if (typeof value === 'object') {
+			// shallow copied value
+			vals = pair(jQuery.extend({}, value), vals);
+		} else {
+			vals = pair(value, vals);
+		}
 	}
 	
 	// update copied frame's function env
@@ -393,9 +399,10 @@ function function_definition_parent(stmt) {
 }
 
 function evaluate_function_definition(stmt, env) {
-	if (function_definition_parent(stmt)) {
+	let parent_name = function_definition_parent(stmt);
+	if (parent_name) {
 		// extends parent
-		var parent = lookup_variable_value(null, function_definition_parent(stmt), env);
+		var parent = lookup_variable_value(null, parent_name, env);
 		var parent_env = extend_environment([],[],function_value_environment(parent));
 		evaluate(function_value_body(parent), parent_env);
 		return make_function_value(
@@ -539,6 +546,7 @@ function apply(fun, args, line) {
 	} else if (is_compound_function_value(fun)) {
 		let func_env = null;
 		if (fun.has_parent) {
+			// if has parent, fun's env is set to be parent's env when make_function_value
 			// override parent environment
 			func_env = function_value_environment(fun);
 			func_env = duplicateFirstFrame(func_env);
