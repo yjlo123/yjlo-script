@@ -4,6 +4,26 @@
  */
 
 class Math {
+	func trunc(n) {
+		return n - n % 1;
+	}
+	
+	func ceil(n) {
+		if n > 0 && n % 1 > 0 {
+			return trunc(n) + 1;
+		} else {
+			return trunc(n);
+		}
+	}
+	
+	func floor(n) {
+		if n < 0 && n % 1 < 0 {
+			return trunc(n) -1;
+		} else {
+			return trunc(n);
+		}
+	}
+	
 	func max(a, b) {
 		return a > b ? a : b;
 	}
