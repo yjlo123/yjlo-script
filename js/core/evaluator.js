@@ -634,6 +634,7 @@ var primitive_functions = {
 		"print": _print,
 		"input": _input,
 
+		"$now": _now,
 		"$sqrt": _sqrt,
 		"$round": _round,
 		"$string_to_char_list": _string_to_char_list,
