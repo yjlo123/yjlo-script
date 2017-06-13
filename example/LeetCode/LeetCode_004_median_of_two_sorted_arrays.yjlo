@@ -1,0 +1,61 @@
+/* LeetCode 4. Median of Two Sorted Arrays
+There are two sorted arrays nums1 and nums2 of size m and n respectively.
+
+Find the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).
+
+Example 1:
+nums1 = [1, 3]
+nums2 = [2]
+The median is 2.0
+
+Example 2:
+nums1 = [1, 2]
+nums2 = [3, 4]
+The median is (2 + 3)/2 = 2.5
+*/
+
+import ListUtil;
+import Math;
+
+len := ListUtil.len;
+get := ListUtil.get;
+
+func median(A, B){
+	m := len(A);
+	n := len(B);
+	if m > n { return median(B, A); }
+	if n == 0 { throw("Value Error"); }
+	
+	var imin = 0, imax = m;
+	half_len := (m + n + 1) / 2;
+
+	var i, j, max_of_left, min_of_right;
+	while imin <= imax {
+		i = (imin + imax) / 2;
+		j = half_len - i;
+		if i < m && get(B, j-1) > get(A, i) {
+			// i is too small, must increase it
+			imin = i + 1;
+		} else if i > 0 && get(A, i-1) > get(B, j) {
+			// i is too big, must decrease it
+			imax = i - 1;
+		} else {
+			// i is perfect
+			if i == 0 { max_of_left = get(B, j-1); }
+			else if j == 0 { max_of_left = get(A, i-1); }
+			else { max_of_left = Math.max(get(A, i-1), get(B, j-1)); }
+
+			if (m + n) % 2 == 1 {
+				return max_of_left;
+			}
+
+			if i == m { min_of_right = get(B, j); }
+			else if j == n { min_of_right = get(A, i); }
+			else { min_of_right = Math.min(get(A, i), get(B, j)); }
+
+			return (max_of_left + min_of_right) /. 2;
+		}
+	}
+}
+
+print(median([1, 2, 3], [4, 5, 6, 7]));

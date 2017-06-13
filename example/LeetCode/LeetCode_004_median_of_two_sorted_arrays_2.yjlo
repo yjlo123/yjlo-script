@@ -1,0 +1,54 @@
+/* LeetCode 4. Median of Two Sorted Arrays
+
+The same solution as LeetCode_004_median_of_two_sorted_arrays.yjlo
+but using HeapList as input
+*/
+import HeapList;
+import Math;
+
+func median(A, B){
+	m := A.size();
+	n := B.size();
+	if m > n { return median(B, A); }
+	if n == 0 { throw("Value Error"); }
+	
+	var imin = 0, imax = m;
+	half_len := (m + n + 1) / 2;
+
+	var i, j, max_of_left, min_of_right;
+	while imin <= imax {
+		i = (imin + imax) / 2;
+		j = half_len - i;
+		if i < m && B.get(j-1) > A.get(i) {
+			// i is too small, must increase it
+			imin = i + 1;
+		} else if i > 0 && A.get(i-1) > B.get(j) {
+			// i is too big, must decrease it
+			imax = i - 1;
+		} else {
+			// i is perfect
+
+			if i == 0 { max_of_left = B.get(j-1); }
+			else if j == 0 { max_of_left = A.get(i-1); }
+			else { max_of_left = Math.max(A.get(i-1), B.get(j-1)); }
+
+			if (m + n) % 2 == 1 {
+				return max_of_left;
+			}
+
+			if i == m { min_of_right = B.get(j); }
+			else if j == n { min_of_right = A.get(i); }
+			else { min_of_right = Math.min(A.get(i), B.get(j)); }
+
+			return (max_of_left + min_of_right) /. 2;
+		}
+	}
+}
+
+listA := HeapList();
+listA.init([1,2]);
+
+listB := HeapList();
+listB.init([3,4]);
+
+print(median(listA, listB));
