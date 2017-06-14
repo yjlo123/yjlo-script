@@ -1,6 +1,6 @@
 /**
  * Math
- * @author Liu Siwei
+ * @author Siwei Liu
  */
 
 class Math {
@@ -30,5 +30,23 @@ class Math {
 	
 	func min(a, b) {
 		return a < b ? a : b;
+	}
+	
+		class rand {
+		var a = 25214903917;
+		var c = 11;
+		var previous = 0;
+		
+		@(seed) {
+			if seed {
+				previous = seed;
+			}
+		}
+		
+		func next() {
+			var r = a * previous + c;
+			previous = r;
+			return r % 1000 /. 1000;
+		}
 	}
 }
