@@ -15,6 +15,16 @@ class StringUtil {
 		return ListUtil.get(chars, i);
 	}
 	
+	func listToString(lst) {
+		if $is_list(lst) && $is_empty(lst) {
+			return "";
+		}
+		if $is_list($head(lst)) {
+			return listToString($head(lst)) + listToString($tail(lst));
+		}
+		return $head(lst) + listToString($tail(lst));
+	}
+	
 	func toLower(str) {
 		
 	}
