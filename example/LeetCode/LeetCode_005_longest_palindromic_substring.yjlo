@@ -1,0 +1,52 @@
+/* LeetCode 5. Longest Palindromic Substring
+Given a string s, find the longest palindromic substring in s.
+You may assume that the maximum length of s is 1000.
+
+Example:
+Input: "babad"
+Output: "bab"
+Note: "aba" is also a valid answer.
+
+Example:
+Input: "cbbd"
+Output: "bb"
+*/
+
+import ListUtil;
+import StringUtil;
+
+var lo, maxLen;
+
+func extendPalindrome(s, j, k) {
+	while j >= 0 && k < ListUtil.len(s) && ListUtil.get(s, j) == ListUtil.get(s, k) {
+		j--;
+		k++;
+	}
+	if maxLen < k - j - 1 {
+		lo = j + 1;
+		maxLen = k - j - 1;
+	}
+}
+
+func longestPalindrome(s) {
+	s = $string_to_char_list(s);
+	len := ListUtil.len(s);
+	if len < 2 { return s; }
+	
+	for i in 0..<len-1 {
+		//assume odd length, try to extend Palindrome as possible
+		extendPalindrome(s, i, i);
+		//assume even length.
+		extendPalindrome(s, i, i+1);
+	}
+	var result = [];
+	while lo > 0 { s = $tail(s); lo--; }
+	while maxLen > 0 {
+		result = ListUtil.append(result, $head(s));
+		s = $tail(s);
+		maxLen--;
+	}
+	return StringUtil.listToString(result);
+}
+
+print(longestPalindrome("sdfafafbawaf"));
