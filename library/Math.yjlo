@@ -4,6 +4,11 @@
  */
 
 class Math {
+	func abs(n) {
+		if n < 0 { return -n; }
+		return n;
+	}
+	
 	func trunc(n) {
 		return n - n % 1;
 	}
@@ -24,6 +29,19 @@ class Math {
 		}
 	}
 	
+	func round(n, d) {
+		if d == null || d == 0 {
+			if (abs(n % 1) >= 0.5 && n > 0) 
+			|| (abs(n % 1) < 0.5 && n < 0){
+				return ceil(n);
+			} else {
+				return floor(n);
+			}
+		}
+		var precision = 10 ** d;
+		return round(n * precision) /. precision;
+	}
+	
 	func max(a, b) {
 		return a > b ? a : b;
 	}
@@ -32,7 +50,7 @@ class Math {
 		return a < b ? a : b;
 	}
 	
-		class rand {
+	class rand {
 		var a = 25214903917;
 		var c = 11;
 		var previous = 0;
