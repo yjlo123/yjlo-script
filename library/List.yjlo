@@ -1,0 +1,70 @@
+/*
+ * Wrapper class of list
+ * @author Siwei Liu
+ */
+
+import ListUtil;
+
+class List {
+	var list = [];
+	
+	@(lst) {
+		list = lst;
+	}
+	
+	func toList() {
+		return list;
+	}
+	
+	func set(n, v) {
+		list = ListUtil.set(list, n, v);
+	}
+	
+	func get(n) {
+		return ListUtil.get(list, n);
+	}
+	
+	func len() {
+		return ListUtil.len(list);
+	}
+	
+	func equal(lst) {
+		return ListUtil.equal(list, lst);
+	}
+	
+	func index(v) {
+		return ListUtil.index(list, v);
+	}
+	
+	func append(v) {
+		list = ListUtil.append(list, v);
+	}
+	
+	func getLast() {
+		return ListUtil.getLast(list);
+	}
+	
+	func sort() {
+		list = ListUtil.sort(list);
+	}
+	
+	func sortBy(fun) {
+		ListUtil.sortBy(list, fun);
+	}
+	
+	func max() {
+		return ListUtil.max(list);
+	}
+	
+	func min() {
+		return ListUtil.min(list);
+	}
+	
+	func reverse() {
+		list = ListUtil.reverse(list);
+	}
+	
+	func concat(lst) {
+		list = ListUtil.concat(list, lst);
+	}
+}
