@@ -310,7 +310,7 @@
 					/* prefix all unary operators with '_' ! */
 					if (thisNode.name === '-' &&
 							(expression_nodes_postfix.length === 0 ||
-							(prevNode && /^([\(=]|:=|[=><!]=)$/.test(prevNode.name)))) {
+							(prevNode && /^([\(=]|:=|[=><!]=|\?)$/.test(prevNode.name)))) {
 						// ( , = , :=
 						// negative operator
 						thisNode.name = '_-';
@@ -777,7 +777,7 @@
 
 	/*===================== CONDITION ======================= */
 		var condition = function () {
-			return condition_expression = expression();
+			return expression();
 		};
 
 	/*===================== CONTINUE ======================= */
