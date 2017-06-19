@@ -92,18 +92,8 @@ function runtime() {
 	return d.getTime();
 }
 
-function _sqrt(n) {
-	return Math.sqrt(n);
-}
-
 function _now() {
 	return new Date().getTime();
-}
-
-function _round(n, d) {
-	if (!d) return Math.round(n);
-	var precision = Math.pow(10, d);
-	return Math.round(n * precision) / precision;
 }
 
 function _string_to_char_list(str) {

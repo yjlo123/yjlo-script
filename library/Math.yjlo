@@ -4,9 +4,24 @@
  */
 
 class Math {
+	
+	var MAX_INT = 9007199254740991;
+	var MIN_INT = -9007199254740991;
+	
 	func abs(n) {
 		if n < 0 { return -n; }
 		return n;
+	}
+	
+	func sqrt(x) {
+		if x <= 0 { return 0; }
+		var a = 1;
+		var b = x;
+		while abs(a - b) > 0.000000001 {
+			a = (a + b) /. 2;
+			b = x /. a;
+		}
+		return round(a, 8);
 	}
 	
 	func trunc(n) {
