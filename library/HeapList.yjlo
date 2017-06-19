@@ -55,6 +55,17 @@ func HeapList() extends Heap {
 		return list;
 	}
 	
+	func toString() {
+		var str = "[";
+		for i in 0..<size()-1 {
+			str += (get(i) + ", ");
+		}
+		if size() > 0 {
+			str += (get(size()-1) + "]");
+		}
+		return str;
+	}
+	
 	return func(){};
 }
 
