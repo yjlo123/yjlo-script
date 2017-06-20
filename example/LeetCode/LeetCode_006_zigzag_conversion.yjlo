@@ -1,0 +1,55 @@
+/* LeetCode 6. ZigZag Conversion
+The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows
+like this: (you may want to display this pattern in a fixed font for better legibility)
+
+P   A   H   N
+A P L S I I G
+Y   I   R
+And then read line by line: "PAHNAPLSIIGYIR"
+Write the code that will take a string and make this conversion given a number of rows:
+
+string convert(string text, int nRows);
+convert("PAYPALISHIRING", 3) should return "PAHNAPLSIIGYIR".
+*/
+import HeapList;
+import ListUtil;
+
+func convert(s, nRows) {
+	c := $string_to_char_list(s);
+	len := ListUtil.len(c);
+	
+	// a list of string buffers
+	sb := HeapList();
+	
+	for i in 0..<nRows {
+		sb.put(i, "");
+	}
+	
+	i := 0;
+	while i < len {
+		or idx in 0..<nRows {
+			// vertically down
+			if i >= len { break; }
+			sb.put(idx, sb.get(idx) + ListUtil.get(c, i++));
+		}
+		for idx in nRows-2...1 by -1 {
+			// obliquely up
+			if i >= len { break; }
+			sb.put(idx, sb.get(idx) + ListUtil.get(c, i++));
+		}
+	}
+	
+	// concatenate all string buffers
+	result := "";
+	for idx in 0..<nRows {
+		result += sb.get(idx);
+	}
+	
+	return result;
+}
+
+print(convert("PAYPALISHIRING", 3));
+// P   A   H   N
+// A P L S I I G
+// Y   I   R
+print("PAHNAPLSIIGYIR");
