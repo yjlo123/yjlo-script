@@ -141,9 +141,6 @@ function _process_output(args) {
 		} else if (arg && arg.tag === "function_value") {
 			output += apply(refer(arg, "toString"),list(),"?");
 		} else {
-			if (arg && arg.tag === 'primitive' && typeof (arg.implementation) === 'boolean') {
-				arg = arg.implementation.toString();
-			}
 			output += ((output === "" ? "" : " ") + arg);
 		}
 	}

@@ -14,8 +14,7 @@ function is_tagged_object(stmt,the_tag) {
 function is_self_evaluating(stmt) {
 	return stmt === [] ||
 	typeof stmt === "number" ||
-	typeof stmt === "string" ||
-	typeof stmt === "boolean";
+	typeof stmt === "string";
 }
 
 // =============== ENV ===================
@@ -638,8 +637,8 @@ var primitive_functions = {
 		"$string_to_char_list": _string_to_char_list,
 		"$char_code": _char_code,
 
-		true: true,
-		false: false,
+		//true: true,
+		//false: false,
 		
 		"_-": (x) => -x, // negative
 		"**": (x,y) => Math.pow(x,y), // power 
@@ -782,22 +781,20 @@ function add_constant(name, value) {
 }
 
 function initConstantValues() {
+	an_empty_frame = {};
 	add_constant('null', null);
-	add_constant('PI', 3.141592653589793);
+	add_constant('true', true);
+	add_constant('false', false);
 }
 
 function setup_global_environment() {
-	an_empty_frame = {};
-	the_global_environment = setup_environment();
-	
 	initConstantValues();
+	the_global_environment = setup_environment();
 }
 
 function setup_console_environment() {
-	an_empty_frame = {};
-	the_console_environment = setup_environment();
-	
 	initConstantValues();
+	the_console_environment = setup_environment();
 }
 
 function get_console_environment() {
