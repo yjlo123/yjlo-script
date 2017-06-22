@@ -45,7 +45,7 @@
 			}
 		}
 
-		// Includs variable, operator, boolean
+		// Includs variable, operator
 		class VariableNode extends Node {
 			constructor(name, type, line) {
 				super("variable", line);
@@ -258,8 +258,7 @@
 					left_node = new ConstantNode(token.value, token.line);
 				} else if (isVarNameToken(token)) {
 					// variable
-					let is_boolean = (token.value == "true") || (token.value == "false");
-					left_node = new VariableNode(token.value, is_boolean ? "boolean" : "variable", token.line);
+					left_node = new VariableNode(token.value, "variable", token.line);
 				} else if (isOperatorToken(token)) {
 					// operator
 					left_node = new VariableNode(token.value, "operator", token.line);
@@ -292,8 +291,6 @@
 					temp_stack.push(thisNode);
 				} else if (thisNode.type === 'variable' || thisNode instanceof ApplicationNode) {
 					expression_nodes_postfix.push(thisNode);
-				} else if (thisNode.type === 'boolean') {
-					expression_nodes_postfix.push(thisNode.name === "true" ? true : false);
 				} else if (thisNode.tag === 'constant') {
 					expression_nodes_postfix.push(thisNode.value);
 				} else if (thisNode.name === ')') {
@@ -968,10 +965,20 @@
 			token = tokens[token_nr];
 			var libs = list();
 			while (token && token.value === "import") {
-				advance();
+				advance("import");
 				if (token && isVarNameToken(token)) {
-					libs = pair(token.value, libs);
+					let libPath = token.value;
 					advance(); // library name
+					if (token.value === "from") {
+						advance("from");
+						if (token && token.type === "string") {
+							libPath = token.value + (token.value.slice(-1)==="/"?"":"/") + libPath;
+							advance(); // path
+						} else {
+							throwError(null, "Invalid library path for '" + libPath + "'.");
+						}
+					}
+					libs = pair(libPath, libs);
 					advance(";");
 				} else {
 					throwError(null, "Invalid library '"+token.value()+"'.");
@@ -1001,8 +1008,9 @@
 		var loadSources = function(evaluate_callback) {
 			var nextSourceName = head(loadingQueue);
 			
+			let libPath = (nextSourceName.indexOf("/")===-1 ? "library/" : "") + nextSourceName + ".yjlo";
 			$.ajax({
-				url: "library/" + nextSourceName + ".yjlo",
+				url: libPath,
 				dataType: 'text',
 				type: 'GET'
 			}).done(function(data){
