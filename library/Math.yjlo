@@ -8,6 +8,8 @@ class Math {
 	var MAX_INT = 9007199254740991;
 	var MIN_INT = -9007199254740991;
 	
+	var PI = 3.141592653589793;
+	
 	func abs(n) {
 		if n < 0 { return -n; }
 		return n;
