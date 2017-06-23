@@ -237,9 +237,19 @@
 			}
 
 			// read in the tokens in this expression
-			while (token && !/^[,;{]$/.test(token.value) &&
-					!/^\.\.[\.<>]$/.test(token.value) &&
-					!/^by$/.test(token.value)) {
+			while (token) {
+				if (isOperatorToken(token) && /^[,;{]$/.test(token.value)) {
+					// , or ; or {
+					break;
+				}
+				if (isOperatorToken(token) && /^\.\.[\.<>]$/.test(token.value)) {
+					// ..< or ..>
+					break;
+				}
+				if (!isConstantToken(token) && /^by$/.test(token.value)) {
+					// "by" keyword
+					break;
+				}
 				if (isClosingBracketToken(token) && bracket_count === 0) {
 					// end of current expression
 					break;
