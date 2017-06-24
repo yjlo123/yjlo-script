@@ -1,10 +1,8 @@
 /**
- * (c) 2017 liusiwei.com
- *
  * Expression parser and evaluator
  * written in YJLO Script
  *
- * @author Liu Siwei
+ * @author Siwei Liu
  */
 
 import Tokenizer;
@@ -78,6 +76,8 @@ while !$is_empty(infix_list) {
 	token = $head(infix_list);
 	if token.type == 'number' {
 		postfix_stack.push(token.value);
+	} else if token.value == '(' {
+		stack.push(token);
 	} else if token.value == ')' {
 		while stack.size() > 0 && stack.peek().value != "(" {
 			postfix_stack.push(stack.pop().value);
