@@ -27,7 +27,7 @@ func convert(s, nRows) {
 	
 	i := 0;
 	while i < len {
-		or idx in 0..<nRows {
+		for idx in 0..<nRows {
 			// vertically down
 			if i >= len { break; }
 			sb.put(idx, sb.get(idx) + ListUtil.get(c, i++));
