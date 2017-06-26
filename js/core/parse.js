@@ -847,6 +847,7 @@
 			let class_arg_positions = list();
 			let class_constructor = false;
 			let class_constructor_arg_tokens = [];
+			let class_constructor_stack = list();
 			for (let i = 0; i < original_tokens.length; i++) {
 				let t = original_tokens[i];
 				if (t.type !== "operator" && t.type !== "name") {
@@ -862,6 +863,7 @@
 						desugared_tokens.push(new Token('operator', ')', t.line));
 						break;
 					case 'class':
+						class_constructor_stack = pair(false, class_constructor_stack);
 						desugared_tokens.push(new Token('name', 'func', t.line));
 						i++;
 						t = original_tokens[i];
@@ -872,6 +874,7 @@
 						class_level++;
 						break;
 					case '@':
+						class_constructor_stack = pair(true, tail(class_constructor_stack));
 						// constructor
 						if (class_level > 0 && brace_count === class_level) {
 							if (is_empty(class_arg_positions)){
@@ -917,6 +920,15 @@
 					case '}':
 						if (class_level > 0 && brace_count === class_level) {
 							// end of class
+							if (head(class_constructor_stack)) {
+								desugared_tokens.push(new Token('name', '@', t.line));
+								desugared_tokens.push(new Token('operator', '(', t.line));
+								desugared_tokens = desugared_tokens.concat(class_constructor_arg_tokens);
+								desugared_tokens.push(new Token('operator', ')', t.line));
+								desugared_tokens.push(new Token('operator', ';', t.line));
+							}
+							class_constructor_stack = tail(class_constructor_stack);
+							
 							desugared_tokens.push(new Token('name', 'return', t.line));
 							desugared_tokens.push(new Token('name', 'func', t.line));
 							desugared_tokens.push(new Token('operator', '(', t.line));
@@ -930,11 +942,6 @@
 						} else if(class_level > 0 && class_constructor && brace_count === class_level+1) {
 							// end of constructor
 							desugared_tokens.push(t); // "}"
-							desugared_tokens.push(new Token('name', '@', t.line));
-							desugared_tokens.push(new Token('operator', '(', t.line));
-							desugared_tokens = desugared_tokens.concat(class_constructor_arg_tokens);
-							desugared_tokens.push(new Token('operator', ')', t.line));
-							desugared_tokens.push(new Token('operator', ';', t.line));
 							class_constructor = false;
 						} else {
 							desugared_tokens.push(t);
