@@ -121,28 +121,30 @@ function _process_output(args) {
 
 	for (var i = 0; i < args.length; i++) {
 		var arg = args[i];
+		var segment = "";
 		if (arg && is_list(arg)) {
 			// print list
-			output += "[";
+			segment += "[";
 			while (!is_empty(arg)) {
 				// nested list
 				if (is_list(head(arg))) {
-					output += (_process_output([head(arg)]) + ", ");
+					segment += (_process_output([head(arg)]) + ", ");
 				} else {
-					output += (_process_output([head(arg)]) + ", ");
+					segment += (_process_output([head(arg)]) + ", ");
 				}
 				arg = tail(arg);
 			}
 			// remove ", "
-			if (output.length !== 1) {
-				output = output.slice(0, -2);
+			if (segment.length !== 1) {
+				segment = segment.slice(0, -2);
 			}
-			output += "]";
+			segment += "]";
 		} else if (arg && arg.tag === "function_value") {
-			output += apply(refer(arg, "toString"),list(),"?");
+			segment = apply(refer(arg, "toString"),list(),"?");
 		} else {
-			output += ((output === "" ? "" : " ") + arg);
+			segment = arg;
 		}
+		output += ((output === "" ? "" : " ") + segment);
 	}
 	return output;
 }
