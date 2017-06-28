@@ -5,10 +5,16 @@
 
 import Heap;
 
-func HeapList() extends Heap {
+class HeapList extends Heap {
 
 	var _size = 0;
 	_root = _Node();
+
+	@(arg) {
+		if arg != null && $is_list(arg) {
+			this.init(arg);
+		}
+	}
 
 	func init(lst) {
 		_size = 0;
@@ -62,11 +68,11 @@ func HeapList() extends Heap {
 		}
 		if size() > 0 {
 			str += (get(size()-1) + "]");
+		} else {
+			str += "]";
 		}
 		return str;
 	}
-	
-	return func(){};
 }
 
 /*
