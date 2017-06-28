@@ -48,14 +48,13 @@ Hello YJLO!
   * <https://yjlo.xyz/js>
 
 ## Documentation
-  * <https://github.com/yjlo123/yjlo-script/wiki>
+  * [YJLO Script Wiki](https://github.com/yjlo123/yjlo-script/wiki)
 
 ## Example codes
-* <https://github.com/yjlo123/yjlo-script/tree/master/example>
-  * LeetCode (In progress, current target: 50)
-    * <https://github.com/yjlo123/yjlo-script/tree/master/example/LeetCode>
-  * Minimal examples of data structures and algorithms (In progress)
-    * <https://github.com/yjlo123/yjlo-script/tree/master/example/min_algo>
+* [Human Resource Machine Simulator](https://github.com/yjlo123/human-resource-machine-yjlo)
+* [Example directory](https://github.com/yjlo123/yjlo-script/tree/master/example)
+  * [LeetCode](https://github.com/yjlo123/yjlo-script/tree/master/example/LeetCode) (In progress, current target: 50)
+  * [Minimal examples of data structures and algorithms](https://github.com/yjlo123/yjlo-script/tree/master/example/min_algo) (In progress)
 
 ## Contributing
 Contributions to YJLO Script are welcomed and encouraged!  
