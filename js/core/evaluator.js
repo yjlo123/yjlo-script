@@ -7,7 +7,7 @@ function throwError(line, message) {
 	throw new Error(`[line ${line}] ${message}`);
 }
 
-function is_tagged_object(stmt,the_tag) {
+function is_tagged_object(stmt, the_tag) {
 	return stmt && typeof stmt === "object" && stmt.tag === the_tag;
 }
 
@@ -30,11 +30,11 @@ function is_empty_environment(env) {
 	return is_empty(env);
 }
 
-function enclose_by(frame,env) {
-	return pair(frame,env);
+function enclose_by(frame, env) {
+	return pair(frame, env);
 }
 
-function make_frame(variables,values) {
+function make_frame(variables, values) {
 	if (is_empty(variables) && is_empty(values)) 
 		return {};
 	else {
@@ -63,7 +63,7 @@ function duplicateFirstFrame(env) {
 	}
 	
 	// update copied frame's function env
-	let new_env = enclose_by(make_frame(keys,vals), env);
+	let new_env = enclose_by(make_frame(keys, vals), env);
 	let new_frame = first_frame(new_env);
 	for (let key in new_frame) {
 		if (!new_frame.hasOwnProperty(key)) continue;
@@ -75,16 +75,16 @@ function duplicateFirstFrame(env) {
 	return new_env;
 }
 
-function add_binding_to_frame(variable,value,frame) {
+function add_binding_to_frame(variable, value, frame) {
 	frame[variable] = value; // object field assignment
 }
-function has_binding_in_frame(variable,frame) {
+function has_binding_in_frame(variable, frame) {
 	return frame.hasOwnProperty(variable);
 }
 
-function define_variable(variable,value,env) {
+function define_variable(variable, value, env) {
 	var frame = first_frame(env);
-	add_binding_to_frame(variable,value,frame);
+	add_binding_to_frame(variable, value, frame);
 	return value;
 }
 
@@ -120,7 +120,7 @@ function variable_name(stmt) {
 function lookup_variable_value(stmt, variable, env) {
 	function env_loop(env) {
 		if (is_empty_environment(env))
-			throwError(stmt&&stmt.line?stmt.line:"?", "Cannot find variable: "+variable);
+			throwError(stmt&&stmt.line?stmt.line:"?", "Cannot find variable: " + variable);
 		else if (has_binding_in_frame(variable,first_frame(env)))
 			return first_frame(env)[variable];
 		else return env_loop(enclosing_environment(env));
@@ -129,7 +129,7 @@ function lookup_variable_value(stmt, variable, env) {
 }
 	 
 function is_assignment(stmt) {
-	return is_tagged_object(stmt,"assignment");
+	return is_tagged_object(stmt, "assignment");
 }
 function assignment_left(stmt) {
 	return stmt.left;
@@ -174,7 +174,7 @@ function evaluate_assignment(stmt, env) {
 }
 	 
 function is_var_definition(stmt) {
-	return is_tagged_object(stmt,"var_definition");
+	return is_tagged_object(stmt, "var_definition");
 }
 function var_definition_variable(stmt) {
 	return stmt.left;
@@ -183,7 +183,7 @@ function var_definition_value(stmt) {
 	return stmt.right;
 }
 
-function evaluate_var_definition(stmt,env) {
+function evaluate_var_definition(stmt, env) {
 	let variable = var_definition_variable(stmt);
 	if(!isValidVariableName(variable)) {
 		throwError(stmt.line, `Invalid variable name: ${variable}`);
@@ -194,7 +194,7 @@ function evaluate_var_definition(stmt,env) {
 }
 	 
 function is_if_statement(stmt) {
-	return is_tagged_object(stmt,"if");
+	return is_tagged_object(stmt, "if");
 }
 function if_predicate(stmt) {
 	return stmt.predicate;
@@ -217,7 +217,7 @@ function evaluate_if_statement(stmt, env) {
 }
 
 function is_switch_statement(stmt) {
-	return is_tagged_object(stmt,"switch");
+	return is_tagged_object(stmt, "switch");
 }
 
 function switch_variable(stmt) {
@@ -447,8 +447,8 @@ function rest_statements(stmts) {
 	return tail(stmts);
 }
 		
-function evaluate_sequence(stmts,env) {
-	if (is_last_statement(stmts))  
+function evaluate_sequence(stmts, env) {
+	if (is_last_statement(stmts))
 		return evaluate(first_statement(stmts),env);
 	else {
 		var first_stmt_value = evaluate(first_statement(stmts),env);
@@ -461,7 +461,7 @@ function evaluate_sequence(stmts,env) {
 }
 
 function is_application(stmt) {
-	return is_tagged_object(stmt,"application");
+	return is_tagged_object(stmt, "application");
 }
 function operator(stmt) {
 	return stmt.operator;
@@ -480,20 +480,20 @@ function rest_operands(ops) {
 }
 		
 function is_primitive_function(fun) {
-	return is_tagged_object(fun,"primitive");
+	return is_tagged_object(fun, "primitive");
 }
 function primitive_implementation(fun) {
 	return fun.implementation;
 }
 	 
-function apply_in_underlying_javascript(prim,argument_list) {
+function apply_in_underlying_javascript(prim, argument_list) {
 	var argument_array = new Array();
 	var i = 0;
 	while (!is_empty(argument_list)) {
 		argument_array[i++] = head(argument_list);
 		argument_list = tail(argument_list);
 	}
-	return prim.apply(prim,argument_array);
+	return prim.apply(prim, argument_array);
 }
 	 
 function primitive_implementation(fun) {
@@ -507,7 +507,7 @@ function apply_primitive_function(fun,argument_list) {
 
 function extend_environment(vars, vals, base_env, line) {
 	if (length(vars) >= length(vals))
-		return enclose_by(make_frame(vars,vals),base_env);
+		return enclose_by(make_frame(vars, vals), base_env);
 	else if (length(vars) < length(vals))
 		throwError(line || "?", "Too many arguments supplied: expect "+length(vars)+", but "+length(vals)+" given");
 }
@@ -523,7 +523,7 @@ function update_environment(vars, vals, base_env) {
 }
 	 
 function is_return_statement(stmt) {
-	return is_tagged_object(stmt,"return_statement");
+	return is_tagged_object(stmt, "return_statement");
 }
 function return_statement_expression(stmt) {
 	return stmt.expression;
@@ -533,7 +533,7 @@ function make_return_value(line, content) {
 	return { tag: "return_value", content: content, line: line};
 }
 function is_return_value(value) {
-	return is_tagged_object(value,"return_value");
+	return is_tagged_object(value, "return_value");
 }
 function return_value_content(value) {
 	return value.content;
@@ -559,6 +559,7 @@ function apply(fun, args, line) {
 											args,
 											function_value_environment(fun), line);
 		}
+		// define_variable("this", func_env, func_env);
 		var result = evaluate(function_value_body(fun), func_env);
 		if (is_return_value(result)) {
 			return return_value_content(result);
@@ -609,16 +610,16 @@ function refer(fun, member) {
 			// evaluate function body to update environment
 			evaluate(function_value_body(fun), func_env);
 		}
-		return lookup_variable_value(null, member,func_env);
+		return lookup_variable_value(null, member, func_env);
 	} else {
 		throwError("?", "Unknown function type - REFER: "+fun);
 	}
 }
 
-function list_of_values(exps,env) {
+function list_of_values(exps, env) {
 	if (no_operands(exps)) return [];
-	else return pair(evaluate(first_operand(exps),env),
-						  list_of_values(rest_operands(exps),env));
+	else return pair(evaluate(first_operand(exps), env),
+						  list_of_values(rest_operands(exps), env));
 }
 	 
 var primitive_functions = {
@@ -670,19 +671,19 @@ var primitive_functions = {
 };
 	
 function setup_environment() {
-	var initial_env = enclose_by(an_empty_frame,the_empty_environment);
+	var initial_env = enclose_by(an_empty_frame, the_empty_environment);
 	for (var prop in primitive_functions) {
 		define_variable(prop,
 							 { tag: "primitive",
 								implementation: primitive_functions[prop] },
 							 initial_env);
 	}
-	define_variable("undefined",undefined,initial_env);
+	define_variable("undefined", undefined, initial_env);
 	return initial_env;
 }
 	 
-function evaluate_toplevel(stmt,env) {
-	var value = evaluate(stmt,env);
+function evaluate_toplevel(stmt, env) {
+	var value = evaluate(stmt, env);
 	if (is_return_value(value))
 		throwError(value.line, "return not allowed outside of function definition.");
 	if (is_continue_value(value))
@@ -692,36 +693,36 @@ function evaluate_toplevel(stmt,env) {
 	else return value;
 }
 
-function evaluate(stmt,env) {
+function evaluate(stmt, env) {
 	// console.log(`[EVAL] ${stmt.line}`);
 	if (is_self_evaluating(stmt)) 
 		return stmt;
 	else if (is_variable(stmt))
-		return lookup_variable_value(stmt, variable_name(stmt),env);
+		return lookup_variable_value(stmt, variable_name(stmt), env);
 	else if (is_assignment(stmt)) 
-		return evaluate_assignment(stmt,env);
+		return evaluate_assignment(stmt, env);
 	else if (is_var_definition(stmt)) 
-		return evaluate_var_definition(stmt,env);
+		return evaluate_var_definition(stmt, env);
 	else if (is_if_statement(stmt))
-		return evaluate_if_statement(stmt,env);
+		return evaluate_if_statement(stmt, env);
 	else if (is_switch_statement(stmt))
-		return evaluate_switch_statement(stmt,env);
+		return evaluate_switch_statement(stmt, env);
 	else if (is_while_statement(stmt))
-		return evaluate_while_statement(stmt,env);
+		return evaluate_while_statement(stmt, env);
 	else if (is_do_while_statement(stmt))
-		return evaluate_do_while_statement(stmt,env);
+		return evaluate_do_while_statement(stmt, env);
 	else if (is_for_statement(stmt))
-		return evaluate_for_statement(stmt,env);
+		return evaluate_for_statement(stmt, env);
 	else if (is_continue_statement(stmt))
-		return make_continue_value(stmt,env);
+		return make_continue_value(stmt, env);
 	else if (is_break_statement(stmt))
-		return make_break_value(stmt,env);
+		return make_break_value(stmt, env);
 	else if (is_fallthrough_statement(stmt))
-		return make_fallthrough_value(stmt,env);
+		return make_fallthrough_value(stmt, env);
 	else if (is_function_definition(stmt))
-		return evaluate_function_definition(stmt,env);
+		return evaluate_function_definition(stmt, env);
 	else if (is_sequence(stmt))
-		return evaluate_sequence(stmt,env);
+		return evaluate_sequence(stmt, env);
 	else if (is_application(stmt)){
 		var optr = operator(stmt);
 		if (optr.name === "&&" || optr.name === "||"){
@@ -743,13 +744,13 @@ function evaluate(stmt,env) {
 			// ternary operator
 			return apply_ternary(optr, operands(stmt), env);
 		} else {
-			return apply(evaluate(optr,env), list_of_values(operands(stmt),env), stmt.line);
+			return apply(evaluate(optr,env), list_of_values(operands(stmt), env), stmt.line);
 		}
 	} else if (is_return_statement(stmt)) {
 		return make_return_value(stmt.line, 
 					 evaluate(return_statement_expression(stmt), env));
 	} else {
-		throwError("?", "Unknown expression type - evaluate: "+stmt);
+		throwError("?", "Unknown expression type - evaluate: " + stmt);
 	}
 }
 
@@ -769,7 +770,7 @@ function driver_loop(program_string, program_parser, environment, finish_callbac
 
 	parse_program(program_string, program_parser, function(syntax_tree){
 		if(debug) {
-			console.log(JSON.stringify(syntax_tree,null,4));
+			console.log(JSON.stringify(syntax_tree, null, 4));
 		}
 		var output = evaluate_toplevel(syntax_tree, environment);
 		finish_callback(output);
