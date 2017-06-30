@@ -747,8 +747,16 @@
 		};
 
 		var parse_range = function () {
+			let first_value = expression();
+			if (token.value === "{") {
+				// list iterator
+				if (first_value.tag === "variable") {
+					return new VariableNode(first_value.name, "variable", token.line);
+				}
+			}
+			// value range
 			let range = new RangeNode(token.line);
-			range.setFrom(expression());
+			range.setFrom(first_value);
 			if (/^\.\.[<>]$/.test(token.value)) {
 				// ..< or ..>
 				advance();
