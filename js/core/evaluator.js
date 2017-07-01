@@ -317,28 +317,38 @@ function evaluate_do_while_statement(stmt, env) {
 }
 
 function evaluate_for_statement(stmt, env) {
-	var extented_env = extend_environment([], [], env);
-	var range_from_value = evaluate(for_range(stmt).from, env);
-	define_variable(for_variable(stmt).name,
-						range_from_value,
-						extented_env);
-	return evaluate_for_stmtement_clause(stmt, extented_env);
+	let extented_env = extend_environment([], [], env);
+	let range = for_range(stmt);
+	
+	if (range.tag === "range") {
+		let range_from_value = evaluate(range.from, env);
+		define_variable(for_variable(stmt).name,
+							range_from_value,
+							extented_env);
+		return evaluate_for_statement_range_clause(stmt, 
+							evaluate(range.to, env),
+							range.closed,
+							evaluate(for_increment(stmt) || 1, env),
+							extented_env);
+	} else if (range.tag === "variable") {
+		let list_value = evaluate(range, env);
+		if (!is_list(list_value)) throwError(stmt.line, "Invalid range.");
+		define_variable(for_variable(stmt).name, null, extented_env);
+		return evaluate_for_statement_list_clause(stmt, list_value, extented_env);
+	} else {
+		throwError(stmt.line, "Invalid range.");
+	}
 }
 
-function evaluate_for_stmtement_clause(stmt, env) {
-	var variable_value = evaluate(for_variable(stmt), env);
-	var range_from_value = evaluate(for_range(stmt).from, env);
-	var range_to_value = evaluate(for_range(stmt).to, env);
-	var range_closed = for_range(stmt).closed;
-	var increment = for_increment(stmt) || 1;
-	var increment_value = evaluate(increment, env);
+function evaluate_for_statement_range_clause(stmt, range_to_value, range_closed, increment_value, env) {
+	let variable_value = evaluate(for_variable(stmt), env);
 	if ((increment_value > 0 &&
 			((!range_closed && variable_value < range_to_value) ||
 				range_closed && variable_value <= range_to_value)) ||
 		(increment_value < 0 &&
 			((!range_closed && variable_value > range_to_value) ||
 				(range_closed && variable_value >= range_to_value)))) {
-		var result = evaluate(for_consequent(stmt), env);
+		let result = evaluate(for_consequent(stmt), env);
 		if (is_return_value(result)) {
 			// encounter return statement in for loop
 			return result;
@@ -350,8 +360,23 @@ function evaluate_for_stmtement_clause(stmt, env) {
 		set_variable_value(stmt, for_variable(stmt).name,
 			variable_value + increment_value,
 			env);
-		return evaluate_for_stmtement_clause(stmt, env);
+		return evaluate_for_statement_range_clause(stmt, range_to_value, range_closed, increment_value, env);
 	}
+}
+
+function evaluate_for_statement_list_clause(stmt, range_list, env) {
+	if (is_empty(range_list)) return;
+	// set list head as the current variable value
+	set_variable_value(stmt, for_variable(stmt).name, head(range_list), env);
+	// evaluate consequent
+	let result = evaluate(for_consequent(stmt), env);
+	if (is_return_value(result)) {
+		return result;
+	}
+	if (is_break_value(result)) {
+		return null;
+	}
+	return evaluate_for_statement_list_clause(stmt, tail(range_list), env);
 }
 
 function is_continue_statement(stmt) {
