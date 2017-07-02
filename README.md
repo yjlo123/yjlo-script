@@ -5,15 +5,15 @@
 ## Example
 ```swift
 class Greeting {
-	var _targets;
+	var _names;
 	
 	// constructor
 	@(list) {
-		_targets = list;
+		_names = list;
 	}
 	
 	func sayHelloToAll() {
-		for name in _targets {
+		for name in _names {
 			print("Hello", name + "!");
 		}
 	}
