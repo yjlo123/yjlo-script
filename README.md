@@ -13,10 +13,8 @@ class Greeting {
 	}
 	
 	func sayHelloToAll() {
-		var rest = _targets;
-		while !$is_empty(rest) {
-			print("Hello", $head(rest) + "!");
-			rest = $tail(rest);
+		for name in _targets {
+			print("Hello", name + "!");
 		}
 	}
 }
