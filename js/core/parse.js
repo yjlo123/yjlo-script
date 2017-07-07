@@ -136,16 +136,18 @@
 			return t.type === "name";
 		};
 
-		var isOperatorToken = t => t && t.type === 'operator';
+		var isOperatorToken = t => t && t.type === "operator";
 		var isOpeningBracketToken = t => t && isOperatorToken(t) && t.value === "(";
 		var isClosingBracketToken = t => t && isOperatorToken(t) && t.value === ")";
+		var isNewLineToken = t => t && t.type === "newline";
 		
 		var throwError = function (token, message) {
 			throw new Error((token?`[line ${token.line}] `:"") + message);
 		};
 		
 		var throwTokenError = function (expect, token) {
-			throwError(token, `Expected ${expect}. But ${token.value} found.`);
+			let tokenValue = token.value;
+			throwError(token, `Expected ${expect}. But ${tokenValue==='\n'?"newline":tokenValue} found.`);
 		};
 
 		var precedence = function(operator) {
@@ -208,6 +210,7 @@
 				token = null;
 				return;
 			}
+			ignoreNewline();
 			
 			if (value && token.value !== value) {
 				throwTokenError(value, token);
@@ -216,6 +219,33 @@
 			token = tokens[token_nr];
 			next_token = (token_nr + 1) < tokens.length ? tokens[token_nr + 1] : null;
 			return token;
+		};
+		
+		var checkToken = function(value) {
+			ignoreNewline();
+			return token & token.value === value;
+		};
+		
+		var advanceOptional = function(value) {
+			if (checkToken(value)) {
+				advance(value);
+			}
+		};
+		
+		var ignoreNewline = function() {
+			if (token_nr >= tokens.length) {
+				token = null;
+				return;
+			}
+			if (token.value === "\n") {
+				skipToken();
+			}
+		};
+		
+		var skipToken = function() {
+			token_nr = token_nr + 1;
+			token = tokens[token_nr];
+			next_token = (token_nr + 1) < tokens.length ? tokens[token_nr + 1] : null;
 		};
 
 	/*===================== EXPRESSION ======================= */
@@ -226,7 +256,7 @@
 			let expression_nodes_infix = [];
 			let bracket_count = 0;
 
-			if (token && token.value === "func"){
+			if (checkToken("func")){
 				// function expression, should be anonymous
 				advance("func");
 				if (isVarNameToken(token)){
@@ -238,6 +268,20 @@
 
 			// read in the tokens in this expression
 			while (token) {
+				console.log(token);
+				if (isNewLineToken(token)) {
+					skipToken();
+					if (token && isOperatorToken(token)) {
+						// TODO
+					} else {
+						break;
+					}
+				}
+				if (token.value === "{"){
+					console.log(isOperatorToken(token));
+					console.log(/^[,;{]$/.test(token.value));
+				}
+				
 				if (isOperatorToken(token) && /^[,;{]$/.test(token.value)) {
 					// , or ; or {
 					break;
@@ -533,7 +577,7 @@
 		var return_stmt = function() {
 			log("parsing return. "+token.value);
 			let node = new ReturnStatementNode(token.line, expression());
-			advance(";");
+			advanceOptional(";");
 			return node;
 		};
 
@@ -612,7 +656,7 @@
 				
 				node = new VarDefNode(n.line);
 				node.setLeft(n.value);
-				if (token && token.value === "=") {
+				if (checkToken("=")) {
 					advance("=");
 					node.setRight(expression());
 					var_arr.push(node);
@@ -621,12 +665,12 @@
 					node.setRight(new VariableNode("null", "variable", n.line));
 					var_arr.push(node);
 				}
-				if (token && token.value !== ",") {
+				if (!checkToken(",")) {
 					break;
 				}
 				advance(",");
 			}
-			advance(";");
+			advanceOptional(";");
 			return array_to_list(var_arr);
 		};
 
@@ -637,7 +681,7 @@
 			n.tag = "if";
 			n.predicate = condition();
 			n.consequent = block();
-			if (token && token.value === "else") {
+			if (checkToken("else")) {
 				advance("else");
 				if (token.value === "if"){
 					// else if
@@ -718,7 +762,7 @@
 			n.consequent = block();
 			advance("while");
 			n.predicate = condition();
-			advance(";");
+			advanceOptional(";");
 			return n;
 		};
 
@@ -769,7 +813,7 @@
 		};
 
 		var parse_increment = function () {
-			if (token && token.value !== "by") {
+			if (!checkToken("by")) {
 				return null;
 			}
 			advance("by");
@@ -799,7 +843,7 @@
 		var continue_stmt = function () {
 			log("parsing continue. " + token.value);
 			let node = new Node("continue", token.line);
-			advance(";");
+			advanceOptional(";");
 			return node;
 		};
 
@@ -807,7 +851,7 @@
 		var break_stmt = function () {
 			log("parsing break. " + token.value);
 			let node = new Node("break", token.line);
-			advance(";");
+			advanceOptional(";");
 			return node;
 		};
 
@@ -815,7 +859,7 @@
 		var fallthrough_stmt = function () {
 			log("parsing fallthrough. " + token.value);
 			let node = new Node("fallthrough", token.line);
-			advance(";");
+			advanceOptional(";");
 			return node;
 		};
 
@@ -989,7 +1033,7 @@
 			token_nr = 0;
 			token = tokens[token_nr];
 			var libs = list();
-			while (token && token.value === "import") {
+			while (checkToken("import")) {
 				advance("import");
 				if (token && isVarNameToken(token)) {
 					let libPath = token.value;
@@ -1004,7 +1048,7 @@
 						}
 					}
 					libs = pair(libPath, libs);
-					advance(";");
+					advanceOptional(";");
 				} else {
 					throwError(null, "Invalid library '"+token.value()+"'.");
 				}
