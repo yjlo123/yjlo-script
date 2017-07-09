@@ -212,7 +212,7 @@
 			}
 			ignoreNewline();
 			
-			if (value && token.value !== value) {
+			if (value && !checkToken(value)) {
 				throwTokenError(value, token);
 			}
 			token_nr = token_nr + 1;
@@ -271,8 +271,9 @@
 				if (isNewLineToken(token)) {
 					skipToken();
 					if (token && isOperatorToken(token)) {
-						// TODO check e.g. ++, --
-						
+						if (checkToken("++") || checkToken("--")) {
+							break;
+						}
 					} else {
 						break;
 					}
@@ -535,9 +536,9 @@
 				ignoreNewline();
 				// TODO check if is operator or string
 				if (token_nr === tokens.length ||
-					token.value === '}' ||
-					token.value === 'case' ||
-					token.value === 'default') {
+					checkToken('}') ||
+					checkToken('case') ||
+					checkToken('default')) {
 					log("end of statement list");
 					break;
 				}
@@ -603,7 +604,7 @@
 					}
 					args.push(token.value);
 					advance();
-					if (token.value !== ",") {
+					if (!checkToken(",")) {
 						break;
 					}
 					advance(",");
@@ -611,7 +612,7 @@
 			}
 			advance(")");
 
-			if (token.value === "extends") {
+			if (checkToken("extends")) {
 				// inheritance
 				advance("extends");
 				if (!isVarNameToken(token)){
@@ -681,7 +682,7 @@
 			n.consequent = block();
 			if (checkToken("else")) {
 				advance("else");
-				if (token.value === "if"){
+				if (checkToken("if")) {
 					// else if
 					advance("if");
 					n.alternative = if_stmt();
@@ -705,8 +706,8 @@
 			var cases = [];
 			advance("{");
 			/* cases */
-			while (token.value != "}") {
-				if (token.value === "case") {
+			while (!checkToken("}")) {
+				if (checkToken("case")) {
 					advance("case");
 					var case_node = new_node();
 					case_node.tag = "case";
@@ -716,7 +717,7 @@
 					}
 					case_value.push(token.value);
 					advance(); // advance value
-					while (token.value === ",") {
+					while (checkToken(",")) {
 						advance(",");
 						if (!isConstantToken(token)) {
 							throwTokenError("a constant value", token);
@@ -728,7 +729,7 @@
 					advance(":");
 					case_node.stmt = statements();
 					cases.push(case_node);
-				} else if (token.value === "default") {
+				} else if (checkToken("default")) {
 					advance("default");
 					advance(":");
 					n.default = statements();
@@ -790,7 +791,7 @@
 
 		var parse_range = function () {
 			let first_value = expression();
-			if (token.value === "{") {
+			if (checkToken("{")) {
 				// list iterator
 				if (first_value.tag === "variable") {
 					return new VariableNode(first_value.name, "variable", token.line);
@@ -821,7 +822,7 @@
 	/*===================== BLOCK ======================= */
 		var block = function () {
 			var block_stmts = null;
-			if (token.value !== '{') {
+			if (!checkToken('{')) {
 				// single statement block
 				block_stmts = array_to_list([statement()]);
 			} else {
@@ -1036,7 +1037,7 @@
 				if (token && isVarNameToken(token)) {
 					let libPath = token.value;
 					advance(); // library name
-					if (token.value === "from") {
+					if (checkToken("from")) {
 						advance("from");
 						if (token && token.type === "string") {
 							libPath = token.value + (token.value.slice(-1)==="/"?"":"/") + libPath;
