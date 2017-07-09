@@ -86,7 +86,12 @@ String.prototype.tokens = function (prefix, suffix) {
 
 // increase line number
 		if (c === '\n') {
-			line += 1;
+			result.push(make('newline', '\n'));
+			while (c === '\n') {
+				line += 1;
+				i += 1;
+				c = this.charAt(i);
+			}
 		}
 
 // Ignore whitespace.
