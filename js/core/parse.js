@@ -223,7 +223,7 @@
 		
 		var checkToken = function(value) {
 			ignoreNewline();
-			return token & token.value === value;
+			return token && token.value === value;
 		};
 		
 		var advanceOptional = function(value) {
@@ -237,7 +237,7 @@
 				token = null;
 				return;
 			}
-			if (token.value === "\n") {
+			if (token.type === "newline") {
 				skipToken();
 			}
 		};
@@ -268,22 +268,18 @@
 
 			// read in the tokens in this expression
 			while (token) {
-				console.log(token);
 				if (isNewLineToken(token)) {
 					skipToken();
 					if (token && isOperatorToken(token)) {
-						// TODO
+						// TODO check e.g. ++, --
+						
 					} else {
 						break;
 					}
 				}
-				if (token.value === "{"){
-					console.log(isOperatorToken(token));
-					console.log(/^[,;{]$/.test(token.value));
-				}
 				
-				if (isOperatorToken(token) && /^[,;{]$/.test(token.value)) {
-					// , or ; or {
+				if (isOperatorToken(token) && /^[,;{}]$/.test(token.value)) {
+					// , or ; or { or }
 					break;
 				}
 				if (isOperatorToken(token) && /^\.\.[\.<>]$/.test(token.value)) {
@@ -473,60 +469,61 @@
 
 	/*===================== STATEMENT ======================= */
 		var statement = function () {
-			var n = token, v;
-
-			switch (n.value){
+			let stmt_tree;
+			ignoreNewline();
+			switch (token.value){
 				case ";":
 					advance();
 					break;
 				case "var":
 					advance();
-					v = var_def();
+					stmt_tree = var_def();
 					break;
 				case "func":
 					advance();
-					v = func();
+					stmt_tree = func();
 					break;
 				case "if":
 					advance();
-					v = if_stmt();
+					stmt_tree = if_stmt();
 					break;
 				case "switch":
 					advance();
-					v = switch_stmt();
+					stmt_tree = switch_stmt();
 					break;
 				case "while":
 					advance();
-					v = while_stmt();
+					stmt_tree = while_stmt();
 					break;
 				case "do":
 					advance();
-					v = do_while_stmt();
+					stmt_tree = do_while_stmt();
 					break;
 				case "for":
 					advance();
-					v = for_stmt();
+					stmt_tree = for_stmt();
 					break;
 				case "continue":
 					advance();
-					v = continue_stmt();
+					stmt_tree = continue_stmt();
 					break;
 				case "break":
 					advance();
-					v = break_stmt();
+					stmt_tree = break_stmt();
 					break;
 				case "return":
 					advance();
-					v = return_stmt();
+					stmt_tree = return_stmt();
 					break;
 				case "fallthrough":
 					advance();
-					v = fallthrough_stmt();
+					stmt_tree = fallthrough_stmt();
 					break;
 				default:
-					v = expression();
+					stmt_tree = expression();
 			}
-			return v;
+			advanceOptional(";");
+			return stmt_tree;
 		};
 
 	/*===================== STATEMENTS ======================= */
@@ -535,6 +532,8 @@
 			var stmts = [],
 				stmt;
 			while (true) {
+				ignoreNewline();
+				// TODO check if is operator or string
 				if (token_nr === tokens.length ||
 					token.value === '}' ||
 					token.value === 'case' ||
@@ -543,7 +542,6 @@
 					break;
 				}
 				stmt = statement();
-
 				if (stmt) {
 					stmts.push(stmt);
 				}
