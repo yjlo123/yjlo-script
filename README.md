@@ -5,22 +5,22 @@
 ## Example
 ```swift
 class Greeting {
-	var _names;
+	var _names
 	
 	// constructor
 	@(list) {
-		_names = list;
+		_names = list
 	}
 	
 	func sayHelloToAll() {
 		for name in _names {
-			print("Hello", name + "!");
+			print("Hello", name + "!")
 		}
 	}
 }
 
-myGreeting := Greeting(["World", "JS", "YJLO"]);
-myGreeting.sayHelloToAll();
+myGreeting := Greeting(["World", "JS", "YJLO"])
+myGreeting.sayHelloToAll()
 
 /* OUTPUT
 Hello World!
@@ -43,7 +43,7 @@ Hello YJLO!
 * Latest
   * <https://yjlo123.github.io/yjlo-script/>
 * Stable
-  * <https://yjlo.xyz/js>
+  * <https://yjlo.xyz/script>
 
 ## Documentation
   * [YJLO Script Wiki](https://github.com/yjlo123/yjlo-script/wiki)
