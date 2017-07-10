@@ -206,10 +206,6 @@
 		};
 
 		var advance = function (value) {
-			if (token_nr >= tokens.length) {
-				token = null;
-				return;
-			}
 			ignoreNewline();
 			
 			if (value && !checkToken(value)) {
@@ -284,7 +280,8 @@
 					break;
 				}
 				if (isOperatorToken(token) && /^\.\.[\.<>]$/.test(token.value)) {
-					// ..< or ..>
+					// ... or ..< or ..>
+					// TODO parse range
 					break;
 				}
 				if (!isConstantToken(token) && /^by$/.test(token.value)) {
@@ -790,12 +787,11 @@
 		};
 
 		var parse_range = function () {
+			// TODO parse range in expression()
 			let first_value = expression();
 			if (checkToken("{")) {
-				// list iterator
-				if (first_value.tag === "variable") {
-					return new VariableNode(first_value.name, "variable", token.line);
-				}
+				// list
+				return first_value;
 			}
 			// value range
 			let range = new RangeNode(token.line);

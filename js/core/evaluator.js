@@ -321,6 +321,7 @@ function evaluate_for_statement(stmt, env) {
 	let range = for_range(stmt);
 	
 	if (range.tag === "range") {
+		// value range
 		let range_from_value = evaluate(range.from, env);
 		define_variable(for_variable(stmt).name,
 							range_from_value,
@@ -330,7 +331,8 @@ function evaluate_for_statement(stmt, env) {
 							range.closed,
 							evaluate(for_increment(stmt) || 1, env),
 							extented_env);
-	} else if (range.tag === "variable") {
+	} else if (range.tag === "variable" || range.tag === "application") {
+		// list
 		let list_value = evaluate(range, env);
 		if (!is_list(list_value)) throwError(stmt.line, "Invalid range.");
 		define_variable(for_variable(stmt).name, null, extented_env);
