@@ -139,6 +139,8 @@
 		var isOperatorToken = t => t && t.type === "operator";
 		var isOpeningBracketToken = t => t && isOperatorToken(t) && t.value === "(";
 		var isClosingBracketToken = t => t && isOperatorToken(t) && t.value === ")";
+		var isBracketToken = t => t && (isOpeningBracketToken(t) || isClosingBracketToken(t));
+		var isNonBracketOperatorToken = t => isOperatorToken(t) && !isBracketToken(t);
 		var isNewLineToken = t => t && t.type === "newline";
 		
 		var throwError = function (token, message) {
@@ -248,6 +250,7 @@
 		var expression = function () {
 			log("parsing expression: "+token.value);
 			
+			let prev_token;
 			let left_node;
 			let expression_nodes_infix = [];
 			let bracket_count = 0;
@@ -266,7 +269,10 @@
 			while (token) {
 				if (isNewLineToken(token)) {
 					skipToken();
-					if (token && isOperatorToken(token)) {
+					if (prev_token && isNonBracketOperatorToken(prev_token)) {
+						continue;
+					}
+					if (token && isNonBracketOperatorToken(token)) {
 						if (checkToken("++") || checkToken("--")) {
 							break;
 						}
@@ -274,6 +280,8 @@
 						break;
 					}
 				}
+				
+				prev_token = token;
 				
 				if (isOperatorToken(token) && /^[,;{}]$/.test(token.value)) {
 					// , or ; or { or }
@@ -314,6 +322,7 @@
 					throwTokenError("expression", token);
 				}
 				expression_nodes_infix.push(left_node);
+				
 				advance();
 			}
 			
