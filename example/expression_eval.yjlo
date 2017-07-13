@@ -5,136 +5,134 @@
  * @author Siwei Liu
  */
 
-import Tokenizer;
-import Stack;
+import Tokenizer
+import Stack
 
-var expression = "35-(-95)/5+4*(-23-3)";
+expression := "35-(-95)/5+4*(-23-3)"
 
 func precedence(operator) {
 	switch operator {
 		case "_-": // negative
-			return 3;
+			return 3
 		case "*", "/", "%":
-			return 2;
+			return 2
 		case "+", "-":
-			return 1;
+			return 1
 		default:
-			return 0;
+			return 0
 	}
 }
 
 func isOperator(v) {
-	if precedence(v) > 0
-		&& precedence(v) < 3 {
+	if precedence(v) > 0 && precedence(v) < 3 {
 		// binary op: + - * / %
-		return 2;
+		return 2
 	} else if precedence(v) > 2 {
 		// unary op: _-
-		return 1;
+		return 1
 	}
-	return 0;
+	return 0
 }
 
-func add(x, y) { return x + y; }
-func sub(x, y) { return x - y; }
-func mul(x, y) { return x * y; }
-func div(x, y) { return x /. y; }
-func mod(x, y) { return x % y; }
-func neg(x) { return -x; }
+func add(x, y) { return x + y }
+func sub(x, y) { return x - y }
+func mul(x, y) { return x * y }
+func div(x, y) { return x /. y }
+func mod(x, y) { return x % y }
+func neg(x) { return -x }
 
 func eval(op, x, y) {
-	var fun = null;
+	var fun = null
 	switch op {
-		case "+": op = add;
-		case "-": op = sub;
-		case "*": op = mul;
-		case "/": op = div;
-		case "%": op = mod;
-		case "_-": return neg(x);
+		case "+": op = add
+		case "-": op = sub
+		case "*": op = mul
+		case "/": op = div
+		case "%": op = mod
+		case "_-": return neg(x)
 	}
-	return op(x,y);
+	return op(x,y)
 }
 
 /**
  * Tokenization
  */
-var tokenizer = Tokenizer();
-tokenizer.tokenize(expression);
-var tokens = tokenizer.tokens;
+var tokenizer = Tokenizer()
+tokenizer.tokenize(expression)
+var tokens = tokenizer.tokens
 
 /**
  * Convert in-fix expression to post-fix expression
  */
-var infix_list = tokenizer.tokens;
-var postfix_stack = Stack();
-var stack = Stack();
+var infix_list = tokenizer.tokens
+var postfix_stack = Stack()
+var stack = Stack()
 
-var prev_token = null;
-var token = null;
-while !$is_empty(infix_list) {
-	prev_token = token;
-	token = $head(infix_list);
+var prev_token = null
+var token = null
+for t in infix_list {
+	prev_token = token
+	token = t
 	if token.type == 'number' {
-		postfix_stack.push(token.value);
+		postfix_stack.push(token.value)
 	} else if token.value == '(' {
-		stack.push(token);
+		stack.push(token)
 	} else if token.value == ')' {
 		while stack.size() > 0 && stack.peek().value != "(" {
-			postfix_stack.push(stack.pop().value);
+			postfix_stack.push(stack.pop().value)
 		}
 		if stack.size() > 0 {
-			stack.pop(); // pop '('
+			stack.pop() // pop '('
 		} else {
-			throw("Unmatched bracket.");
+			throw("Unmatched bracket.")
 		}
 	} else {
 		// operators
 		/* prefix unary operators with '_' */
 		if token.value == '-' {
 			// negative operator
-			if postfix_stack.size() == 0 
-				|| (prev_token != null && prev_token.value == "("){
-				token.value = "_-";
+			if postfix_stack.size() == 0 ||
+				(prev_token != null && prev_token.value == "(") {
+				token.value = "_-"
 			}
 		}
-		while stack.size() > 0 
-			&& precedence(token.value) <= precedence(stack.peek().value) {
-			postfix_stack.push(stack.pop().value);
+		while stack.size() > 0 &&
+			precedence(token.value) <= precedence(stack.peek().value) {
+			postfix_stack.push(stack.pop().value)
 		}
-		stack.push(token);
+		stack.push(token)
 	}
-	infix_list = $tail(infix_list);
 }
 
 // pop the rest of the tokens in the stack
 while stack.size() > 0 {
-	postfix_stack.push(stack.pop().value);
+	postfix_stack.push(stack.pop().value)
 }
 
 // Reverse stack
-var reversed_stack = Stack();
+var reversed_stack = Stack()
 while postfix_stack.size() > 0 {
-	reversed_stack.push(postfix_stack.pop());
+	reversed_stack.push(postfix_stack.pop())
 }
 
 /**
  * Evaluation
  */
-var value_stack = Stack();
+var value_stack = Stack()
 while reversed_stack.size() > 0 {
-	var token = reversed_stack.pop();
+	var token = reversed_stack.pop()
 	if isOperator(token) == 2 {
-		var operand2 = value_stack.pop();
-		var operand1 = value_stack.pop();
-		value_stack.push(eval(token, operand1, operand2));
+		var operand2 = value_stack.pop()
+		var operand1 = value_stack.pop()
+		value_stack.push(eval(token, operand1, operand2))
 	} else if isOperator(token) == 1 {
-		var operand = value_stack.pop();
-		value_stack.push(eval(token, operand, 0));
+		var operand = value_stack.pop()
+		value_stack.push(eval(token, operand, 0))
 	} else {
-		value_stack.push(token);
+		value_stack.push(token)
 	}
-	// print(value_stack.toString());
+	// print(value_stack.toString())
 }
 
 // print evaluation result
-print(value_stack.pop());
+print(value_stack.pop())
