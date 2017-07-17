@@ -86,7 +86,10 @@ String.prototype.tokens = function (prefix, suffix) {
 
 // increase line number
 		if (c === '\n') {
-			result.push(make('newline', '\n'));
+			if (result.length > 0 &&
+				result[result.length-1].type !== 'newline') {
+				result.push(make('newline', '\n'));
+			}
 			while (c === '\n') {
 				line += 1;
 				i += 1;
