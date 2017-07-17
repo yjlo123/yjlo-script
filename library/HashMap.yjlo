@@ -16,9 +16,8 @@ func HashMap(capacity) extends Heap {
 		func toString() {
 			var str = "";
 			var tempEntry = entry;
-			while !$is_empty(tempEntry) {
-				str += $head(tempEntry).toString();
-				tempEntry = $tail(tempEntry);
+			for e in tempEntry {
+				str += e.toString();
 			}
 			return str;
 		}
@@ -54,11 +53,9 @@ func HashMap(capacity) extends Heap {
 		var hash = 0;
 		var chars = $string_to_char_list(str);
 		if $is_empty(chars) { return hash; }
-		while !$is_empty(chars) {
-			var chr = $head(chars);
+		for chr in chars {
 			hash = ((hash << 5) - hash) + $char_code(chr);
 			hash = hash & hash; // Convert to 32bit integer
-			chars = $tail(chars);
 		}
 		return hash % _CAPACITY;
 	}
@@ -80,15 +77,13 @@ func HashMap(capacity) extends Heap {
 		var index = hashCode(key);
 		var target = _getNodeByPath(_getPathByIndex(index), true);
 		var entries = target.entry;
-		while !$is_empty(entries) {
-			var entry = $head(entries);
+		for entry in entries {
 			if entry.key == key {
 				// found existing key
 				var prev_value = entry.value;
 				entry.value = value;
 				return prev_value;
 			}
-			entries = $tail(entries);
 		}
 		// new key
 		target.entry = $pair(_Entry(key, value), target.entry);
@@ -101,11 +96,10 @@ func HashMap(capacity) extends Heap {
 		var target = _getNodeByPath(_getPathByIndex(index), false);
 		if target {
 			var list = target.entry;
-			while !$is_empty(list) {
-				if $head(list).key == key {
-					return $head(list).value;
+			for e in list {
+				if e.key == key {
+					return e.value;
 				}
-				list = $tail(list);
 			}
 			return null;
 		}
@@ -127,13 +121,12 @@ func HashMap(capacity) extends Heap {
 		if target {
 			var list = target.entry;
 			var foundEntry = null;
-			while !$is_empty(list) {
-				if $head(list).key == key {
-					foundEntry = $head(list);
+			for e in list {
+				if e.key == key {
+					foundEntry = e;
 					target.entry = deleteFromList(target.entry, key);
 					return foundEntry.value;
 				}
-				list = $tail(list);
 			}
 			return null;
 		}
