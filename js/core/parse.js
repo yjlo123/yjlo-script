@@ -292,8 +292,8 @@
 					// TODO parse range
 					break;
 				}
-				if (!isConstantToken(token) && /^by$/.test(token.value)) {
-					// "by" keyword
+				if (!isConstantToken(token) && /^(by|in)$/.test(token.value)) {
+					// keyword: "by", "in"
 					break;
 				}
 				if (isClosingBracketToken(token) && bracket_count === 0) {
