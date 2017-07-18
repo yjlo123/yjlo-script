@@ -8,30 +8,28 @@ Given "pwwkew", the answer is "wke", with the length of 3.
 Note that the answer must be a substring, "pwke" is a subsequence and not a substring.
 */
 
-import HashMap;
+import HashMap
 
 func lengthOfLongestSubstring(str) {
-	chars := $string_to_char_list(str);
-	hm := HashMap();
-	longest := preLength := i := 0;
-	while !$is_empty(chars) {
-		c := $head(chars);
-		var length;
-		val := hm.get(c);
+	chars := $string_to_char_list(str)
+	hm := HashMap()
+	longest := preLength := i := 0
+	for c in chars {
+		var length
+		val := hm.get(c)
 		if val == null || val < i - preLength {
-			length = preLength + 1;
+			length = preLength + 1
 		} else {
-			length = i - val;
+			length = i - val
 		}
 		if length > longest {
-			longest = length;
+			longest = length
 		}
-		preLength = length;
-		hm.put(c, i);
-		i++;
-		chars = $tail(chars);
+		preLength = length
+		hm.put(c, i)
+		i++
 	}
-	return longest;
+	return longest
 }
 
-print(lengthOfLongestSubstring("abcabcbb"));
+print(lengthOfLongestSubstring("abcabcbb"))
