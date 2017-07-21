@@ -150,25 +150,3 @@ func HashMap(capacity) extends Heap {
 
 	return func(){};
 }
-
-/*
-var hm = HashMap(7);
-
-hm.put("yjlo", 12);
-hm.put("siwei", 24);
-hm.put("cn", 36);
-hm.put("Singapore", 1);
-
-print(hm.toString());
-
-print(hm.get("yjlo"));
-print(hm.get("cn"));
-
-hm.put("siwei", "1992");
-hm.remove("abc");
-hm.remove("yjlo");
-	
-print(hm.toString());
-
-print(hm.get("siwei"));
-*/
