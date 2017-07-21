@@ -1,0 +1,16 @@
+/* LeetCode 9. Palindrome Number
+Determine whether an integer is a palindrome.
+Do this without extra space.
+*/
+
+func isPalindrome(x) {
+	if x<0 || (x != 0 && x % 10 == 0) { return false }
+	var rev = 0
+	while x > rev {
+		rev = rev * 10 + x % 10
+		x = x / 10
+	}
+	return x == rev || x == rev / 10
+}
+
+print(isPalindrome(12321))
