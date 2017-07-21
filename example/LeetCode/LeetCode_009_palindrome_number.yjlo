@@ -4,8 +4,8 @@ Do this without extra space.
 */
 
 func isPalindrome(x) {
-	if x<0 || (x != 0 && x % 10 == 0) { return false }
-	var rev = 0
+	if x < 0 || (x != 0 && x % 10 == 0) { return false }
+	rev := 0
 	while x > rev {
 		rev = rev * 10 + x % 10
 		x = x / 10
