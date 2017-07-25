@@ -52,21 +52,3 @@ func HashSet(capacity) {
 
 	return func(){};
 }
-
-/*
-var set = HashSet();
-
-print(set.add(3));
-
-print(set.add(4));
-print(set.add(3));
-set.remove(3);
-print(set.add(3));
-print(set.size());
-
-set.clear();
-
-print(set.size());
-print(set.add(4));
-print(set.size());
-*/
