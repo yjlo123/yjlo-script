@@ -16,10 +16,9 @@ func listToLinkedList(lst) {
 	var head = ListNode($head(lst));
 	lst = $tail(lst);
 	var current = head;
-	while !$is_empty(lst) {
-		current.next = ListNode($head(lst));
+	for v in lst {
+		current.next = ListNode(v);
 		current = current.next;
-		lst = $tail(lst);
 	}
 	return head;
 }

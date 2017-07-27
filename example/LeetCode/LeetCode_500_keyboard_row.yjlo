@@ -27,24 +27,21 @@ func letterToRowNumber(char) {
 
 func findWords(words) {
 	var result = LinkedList();
-	while !$is_empty(words) {
-		var thisWord = $head(words);
-		var letters = $string_to_char_list(thisWord);
+	for word in words {
+		var letters = $string_to_char_list(word);
 		// previous letter row number
 		var row = letterToRowNumber($head(letters));
 		letters = $tail(letters);
 		var same = true;
-		while !$is_empty(letters) {
-			if letterToRowNumber($head(letters)) != row {
+		for letter in letters {
+			if letterToRowNumber(letter) != row {
 				same = false;
 				break;
 			}
-			letters = $tail(letters);
 		}
 		if same {
-			result.add(thisWord);
+			result.add(word);
 		}
-		words = $tail(words);
 	}
 	return result;
 }
