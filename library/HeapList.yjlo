@@ -12,17 +12,15 @@ class HeapList extends Heap {
 
 	@(arg) {
 		if arg != null && $is_list(arg) {
-			this.init(arg);
+			init(arg);
 		}
 	}
 
 	func init(lst) {
 		_size = 0;
 		var i = 0;
-		while !$is_empty(lst) {
-			put(i, $head(lst));
-			i++;
-			lst = $tail(lst);
+		for e in lst {
+			put(i++, e);
 		}
 	}
 
