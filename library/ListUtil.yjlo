@@ -30,12 +30,11 @@ class ListUtil {
 	/* return the index of the first val in a list */
 	func index(lst, val) {
 		var i = 0;
-		while !$is_empty(lst) {
-			if $head(lst) == val {
+		for e in lst {
+			if e == val {
 				return i;
 			}
 			i++;
-			lst = $tail(lst);
 		}
 		return -1;
 	}
@@ -77,11 +76,10 @@ class ListUtil {
 		if $is_empty(lst) { return null; }
 		var max = $head(lst);
 		lst = $tail(lst);
-		while !$is_empty(lst) {
-			if $head(lst) > max {
-				max = $head(lst);
+		for e in lst {
+			if e > max {
+				max = e;
 			}
-			lst = $tail(lst);
 		}
 		return max;
 	}
@@ -90,11 +88,10 @@ class ListUtil {
 		if $is_empty(lst) { return null; }
 		var min = $head(lst);
 		lst = $tail(lst);
-		while !$is_empty(lst) {
-			if $head(lst) < min {
-				min = $head(lst);
+		for e in lst {
+			if e < min {
+				min = e;
 			}
-			lst = $tail(lst);
 		}
 		return min;
 	}
