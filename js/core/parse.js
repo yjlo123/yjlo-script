@@ -29,103 +29,6 @@
 		var new_node = function() {
 			return {};
 		};
-		
-		class Token {
-			constructor(type, value, line) {
-				this.type = type;
-				this.value = value;
-				this.line = line;
-			}
-		}
-
-		class Node {
-			constructor(tag, line) {
-				this.tag = tag;
-				this.line = line;
-			}
-		}
-
-		// Includs variable, operator
-		class VariableNode extends Node {
-			constructor(name, type, line) {
-				super("variable", line);
-				this.name = name;
-				this.type = type;
-			}
-		}
-
-		class ConstantNode extends Node {
-			constructor(value, line) {
-				super("constant", line);
-				this.value = value;
-			}
-		}
-
-		class ApplicationNode extends Node {
-			constructor(line) {
-				super("application", line);
-			}
-			setOperator(value) {
-				this.operator = value;
-			}
-			setOperands(value) {
-				this.operands = value;
-			}
-		}
-		
-		class AssignmentNode extends Node {
-			constructor(line) {
-				super("assignment", line);
-				this.returnLeft = false;
-			}
-			setLeft(value) {
-				this.left = value;
-			}
-			setRight(value) {
-				this.right = value;
-			}
-			setReturnLeft() {
-				this.returnLeft = true;
-			}
-		}
-		
-		class VarDefNode extends Node {
-			constructor(line) {
-				super("var_definition", line);
-			}
-			setLeft(value) {
-				this.left = value;
-			}
-			setRight(value) {
-				this.right = value;
-			}
-		}
-		
-		class ReturnStatementNode extends Node {
-			constructor(line, expression) {
-				super("return_statement", line);
-				this.expression = expression;
-			}
-		}
-		
-		class RangeNode extends Node {
-			constructor(line) {
-				super("range", line);
-				this.closed = false;
-			}
-			
-			setFrom(value) {
-				this.from = value;
-			}
-			
-			setTo(value) {
-				this.to = value;
-			}
-			
-			setClosed() {
-				this.closed = true;
-			}
-		}
 
 		var isConstantToken = t => t && (t.type === "string" || t.type === "number");
 
@@ -680,26 +583,49 @@
 		};
 
 	/*===================== IF ======================= */
+class ConditionNode extends Node {
+	constructor(type, line) {
+		super(type, line);
+	}
+	
+	setPredicate(value) {
+		this.predicate = value;
+	}
+	
+	setConsequent(value) {
+		this.consequent = value;
+	}
+	
+	setAlternative(value) {
+		this.alternative = value;
+	}
+}
+	
+class IfNode extends ConditionNode {
+	constructor(line) {
+		super("if", line);
+	}
+}
+	
 		var if_stmt = function() {
 			log("parsing if.");
-			var n = new_node();
-			n.tag = "if";
-			n.predicate = condition();
-			n.consequent = block();
+			let node = new IfNode(token.line);
+			node.setPredicate(condition());
+			node.setConsequent(block());
 			if (checkToken("else")) {
 				advance("else");
 				if (checkToken("if")) {
 					// else if
 					advance("if");
-					n.alternative = if_stmt();
+					node.setAlternative(if_stmt());
 				} else {
 					// else
-					n.alternative = block();
+					node.setAlternative(block());
 				}
 			} else {
-				n.alternative = null;
+				node.setAlternative(null);
 			}
-			return n;
+			return node;
 		};
 		
 	/*===================== SWITCH ======================= */
@@ -749,26 +675,35 @@
 			return n;
 		};
 
+class WhileNode extends ConditionNode {
+	constructor(line) {
+		super("while", line);
+	}
+}
+		
 	/*===================== WHILE ======================= */
 		var while_stmt = function () {
 			log("parsing while.");
-			var n = new_node();
-			n.tag = "while";
-			n.predicate = condition();
-			n.consequent = block();
-			return n;
+			let node = new WhileNode(token.line);
+			node.setPredicate(condition());
+			node.setConsequent(block());
+			return node;
 		};
 
+class DoWhileNode extends ConditionNode {
+	constructor(line) {
+		super("do", line);
+	}
+}
 	/*===================== DO WHILE ======================= */
 		var do_while_stmt = function () {
 			log("parsing do.");
-			var n = new_node();
-			n.tag = "do";
-			n.consequent = block();
+			let node = new DoWhileNode(token.line);
+			node.setConsequent(block());
 			advance("while");
-			n.predicate = condition();
+			node.setPredicate(condition());
 			advanceOptional(";");
-			return n;
+			return node;
 		};
 
 	/*===================== FOR ======================= */
