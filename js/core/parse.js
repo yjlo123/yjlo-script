@@ -173,6 +173,10 @@
 				if (isNewLineToken(token)) {
 					skipToken();
 					if (prev_token && isNonBracketOperatorToken(prev_token)) {
+						// last line ends with an operator
+						if (prev_token.value === "++" || prev_token.value === "--") {
+							break;
+						}
 						continue;
 					}
 					if (token && isNonBracketOperatorToken(token)) {
