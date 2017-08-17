@@ -627,6 +627,22 @@ function apply_ternary(fun_raw, args, env) {
 function is_reference(stmt) {
 	return is_tagged_object(stmt,"reference");
 }
+
+function list_method(list, method) {
+	switch (method) {
+		case "head":
+			return head(list);
+		case "tail":
+			return tail(list);
+		case "isEmpty":
+			return is_empty(list);
+		case "len":
+			return length(list);
+		default:
+		throwError("?", "Unknown list method: " + member);
+	}
+}
+
 function refer(fun, member) {
 	if (member.charAt(0) === "_"){
 		throwError("?", "Referencing private members is not allowed.");
@@ -638,8 +654,10 @@ function refer(fun, member) {
 			evaluate(function_value_body(fun), func_env);
 		}
 		return lookup_variable_value(null, member, func_env);
+	} else if (is_list(fun)) {
+		return list_method(fun, member);
 	} else {
-		throwError("?", "Unknown function type - REFER: "+fun);
+		throwError("?", "Unknown function type - REFER: " + fun);
 	}
 }
 
@@ -765,6 +783,7 @@ function evaluate(stmt, env) {
 				return apply(refer(evaluate(fun, env), operator(member).name),
 						list_of_values(operands(member), env), stmt.line);
 			} else {
+				// reference function field
 				return refer(evaluate(fun,env), member.name);
 			}
 		} else if (optr.name === ":") {
