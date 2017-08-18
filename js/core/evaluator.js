@@ -711,6 +711,8 @@ var primitive_functions = {
 		">>": (x,y) => x >> y,
 		">>>": (x,y) => x >>> y,
 		
+		',': (x,y) => _pair(x, y),
+		
 		"throw": (x) => { throw Error(x); }
 };
 	

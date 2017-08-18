@@ -58,9 +58,9 @@
 		var precedence = function(operator) {
 			switch(operator){
 			case ".": // reference
-				return 14;
+				return 15;
 			case "**": // power
-				return 13;
+				return 14;
 			case "_-": // negative
 			case "_!": // not
 			case "_~":
@@ -68,39 +68,41 @@
 			case "_++":	// i++
 			case "--":	// --i
 			case "_--":	// i--
-				return 12;
+				return 13;
 			case "*":
 			case "/":
 			case "/.":
 			case "%":
-				return 11;
+				return 12;
 			case "+":
 			case "-":
-				return 10;
+				return 11;
 			case "<<":
 			case ">>":
 			case ">>>":
-				return 9;
+				return 10;
 			case "<":
 			case "<=":
 			case ">":
 			case ">=":
-				return 8;
+				return 9;
 			case "==":
 			case "!=":
-				return 7;
+				return 8;
 			case "&":
-				return 6;
+				return 7;
 			case "^":
-				return 5;
+				return 6;
 			case "|":
-				return 4;
+				return 5;
 			case "&&":
-				return 3;
+				return 4;
 			case "||":
-				return 2;
+				return 3;
 			case "?":
 			case ":":
+				return 2;
+			case ',':
 				return 1;
 			case "=": // assignment
 			case ":=":
@@ -190,8 +192,11 @@
 				
 				prev_token = token;
 				
-				if (isOperatorToken(token) && /^[,;{}]$/.test(token.value)) {
-					// , or ; or { or }
+				if (isOperatorToken(token) && token.value === ',' && bracket_count === 0) {
+					break;
+				}
+				if (isOperatorToken(token) && /^[;{}]$/.test(token.value)) {
+					// ; or { or }
 					break;
 				}
 				if (isOperatorToken(token) && /^\.\.[\.<>]$/.test(token.value)) {
@@ -833,7 +838,7 @@ class DoWhileNode extends ConditionNode {
 		function tokenizeAndDesugaring(source){
 			// var program_string_without_comments 
 			// = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
-			let original_tokens = source.tokens('=<>!+-*&|/%^*.:', '=<>&|*+-.');
+			let original_tokens = source.tokens('=<>!+-*&|/%^*.:,', '=<>&|*+-.');
 			let desugared_tokens = [];
 			
 			// desugaring
