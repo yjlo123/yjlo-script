@@ -8,13 +8,13 @@ function throwError(line, message) {
 }
 
 function is_tagged_object(stmt, the_tag) {
-	return stmt && typeof stmt === "object" && stmt.tag === the_tag;
+	return stmt && typeof stmt === 'object' && stmt.tag === the_tag;
 }
 
 function is_self_evaluating(stmt) {
 	return stmt === [] ||
-	typeof stmt === "number" ||
-	typeof stmt === "string";
+	typeof stmt === 'number' ||
+	typeof stmt === 'string';
 }
 
 // =============== ENV ===================
@@ -68,7 +68,7 @@ function duplicateFirstFrame(env) {
 	for (let key in new_frame) {
 		if (!new_frame.hasOwnProperty(key)) continue;
 		let val = new_frame[key];
-		if (val.tag === "function_value") {
+		if (val.tag === 'function_value') {
 			val.environment = new_env;
 		}
 	}
@@ -92,13 +92,13 @@ function define_variable(variable, value, env) {
 // ===================================================
 
 function is_variable(stmt) {
-	return is_tagged_object(stmt, "variable");
+	return is_tagged_object(stmt, 'variable');
 }
 
 function isBuiltInVariable(variable) {
 	if (variable && variable.length > 0) {
 		let firstChar = variable.charAt(0);
-		if (firstChar === "$") {
+		if (firstChar === '$') {
 			return true;
 		}
 	}
@@ -120,7 +120,7 @@ function variable_name(stmt) {
 function lookup_variable_value(stmt, variable, env) {
 	function env_loop(env) {
 		if (is_empty_environment(env))
-			throwError(stmt&&stmt.line?stmt.line:"?", "Cannot find variable: " + variable);
+			throwError(stmt&&stmt.line?stmt.line:'?', 'Cannot find variable: ' + variable);
 		else if (has_binding_in_frame(variable,first_frame(env)))
 			return first_frame(env)[variable];
 		else return env_loop(enclosing_environment(env));
@@ -129,7 +129,7 @@ function lookup_variable_value(stmt, variable, env) {
 }
 	 
 function is_assignment(stmt) {
-	return is_tagged_object(stmt, "assignment");
+	return is_tagged_object(stmt, 'assignment');
 }
 function assignment_left(stmt) {
 	return stmt.left;
@@ -144,7 +144,7 @@ function set_variable_value(stmt, variable, value, env) {
 	}
 	function env_loop(env) {
 		if (is_empty_environment(env))
-			throwError(stmt&&stmt.line?stmt.line:"?", "Cannot find variable: "+variable);
+			throwError(stmt&&stmt.line?stmt.line:'?', 'Cannot find variable: '+variable);
 		else if (has_binding_in_frame(variable,first_frame(env)))
 			add_binding_to_frame(variable,value,first_frame(env));
 		else env_loop(enclosing_environment(env));
@@ -174,7 +174,7 @@ function evaluate_assignment(stmt, env) {
 }
 	 
 function is_var_definition(stmt) {
-	return is_tagged_object(stmt, "var_definition");
+	return is_tagged_object(stmt, 'var_definition');
 }
 function var_definition_variable(stmt) {
 	return stmt.left;
@@ -194,7 +194,7 @@ function evaluate_var_definition(stmt, env) {
 }
 	 
 function is_if_statement(stmt) {
-	return is_tagged_object(stmt, "if");
+	return is_tagged_object(stmt, 'if');
 }
 function if_predicate(stmt) {
 	return stmt.predicate;
@@ -217,7 +217,7 @@ function evaluate_if_statement(stmt, env) {
 }
 
 function is_switch_statement(stmt) {
-	return is_tagged_object(stmt, "switch");
+	return is_tagged_object(stmt, 'switch');
 }
 
 function switch_variable(stmt) {
@@ -271,20 +271,20 @@ function for_consequent(stmt) {
 }
 
 function is_while_statement(stmt) {
-	return is_tagged_object(stmt,"while");
+	return is_tagged_object(stmt,'while');
 }
 function is_do_while_statement(stmt) {
-	return is_tagged_object(stmt,"do");
+	return is_tagged_object(stmt,'do');
 }
 function is_for_statement(stmt) {
-	return is_tagged_object(stmt,"for");
+	return is_tagged_object(stmt,'for');
 }
 
 function is_true(x) {
 	return ! is_false(x);
 }
 function is_false(x) {
-	return x === false || x === 0 || x === "" || 
+	return x === false || x === 0 || x === '' || 
 		x === undefined || x === NaN || x === null || x.implementation === false;
 }
 
@@ -320,7 +320,7 @@ function evaluate_for_statement(stmt, env) {
 	let extented_env = extend_environment([], [], env);
 	let range = for_range(stmt);
 	
-	if (range.tag === "range") {
+	if (range.tag === 'range') {
 		// value range
 		let range_from_value = evaluate(range.from, env);
 		define_variable(for_variable(stmt).name,
@@ -331,14 +331,14 @@ function evaluate_for_statement(stmt, env) {
 							range.closed,
 							evaluate(for_increment(stmt) || 1, env),
 							extented_env);
-	} else if (range.tag === "variable" || range.tag === "application") {
+	} else if (range.tag === 'variable' || range.tag === 'application') {
 		// list
 		let list_value = evaluate(range, env);
-		if (!_is_list(list_value)) throwError(stmt.line, "Invalid range.");
+		if (!_is_list(list_value)) throwError(stmt.line, 'Invalid range.');
 		define_variable(for_variable(stmt).name, null, extented_env);
 		return evaluate_for_statement_list_clause(stmt, list_value, extented_env);
 	} else {
-		throwError(stmt.line, "Invalid range.");
+		throwError(stmt.line, 'Invalid range.');
 	}
 }
 
@@ -382,37 +382,37 @@ function evaluate_for_statement_list_clause(stmt, range_list, env) {
 }
 
 function is_continue_statement(stmt) {
-	return is_tagged_object(stmt,"continue");
+	return is_tagged_object(stmt,'continue');
 }
 function make_continue_value(stmt, env) {
-	return { tag: "continue_value", line: stmt.line };
+	return { tag: 'continue_value', line: stmt.line };
 }
 function is_continue_value(value) {
-	return is_tagged_object(value,"continue_value");
+	return is_tagged_object(value,'continue_value');
 }
 
 function is_break_statement(stmt) {
-	return is_tagged_object(stmt,"break");
+	return is_tagged_object(stmt,'break');
 }
 function make_break_value(stmt, env) {
-	return { tag: "break_value", line: stmt.line };
+	return { tag: 'break_value', line: stmt.line };
 }
 function is_break_value(value) {
-	return is_tagged_object(value,"break_value");
+	return is_tagged_object(value,'break_value');
 }
 
 function is_fallthrough_statement(stmt) {
-	return is_tagged_object(stmt,"fallthrough");
+	return is_tagged_object(stmt,'fallthrough');
 }
 function make_fallthrough_value(stmt, env) {
-	return { tag: "fallthrough_value", line: stmt.line };
+	return { tag: 'fallthrough_value', line: stmt.line };
 }
 function is_fallthrough_value(value) {
-	return is_tagged_object(value,"fallthrough_value");
+	return is_tagged_object(value,'fallthrough_value');
 }
 
 function is_function_definition(stmt) {
-	return is_tagged_object(stmt,"function_definition");
+	return is_tagged_object(stmt,'function_definition');
 }
 function function_definition_parameters(stmt) {
 	return stmt.parameters;
@@ -442,14 +442,14 @@ function evaluate_function_definition(stmt, env) {
 				 env, false);
 }
 function make_function_value(parameters, body, env, hasParent) {
-	return { tag: "function_value",
+	return { tag: 'function_value',
 				parameters: parameters,
 				body: body,
 				environment: env,
 				has_parent: hasParent };
 }
 function is_compound_function_value(f) {
-	return is_tagged_object(f,"function_value");
+	return is_tagged_object(f,'function_value');
 }
 function function_value_parameters(value) {
 	return value.parameters;
@@ -488,7 +488,7 @@ function evaluate_sequence(stmts, env) {
 }
 
 function is_application(stmt) {
-	return is_tagged_object(stmt, "application");
+	return is_tagged_object(stmt, 'application');
 }
 function operator(stmt) {
 	return stmt.operator;
@@ -507,7 +507,7 @@ function rest_operands(ops) {
 }
 		
 function is_primitive_function(fun) {
-	return is_tagged_object(fun, "primitive");
+	return is_tagged_object(fun, 'primitive');
 }
 function primitive_implementation(fun) {
 	return fun.implementation;
@@ -536,7 +536,7 @@ function extend_environment(vars, vals, base_env, line) {
 	if (_length(vars) >= _length(vals))
 		return enclose_by(make_frame(vars, vals), base_env);
 	else if (_length(vars) < _length(vals))
-		throwError(line || "?", "Too many arguments supplied: expect "+_length(vars)+", but "+_length(vals)+" given");
+		throwError(line || '?', 'Too many arguments supplied: expect '+_length(vars)+', but '+_length(vals)+' given');
 }
 
 function update_environment(vars, vals, base_env) {
@@ -546,21 +546,21 @@ function update_environment(vars, vals, base_env) {
 		return update_environment(_tail(vars), _tail(vals), base_env);
 	}
 	else if (_is_list(vars) && _is_list(vals) && _length(vars) < _length(vals))
-		throwError("?", "Too many arguments supplied: expect "+_length(vars)+", but "+_length(vals)+" given");
+		throwError('?', 'Too many arguments supplied: expect '+_length(vars)+', but '+_length(vals)+' given');
 }
 	 
 function is_return_statement(stmt) {
-	return is_tagged_object(stmt, "return_statement");
+	return is_tagged_object(stmt, 'return_statement');
 }
 function return_statement_expression(stmt) {
 	return stmt.expression;
 }
 	
 function make_return_value(line, content) {
-	return { tag: "return_value", content: content, line: line};
+	return { tag: 'return_value', content: content, line: line};
 }
 function is_return_value(value) {
-	return is_tagged_object(value, "return_value");
+	return is_tagged_object(value, 'return_value');
 }
 function return_value_content(value) {
 	return value.content;
@@ -586,13 +586,13 @@ function apply(fun, args, line) {
 											args,
 											function_value_environment(fun), line);
 		}
-		// define_variable("this", func_env, func_env);
+		// define_variable('this', func_env, func_env);
 		let result = evaluate(function_value_body(fun), func_env);
 		if (is_return_value(result)) {
 			return return_value_content(result);
 		}
 	} else {
-		throwError(line, "Unknown function type - APPLY: " + fun);
+		throwError(line, 'Unknown function type - APPLY: ' + fun);
 	}
 	return null;
 }
@@ -600,8 +600,8 @@ function apply(fun, args, line) {
 function apply_logic(fun_raw, args, env) {
 	var oprnd1 = evaluate(_head(args), env);
 	var oprnd2 = false;
-	if ((fun_raw.name === "&&" && oprnd1 === true) ||
-		(fun_raw.name === "||" && oprnd1 === false)) {
+	if ((fun_raw.name === '&&' && oprnd1 === true) ||
+		(fun_raw.name === '||' && oprnd1 === false)) {
 		oprnd2 = evaluate(_head(_tail(args)), env);
 	}
 	var fun = evaluate(fun_raw, env);
@@ -611,7 +611,7 @@ function apply_logic(fun_raw, args, env) {
 
 function apply_ternary(fun_raw, args, env) {
 	if (_length(args) !== 3) {
-		throwError("?", "Invalid conditional expression");
+		throwError('?', 'Invalid conditional expression');
 	}
 	var condition = _head(args);
 	var expTrue = _head(_tail(args));
@@ -625,27 +625,27 @@ function apply_ternary(fun_raw, args, env) {
 }
 
 function is_reference(stmt) {
-	return is_tagged_object(stmt, "reference");
+	return is_tagged_object(stmt, 'reference');
 }
 
 function list_method(list, method) {
 	switch (method) {
-		case "head":
+		case 'head':
 			return _head(list);
-		case "tail":
+		case 'tail':
 			return _tail(list);
-		case "isEmpty":
+		case 'isEmpty':
 			return _is_empty(list);
-		case "length":
+		case 'length':
 			return _length(list);
 		default:
-		throwError("?", "Unknown list method: " + member);
+		throwError('?', 'Unknown list method: ' + member);
 	}
 }
 
 function refer(fun, member) {
-	if (member.charAt(0) === "_"){
-		throwError("?", "Referencing private members is not allowed.");
+	if (member.charAt(0) === '_'){
+		throwError('?', 'Referencing private members is not allowed.');
 	}
 	if (is_compound_function_value(fun)) {
 		let func_env = extend_environment([],[],function_value_environment(fun));
@@ -654,12 +654,12 @@ function refer(fun, member) {
 			evaluate(function_value_body(fun), func_env);
 		}
 		return lookup_variable_value(null, member, func_env);
-	} else if (member === "isList") {
+	} else if (member === 'isList') {
 		return _is_list(fun);
 	} else if (_is_list(fun)) {
 		return list_method(fun, member);
 	} else {
-		throwError("?", "Unknown function type - REFER: " + fun);
+		throwError('?', 'Unknown function type - REFER: ' + fun);
 	}
 }
 
@@ -670,72 +670,72 @@ function list_of_values(exps, env) {
 }
 	 
 var primitive_functions = {
-		"$pair": _pair,
-		"$head": _head,
-		"$tail": _tail,
-		"$list": _list,
-		"$is_list": _is_list,
-		"$is_empty": _is_empty,
+		'$pair': _pair,
+		'$head': _head,
+		'$tail': _tail,
+		'$list': _list,
+		'$is_list': _is_list,
+		'$is_empty': _is_empty,
 		
-		"put": _put,
-		"print": _print,
-		"input": _input,
+		'put': _put,
+		'print': _print,
+		'input': _input,
 
-		"$now": _now,
-		"$string_to_char_list": _string_to_char_list,
-		"$char_code": _char_code,
+		'$now': _now,
+		'$string_to_char_list': _string_to_char_list,
+		'$char_code': _char_code,
 		
-		"_-": (x) => -x, // negative
-		"**": (x,y) => Math.pow(x,y), // power 
-		"+": (x,y) => x + y,
-		"-": (x,y) => x - y,
-		"*": (x,y) => x * y,
-		"/": (x,y) => Math.trunc(x / y),
-		"/.": (x,y) => x / y,
-		"%": (x,y) => x % y,
-		"==": (x,y) => x === y,
-		"!=": (x,y) => x !== y,
-		"<": (x,y) => x < y,
-		"<=": (x,y) => x <= y,
-		">": (x,y) => x > y,
-		">=": (x,y) => x >= y,
-		"_!": (x) => ! x, // not
-		"&&": (x,y) => x && y,
-		"||": (x,y) => x || y,
+		'_-': (x) => -x, // negative
+		'**': (x,y) => Math.pow(x,y), // power 
+		'+': (x,y) => x + y,
+		'-': (x,y) => x - y,
+		'*': (x,y) => x * y,
+		'/': (x,y) => Math.trunc(x / y),
+		'/.': (x,y) => x / y,
+		'%': (x,y) => x % y,
+		'==': (x,y) => x === y,
+		'!=': (x,y) => x !== y,
+		'<': (x,y) => x < y,
+		'<=': (x,y) => x <= y,
+		'>': (x,y) => x > y,
+		'>=': (x,y) => x >= y,
+		'_!': (x) => ! x, // not
+		'&&': (x,y) => x && y,
+		'||': (x,y) => x || y,
 		
-		"&": (x,y) => x & y,
-		"|": (x,y) => x | y,
-		"_~": (x) => ~x, // NOT
-		"^": (x,y) => x ^ y,
-		"<<": (x,y) => x << y,
-		">>": (x,y) => x >> y,
-		">>>": (x,y) => x >>> y,
+		'&': (x,y) => x & y,
+		'|': (x,y) => x | y,
+		'_~': (x) => ~x, // NOT
+		'^': (x,y) => x ^ y,
+		'<<': (x,y) => x << y,
+		'>>': (x,y) => x >> y,
+		'>>>': (x,y) => x >>> y,
 		
 		',': (x,y) => _pair(x, y),
 		
-		"throw": (x) => { throw Error(x); }
+		'throw': (x) => { throw Error(x); }
 };
 	
 function setup_environment() {
 	var initial_env = enclose_by(an_empty_frame, the_empty_environment);
 	for (var prop in primitive_functions) {
 		define_variable(prop,
-							 { tag: "primitive",
+							 { tag: 'primitive',
 								implementation: primitive_functions[prop] },
 							 initial_env);
 	}
-	define_variable("undefined", undefined, initial_env);
+	define_variable('undefined', undefined, initial_env);
 	return initial_env;
 }
 	 
 function evaluate_toplevel(stmt, env) {
 	var value = evaluate(stmt, env);
 	if (is_return_value(value))
-		throwError(value.line, "return not allowed outside of function definition.");
+		throwError(value.line, 'return not allowed outside of function definition.');
 	if (is_continue_value(value))
-		throwError(value.line, "Invalid continue statement.");
+		throwError(value.line, 'Invalid continue statement.');
 	if (is_break_value(value))
-		throwError(value.line, "Invalid break statement.");
+		throwError(value.line, 'Invalid break statement.');
 	else return value;
 }
 
@@ -771,10 +771,10 @@ function evaluate(stmt, env) {
 		return evaluate_sequence(stmt, env);
 	else if (is_application(stmt)){
 		var optr = operator(stmt);
-		if (optr.name === "&&" || optr.name === "||"){
+		if (optr.name === '&&' || optr.name === '||'){
 			// short-circuit evaluation
 			return apply_logic(optr, operands(stmt), env);
-		} else if (optr.name === ".") {
+		} else if (optr.name === '.') {
 			// reference
 			var oprnd = operands(stmt);
 			var fun = _head(oprnd);
@@ -787,7 +787,7 @@ function evaluate(stmt, env) {
 				// reference function field
 				return refer(evaluate(fun,env), member.name);
 			}
-		} else if (optr.name === ":") {
+		} else if (optr.name === ':') {
 			// ternary operator
 			return apply_ternary(optr, operands(stmt), env);
 		} else {
@@ -797,18 +797,18 @@ function evaluate(stmt, env) {
 		return make_return_value(stmt.line, 
 					 evaluate(return_statement_expression(stmt), env));
 	} else {
-		throwError("?", "Unknown expression type - evaluate: " + stmt);
+		throwError('?', 'Unknown expression type - evaluate: ' + stmt);
 	}
 }
 
 function parse_program(program_string, program_parser, evaluate_callback) {
 	if (program_string === null) {
-		return {tag: "exit"};
+		return {tag: 'exit'};
 	} else {
 		if(program_parser) {
 			program_parser(program_string, evaluate_callback, true);
 		} else {
-			alert("No parser available.");
+			alert('No parser available.');
 		}
 	}
 }

@@ -5,9 +5,9 @@
  */
 
 (function(mod) {
-	if (typeof exports == "object" && typeof module == "object") // CommonJS
+	if (typeof exports == 'object' && typeof module == 'object') // CommonJS
 		module.exports = mod();
-	else if (typeof define == "function" && define.amd) // AMD
+	else if (typeof define == 'function' && define.amd) // AMD
 		return define([], mod);
 	else // Plain browser env
 		(this || window).YjloParser = mod();
@@ -20,92 +20,92 @@
 		var tokens;
 		var token_nr;
 		
-		const reservedKeywords = ["var", "func", "import",
-		"if", "else", "switch", "fallthrough", "case", "default",
-		"continue", "break", "while", "do", "for", "in", "by", "return"];
+		const reservedKeywords = ['var', 'func', 'import',
+		'if', 'else', 'switch', 'fallthrough', 'case', 'default',
+		'continue', 'break', 'while', 'do', 'for', 'in', 'by', 'return'];
 
-		const reservedValues = ["true", "false", "null"];
+		const reservedValues = ['true', 'false', 'null'];
 
 		var new_node = function() {
 			return {};
 		};
 
-		var isConstantToken = t => t && (t.type === "string" || t.type === "number");
+		var isConstantToken = t => t && (t.type === 'string' || t.type === 'number');
 
 		var isVarNameToken = function (t) {
 			if (reservedKeywords.indexOf(t.value) != -1){
 				return false;
 			}
-			return t.type === "name";
+			return t.type === 'name';
 		};
 
-		var isOperatorToken = t => t && t.type === "operator";
-		var isOpeningBracketToken = t => t && isOperatorToken(t) && t.value === "(";
-		var isClosingBracketToken = t => t && isOperatorToken(t) && t.value === ")";
+		var isOperatorToken = t => t && t.type === 'operator';
+		var isOpeningBracketToken = t => t && isOperatorToken(t) && t.value === '(';
+		var isClosingBracketToken = t => t && isOperatorToken(t) && t.value === ')';
 		var isBracketToken = t => t && (isOpeningBracketToken(t) || isClosingBracketToken(t));
 		var isNonBracketOperatorToken = t => isOperatorToken(t) && !isBracketToken(t);
-		var isNewLineToken = t => t && t.type === "newline";
+		var isNewLineToken = t => t && t.type === 'newline';
 		
 		var throwError = function (token, message) {
-			throw new Error((token?`[line ${token.line}] `:"") + message);
+			throw new Error((token?`[line ${token.line}] `:'') + message);
 		};
 		
 		var throwTokenError = function (expect, token) {
 			let tokenValue = token.value;
-			throwError(token, `Expected ${expect}. But ${tokenValue==='\n'?"newline":tokenValue} found.`);
+			throwError(token, `Expected ${expect}. But ${tokenValue==='\n'?'newline':tokenValue} found.`);
 		};
 
 		var precedence = function(operator) {
 			switch(operator){
-			case ".": // reference
+			case '.': // reference
 				return 15;
-			case "**": // power
+			case '**': // power
 				return 14;
-			case "_-": // negative
-			case "_!": // not
-			case "_~":
-			case "++":	// ++i
-			case "_++":	// i++
-			case "--":	// --i
-			case "_--":	// i--
+			case '_-': // negative
+			case '_!': // not
+			case '_~':
+			case '++':	// ++i
+			case '_++':	// i++
+			case '--':	// --i
+			case '_--':	// i--
 				return 13;
-			case "*":
-			case "/":
-			case "/.":
-			case "%":
+			case '*':
+			case '/':
+			case '/.':
+			case '%':
 				return 12;
-			case "+":
-			case "-":
+			case '+':
+			case '-':
 				return 11;
-			case "<<":
-			case ">>":
-			case ">>>":
+			case '<<':
+			case '>>':
+			case '>>>':
 				return 10;
-			case "<":
-			case "<=":
-			case ">":
-			case ">=":
+			case '<':
+			case '<=':
+			case '>':
+			case '>=':
 				return 9;
-			case "==":
-			case "!=":
+			case '==':
+			case '!=':
 				return 8;
-			case "&":
+			case '&':
 				return 7;
-			case "^":
+			case '^':
 				return 6;
-			case "|":
+			case '|':
 				return 5;
-			case "&&":
+			case '&&':
 				return 4;
-			case "||":
+			case '||':
 				return 3;
-			case "?":
-			case ":":
+			case '?':
+			case ':':
 				return 2;
 			case ',':
 				return 1;
-			case "=": // assignment
-			case ":=":
+			case '=': // assignment
+			case ':=':
 				return 0;
 			default:
 				return -1;
@@ -140,7 +140,7 @@
 				token = null;
 				return;
 			}
-			if (token.type === "newline") {
+			if (token.type === 'newline') {
 				skipToken();
 			}
 		};
@@ -153,16 +153,16 @@
 
 	/*===================== EXPRESSION ======================= */
 		var expression = function () {
-			log("parsing expression: "+token.value);
+			log('parsing expression: '+token.value);
 			
 			let prev_token;
 			let left_node;
 			let expression_nodes_infix = [];
 			let bracket_count = 0;
 
-			if (checkToken("func")){
+			if (checkToken('func')){
 				// function expression, should be anonymous
-				advance("func");
+				advance('func');
 				if (isVarNameToken(token)){
 					// ignore given name
 					advance();
@@ -176,13 +176,13 @@
 					skipToken();
 					if (prev_token && isNonBracketOperatorToken(prev_token)) {
 						// last line ends with an operator
-						if (prev_token.value === "++" || prev_token.value === "--") {
+						if (prev_token.value === '++' || prev_token.value === '--') {
 							break;
 						}
 						continue;
 					}
 					if (token && isNonBracketOperatorToken(token)) {
-						if (checkToken("++") || checkToken("--")) {
+						if (checkToken('++') || checkToken('--')) {
 							break;
 						}
 					} else {
@@ -205,7 +205,7 @@
 					break;
 				}
 				if (!isConstantToken(token) && /^(by|in)$/.test(token.value)) {
-					// keyword: "by", "in"
+					// keyword: 'by', 'in'
 					break;
 				}
 				if (isClosingBracketToken(token) && bracket_count === 0) {
@@ -226,12 +226,12 @@
 					left_node = new ConstantNode(token.value, token.line);
 				} else if (isVarNameToken(token)) {
 					// variable
-					left_node = new VariableNode(token.value, "variable", token.line);
+					left_node = new VariableNode(token.value, 'variable', token.line);
 				} else if (isOperatorToken(token)) {
 					// operator
-					left_node = new VariableNode(token.value, "operator", token.line);
+					left_node = new VariableNode(token.value, 'operator', token.line);
 				} else {
-					throwTokenError("expression", token);
+					throwTokenError('expression', token);
 				}
 				expression_nodes_infix.push(left_node);
 				
@@ -247,7 +247,7 @@
 			
 			// empty expression
 			if (expression_nodes_infix.length === 0) {
-				return new VariableNode("null", "variable", token.line);
+				return new VariableNode('null', 'variable', token.line);
 			}
 			
 			// convert in-fix order to post-fix order
@@ -269,7 +269,7 @@
 					if (temp_stack.length > 0) {
 						temp_stack.pop(); // pop '('
 					} else {
-						throwError(token, "Unmatched bracket");
+						throwError(token, 'Unmatched bracket');
 					}
 				} else {
 					// operators
@@ -295,9 +295,9 @@
 					
 					while (temp_stack.length > 0 &&
 						precedence(thisNode.name) <= precedence(temp_stack[temp_stack.length - 1].name)) {
-							if ((thisNode.name === "=" && temp_stack[temp_stack.length - 1].name === "=") ||
-								(thisNode.name === ":=" && temp_stack[temp_stack.length - 1].name === ":=")) {
-								// "=" is right association
+							if ((thisNode.name === '=' && temp_stack[temp_stack.length - 1].name === '=') ||
+								(thisNode.name === ':=' && temp_stack[temp_stack.length - 1].name === ':=')) {
+								// '=' is right association
 								break;
 							}
 							expression_nodes_postfix.push(temp_stack.pop());
@@ -326,7 +326,7 @@
 						let compound_assign = exp_node.name.charAt(exp_node.name.length-1) === '=';
 						let assign_node = new AssignmentNode(exp_node.line);
 						let right = null;
-						let operator = "";
+						let operator = '';
 						if (compound_assign) {
 							right = tree_stack.pop();
 							operator = exp_node.name.slice(0, -1);
@@ -337,7 +337,7 @@
 						let left = tree_stack.pop();
 						
 						let apply_node = new ApplicationNode(exp_node.line);
-						apply_node.setOperator(new VariableNode(operator, "operator", exp_node.line));
+						apply_node.setOperator(new VariableNode(operator, 'operator', exp_node.line));
 						apply_node.setOperands(array_to_list([left, right]));
 						
 						assign_node.setLeft(left);
@@ -359,7 +359,7 @@
 					} else {
 						let operands = [];
 						
-						if (exp_node.name === "?") {
+						if (exp_node.name === '?') {
 							// ternary operator, wait for one more operand
 							continue;
 						}
@@ -370,7 +370,7 @@
 							operands.unshift(tree_stack.pop());
 						}
 						
-						if (exp_node.name === ":") {
+						if (exp_node.name === ':') {
 							// ternary operator, pop third operand
 							operands.unshift(tree_stack.pop());
 						}
@@ -391,63 +391,63 @@
 			let stmt_tree;
 			ignoreNewline();
 			switch (token.value){
-				case ";":
+				case ';':
 					advance();
 					break;
-				case "var":
+				case 'var':
 					advance();
 					stmt_tree = var_def();
 					break;
-				case "func":
+				case 'func':
 					advance();
 					stmt_tree = func();
 					break;
-				case "if":
+				case 'if':
 					advance();
 					stmt_tree = if_stmt();
 					break;
-				case "switch":
+				case 'switch':
 					advance();
 					stmt_tree = switch_stmt();
 					break;
-				case "while":
+				case 'while':
 					advance();
 					stmt_tree = while_stmt();
 					break;
-				case "do":
+				case 'do':
 					advance();
 					stmt_tree = do_while_stmt();
 					break;
-				case "for":
+				case 'for':
 					advance();
 					stmt_tree = for_stmt();
 					break;
-				case "continue":
+				case 'continue':
 					advance();
 					stmt_tree = continue_stmt();
 					break;
-				case "break":
+				case 'break':
 					advance();
 					stmt_tree = break_stmt();
 					break;
-				case "return":
+				case 'return':
 					advance();
 					stmt_tree = return_stmt();
 					break;
-				case "fallthrough":
+				case 'fallthrough':
 					advance();
 					stmt_tree = fallthrough_stmt();
 					break;
 				default:
 					stmt_tree = expression();
 			}
-			advanceOptional(";");
+			advanceOptional(';');
 			return stmt_tree;
 		};
 
 	/*===================== STATEMENTS ======================= */
 		var statements = function () {
-			log("parsing statements.");
+			log('parsing statements.');
 			var stmts = [],
 				stmt;
 			while (true) {
@@ -457,7 +457,7 @@
 					checkToken('}') ||
 					checkToken('case') ||
 					checkToken('default')) {
-					log("end of statement list");
+					log('end of statement list');
 					break;
 				}
 				stmt = statement();
@@ -470,11 +470,11 @@
 
 	/*===================== FUNC CALL ======================= */
 		var func_call = function(t) {
-			log("parsing func call. "+t.value);
+			log('parsing func call. '+t.value);
 			let apply_node = new ApplicationNode(t.line);
-			apply_node.setOperator(new VariableNode(t.value, "variable", t.line));
+			apply_node.setOperator(new VariableNode(t.value, 'variable', t.line));
 			var operands = [];
-			advance("(");
+			advance('(');
 			if (!isClosingBracketToken(token)) {
 				while (true) {
 					var o = expression();
@@ -482,25 +482,25 @@
 					if (isClosingBracketToken(token)) {
 						break;
 					}
-					advance(",");
+					advance(',');
 				}
 			}
-			advance(")");
+			advance(')');
 			apply_node.setOperands(array_to_list(operands));
 			return apply_node;
 		};
 
 	/*===================== RETURN ======================= */
 		var return_stmt = function() {
-			log("parsing return. "+token.value);
+			log('parsing return. '+token.value);
 			let node = new ReturnStatementNode(token.line, expression());
-			advanceOptional(";");
+			advanceOptional(';');
 			return node;
 		};
 
 	/*===================== FUNC ======================= */
 		var func = function() {
-			log("parsing function. "+token.value);
+			log('parsing function. '+token.value);
 			var args = [];
 			var funcbody = {};
 			let node = null;
@@ -511,30 +511,30 @@
 			} else if (isOpeningBracketToken(token)) {
 				// anonymous function
 			} else {
-				throwError(token, "Invalid function name.");
+				throwError(token, 'Invalid function name.');
 			}
 
-			advance("(");
+			advance('(');
 			if (!isClosingBracketToken(token)) {
 				while (true) {
 					if (!isVarNameToken(token)) {
-						throwTokenError("a variable name", token);
+						throwTokenError('a variable name', token);
 					}
 					args.push(token.value);
 					advance();
-					if (!checkToken(",")) {
+					if (!checkToken(',')) {
 						break;
 					}
-					advance(",");
+					advance(',');
 				}
 			}
-			advance(")");
+			advance(')');
 
-			if (checkToken("extends")) {
+			if (checkToken('extends')) {
 				// inheritance
-				advance("extends");
+				advance('extends');
 				if (!isVarNameToken(token)){
-					throwTokenError("a variable name", token);
+					throwTokenError('a variable name', token);
 				}
 				funcbody.parent = token.value;
 				advance(); // parent name
@@ -542,12 +542,12 @@
 				funcbody.parent = null;
 			}
 
-			funcbody.tag = "function_definition";
+			funcbody.tag = 'function_definition';
 			funcbody.parameters = array_to_list(args);
 			funcbody.line = token.line;
-			advance("{");
+			advance('{');
 			funcbody.body = statements();
-			advance("}");
+			advance('}');
 			
 
 			if (node) {
@@ -561,33 +561,33 @@
 
 	/*===================== VAR DEF ======================= */
 		var var_def = function() {
-			log("parsing var def. " + token.value);
+			log('parsing var def. ' + token.value);
 			var var_arr = [], n;
 			let node = null;
 			while (token) {
 				n = token;
 				if (!isVarNameToken(n)) {
-					throwTokenError("a variable name", token);
+					throwTokenError('a variable name', token);
 				}
 				advance(); // var name
 				
 				node = new VarDefNode(n.line);
 				node.setLeft(n.value);
-				if (checkToken("=")) {
-					advance("=");
+				if (checkToken('=')) {
+					advance('=');
 					node.setRight(expression());
 					var_arr.push(node);
 				} else {
 					// default initial value
-					node.setRight(new VariableNode("null", "variable", n.line));
+					node.setRight(new VariableNode('null', 'variable', n.line));
 					var_arr.push(node);
 				}
-				if (!checkToken(",")) {
+				if (!checkToken(',')) {
 					break;
 				}
-				advance(",");
+				advance(',');
 			}
-			advanceOptional(";");
+			advanceOptional(';');
 			return array_to_list(var_arr);
 		};
 
@@ -612,20 +612,20 @@ class ConditionNode extends Node {
 	
 class IfNode extends ConditionNode {
 	constructor(line) {
-		super("if", line);
+		super('if', line);
 	}
 }
 	
 		var if_stmt = function() {
-			log("parsing if.");
+			log('parsing if.');
 			let node = new IfNode(token.line);
 			node.setPredicate(condition());
 			node.setConsequent(block());
-			if (checkToken("else")) {
-				advance("else");
-				if (checkToken("if")) {
+			if (checkToken('else')) {
+				advance('else');
+				if (checkToken('if')) {
 					// else if
-					advance("if");
+					advance('if');
 					node.setAlternative(if_stmt());
 				} else {
 					// else
@@ -639,60 +639,60 @@ class IfNode extends ConditionNode {
 		
 	/*===================== SWITCH ======================= */
 		var switch_stmt = function () {
-			log("parsing switch.");
+			log('parsing switch.');
 			var n = new_node();
-			n.tag = "switch";
+			n.tag = 'switch';
 			n.variable = expression();
 			n.default = null;
 			var cases = [];
-			advance("{");
+			advance('{');
 			/* cases */
-			while (!checkToken("}")) {
-				if (checkToken("case")) {
-					advance("case");
+			while (!checkToken('}')) {
+				if (checkToken('case')) {
+					advance('case');
 					var case_node = new_node();
-					case_node.tag = "case";
+					case_node.tag = 'case';
 					var case_value = [];
 					if (!isConstantToken(token)) {
-						throwTokenError("a constant value", token);
+						throwTokenError('a constant value', token);
 					}
 					case_value.push(token.value);
 					advance(); // advance value
-					while (checkToken(",")) {
-						advance(",");
+					while (checkToken(',')) {
+						advance(',');
 						if (!isConstantToken(token)) {
-							throwTokenError("a constant value", token);
+							throwTokenError('a constant value', token);
 						}
 						case_value.push(token.value);
 						advance(); // advance value
 					}
 					case_node.value = array_to_list(case_value);
-					advance(":");
+					advance(':');
 					case_node.stmt = statements();
 					cases.push(case_node);
-				} else if (checkToken("default")) {
-					advance("default");
-					advance(":");
+				} else if (checkToken('default')) {
+					advance('default');
+					advance(':');
 					n.default = statements();
 				} else {
-					throwTokenError("'case' or 'default'", token);
+					throwTokenError('"case" or "default"', token);
 				}
 
 			}
-			advance("}");
+			advance('}');
 			n.cases = array_to_list(cases);
 			return n;
 		};
 
 class WhileNode extends ConditionNode {
 	constructor(line) {
-		super("while", line);
+		super('while', line);
 	}
 }
 		
 	/*===================== WHILE ======================= */
 		var while_stmt = function () {
-			log("parsing while.");
+			log('parsing while.');
 			let node = new WhileNode(token.line);
 			node.setPredicate(condition());
 			node.setConsequent(block());
@@ -701,40 +701,40 @@ class WhileNode extends ConditionNode {
 
 class DoWhileNode extends ConditionNode {
 	constructor(line) {
-		super("do", line);
+		super('do', line);
 	}
 }
 	/*===================== DO WHILE ======================= */
 		var do_while_stmt = function () {
-			log("parsing do.");
+			log('parsing do.');
 			let node = new DoWhileNode(token.line);
 			node.setConsequent(block());
-			advance("while");
+			advance('while');
 			node.setPredicate(condition());
-			advanceOptional(";");
+			advanceOptional(';');
 			return node;
 		};
 
 	/*===================== FOR ======================= */
 		var for_stmt = function () {
-			log("parsing for.");
+			log('parsing for.');
 			var hasBracket = isOpeningBracketToken(token);
-			if (hasBracket) advance("(");
+			if (hasBracket) advance('(');
 			var n = new_node();
-			n.tag = "for";
+			n.tag = 'for';
 			n.line = token.line;
 			// variable
 			if (!isVarNameToken(token)) {
-				throwTokenError("a variable name", token);
+				throwTokenError('a variable name', token);
 			}
-			n.variable = new VariableNode(token.value, "variable", token.line);
+			n.variable = new VariableNode(token.value, 'variable', token.line);
 			advance();
 			// range
-			advance("in");
+			advance('in');
 			n.range = parse_range();
 			// increment
 			n.increment = parse_increment();
-			if (hasBracket) advance(")");
+			if (hasBracket) advance(')');
 			n.consequent = block();
 			return n;
 		};
@@ -742,7 +742,7 @@ class DoWhileNode extends ConditionNode {
 		var parse_range = function () {
 			// TODO parse range in expression()
 			let first_value = expression();
-			if (checkToken("{")) {
+			if (checkToken('{')) {
 				// list
 				return first_value;
 			}
@@ -761,10 +761,10 @@ class DoWhileNode extends ConditionNode {
 		};
 
 		var parse_increment = function () {
-			if (!checkToken("by")) {
+			if (!checkToken('by')) {
 				return null;
 			}
-			advance("by");
+			advance('by');
 			return expression();
 		};
 
@@ -775,9 +775,9 @@ class DoWhileNode extends ConditionNode {
 				// single statement block
 				block_stmts = array_to_list([statement()]);
 			} else {
-				advance("{");
+				advance('{');
 				block_stmts = statements();
-				advance("}");
+				advance('}');
 			}
 			return block_stmts;
 		};
@@ -789,25 +789,25 @@ class DoWhileNode extends ConditionNode {
 
 	/*===================== CONTINUE ======================= */
 		var continue_stmt = function () {
-			log("parsing continue. " + token.value);
-			let node = new Node("continue", token.line);
-			advanceOptional(";");
+			log('parsing continue. ' + token.value);
+			let node = new Node('continue', token.line);
+			advanceOptional(';');
 			return node;
 		};
 
 	/*===================== BREAK ======================= */
 		var break_stmt = function () {
-			log("parsing break. " + token.value);
-			let node = new Node("break", token.line);
-			advanceOptional(";");
+			log('parsing break. ' + token.value);
+			let node = new Node('break', token.line);
+			advanceOptional(';');
 			return node;
 		};
 
 	/*===================== FALLTHROUGH ======================= */
 		var fallthrough_stmt = function () {
-			log("parsing fallthrough. " + token.value);
-			let node = new Node("fallthrough", token.line);
-			advanceOptional(";");
+			log('parsing fallthrough. ' + token.value);
+			let node = new Node('fallthrough', token.line);
+			advanceOptional(';');
 			return node;
 		};
 
@@ -850,7 +850,7 @@ class DoWhileNode extends ConditionNode {
 			let class_constructor_stack = _list();
 			for (let i = 0; i < original_tokens.length; i++) {
 				let t = original_tokens[i];
-				if (t.type !== "operator" && t.type !== "name") {
+				if (t.type !== 'operator' && t.type !== 'name') {
 					desugared_tokens.push(t);
 					continue;
 				}
@@ -878,22 +878,22 @@ class DoWhileNode extends ConditionNode {
 						// constructor
 						if (class_level > 0 && brace_count === class_level) {
 							if (_is_empty(class_arg_positions)){
-								throwError(t, "Invalid constructor position.");
+								throwError(t, 'Invalid constructor position.');
 							}
 							desugared_tokens.push(new Token('name', 'func', t.line));
-							desugared_tokens.push(t); // "@"
+							desugared_tokens.push(t); // '@'
 							i++;
 							t = original_tokens[i];
-							desugared_tokens.push(t); // "("
+							desugared_tokens.push(t); // '('
 							let position = _head(class_arg_positions);
 							i++;
 							t = original_tokens[i];
 							class_constructor_arg_tokens = [];
-							while (t.value !== ")") {
+							while (t.value !== ')') {
 								
 								desugared_tokens.push(t);
 								let trans_token;
-								if (t.type === "name") {
+								if (t.type === 'name') {
 									// prepend @ to argument name
 									// to prevent conflict with other vars in the class
 									trans_token = new Token('name', '@' + t.value, t.line);
@@ -906,7 +906,7 @@ class DoWhileNode extends ConditionNode {
 								i++;
 								t = original_tokens[i];
 							}
-							desugared_tokens.push(t); // ")"
+							desugared_tokens.push(t); // ')'
 							class_constructor = true;
 						} else {
 							// other usage of '@'
@@ -941,7 +941,7 @@ class DoWhileNode extends ConditionNode {
 							class_arg_positions = _tail(class_arg_positions);
 						} else if(class_level > 0 && class_constructor && brace_count === class_level+1) {
 							// end of constructor
-							desugared_tokens.push(t); // "}"
+							desugared_tokens.push(t); // '}'
 							class_constructor = false;
 						} else {
 							desugared_tokens.push(t);
@@ -949,11 +949,11 @@ class DoWhileNode extends ConditionNode {
 						brace_count--;
 						break;
 					default:
-						if (t.type === "name" && t.value && t.value.length > 0) {
+						if (t.type === 'name' && t.value && t.value.length > 0) {
 							let firstChar = t.value.charAt(0);
-							if (firstChar === "@") {
+							if (firstChar === '@') {
 								// prevent defining system generated variables
-								throwError(t, "Invalid variable name: " + t.value);
+								throwError(t, 'Invalid variable name: ' + t.value);
 							}
 						}
 						desugared_tokens.push(t);
@@ -973,7 +973,7 @@ class DoWhileNode extends ConditionNode {
 		var processSource = function(source, name) {
 			tokens = tokenizeAndDesugaring(source);
 			if (!tokens || tokens.length === 0) {
-				throwError(null, "Empty source code.");
+				throwError(null, 'Empty source code.');
 			}
 			var thisSourceObj = newSourceObj(name);
 			
@@ -981,24 +981,24 @@ class DoWhileNode extends ConditionNode {
 			token_nr = 0;
 			token = tokens[token_nr];
 			var libs = _list();
-			while (checkToken("import")) {
-				advance("import");
+			while (checkToken('import')) {
+				advance('import');
 				if (token && isVarNameToken(token)) {
 					let libPath = token.value;
 					advance(); // library name
-					if (checkToken("from")) {
-						advance("from");
-						if (token && token.type === "string") {
-							libPath = token.value + (token.value.slice(-1)==="/"?"":"/") + libPath;
+					if (checkToken('from')) {
+						advance('from');
+						if (token && token.type === 'string') {
+							libPath = token.value + (token.value.slice(-1)==='/'?'':'/') + libPath;
 							advance(); // path
 						} else {
-							throwError(null, "Invalid library path for '" + libPath + "'.");
+							throwError(null, 'Invalid library path for "' + libPath + '".');
 						}
 					}
 					libs = _pair(libPath, libs);
-					advanceOptional(";");
+					advanceOptional(';');
 				} else {
-					throwError(null, "Invalid library '"+token.value()+"'.");
+					throwError(null, 'Invalid library "'+token.value()+'".');
 				}
 			}
 			thisSourceObj.dependency = libs;
@@ -1007,7 +1007,7 @@ class DoWhileNode extends ConditionNode {
 		};
 		
 		var startParsing = function() {
-			log("start parsing.");
+			log('start parsing.');
 			
 			token_nr = 0;
 			token = tokens[token_nr];
@@ -1018,14 +1018,14 @@ class DoWhileNode extends ConditionNode {
 			if (syntax_tree) {
 				return syntax_tree;
 			} else {
-				throwError(null, "Invalid source code.");
+				throwError(null, 'Invalid source code.');
 			}
 		};
 		
 		var loadSources = function(evaluate_callback) {
 			var nextSourceName = _head(loadingQueue);
 			
-			let libPath = (nextSourceName.indexOf("/")===-1 ? "library/" : "") + nextSourceName + ".yjlo";
+			let libPath = (nextSourceName.indexOf('/')===-1 ? 'library/' : '') + nextSourceName + '.yjlo';
 			$.ajax({
 				url: libPath,
 				dataType: 'text',
@@ -1059,7 +1059,7 @@ class DoWhileNode extends ConditionNode {
 				}
 			}).fail(function(){
 				try {
-					throwError(null, "Importing '" + nextSourceName + "' failed.");
+					throwError(null, 'Importing "' + nextSourceName + '" failed.');
 				} catch (error) {
 						outputError(error);
 				}
@@ -1105,7 +1105,7 @@ class DoWhileNode extends ConditionNode {
 				}
 			};
 			var resolved = [];
-			resolve("self", []);
+			resolve('self', []);
 
 			var resolvedTokens = [];
 			for (let i in resolved){
@@ -1116,8 +1116,8 @@ class DoWhileNode extends ConditionNode {
 		};
 
 		return function (source, parsed_callback, import_lib=true) {
-			// current source code is identified as "self"
-			var selfSourceObj = processSource(source, "self");
+			// current source code is identified as 'self'
+			var selfSourceObj = processSource(source, 'self');
 			tokens = selfSourceObj.tokens;
 			//console.log(tokens);
 			
@@ -1140,6 +1140,6 @@ class DoWhileNode extends ConditionNode {
 		};
 	}
 
-	Parser.version = "1.0";
+	Parser.version = '1.0';
 	return Parser;
 });

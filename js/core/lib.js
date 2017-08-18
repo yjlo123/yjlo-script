@@ -54,11 +54,11 @@ function _is_empty(xs) {
 }
 
 function is_number(xs) {
-	return typeof xs == "number";
+	return typeof xs == 'number';
 }
 
 function is_string(xs) {
-	return typeof xs == "string";
+	return typeof xs == 'string';
 }
 
 function _length(xs) {
@@ -114,37 +114,37 @@ function _char_code(char) {
 /*  UI Output */
 function _process_output(args) {
 	//window.latestConsole.display(x);
-	//x = x+"";
+	//x = x+'';
 	//x = x.replace(/(?:\r\n|\r|\n)/g, '<br />');
 
-	var output = "";
+	var output = '';
 
 	for (var i = 0; i < args.length; i++) {
 		var arg = args[i];
-		var segment = "";
+		var segment = '';
 		if (arg && _is_list(arg)) {
 			// print list
-			segment += "[";
+			segment += '[';
 			while (!_is_empty(arg)) {
 				// nested list
 				if (_is_list(_head(arg))) {
-					segment += (_process_output([_head(arg)]) + ", ");
+					segment += (_process_output([_head(arg)]) + ', ');
 				} else {
-					segment += (_process_output([_head(arg)]) + ", ");
+					segment += (_process_output([_head(arg)]) + ', ');
 				}
 				arg = _tail(arg);
 			}
-			// remove ", "
+			// remove ', '
 			if (segment.length !== 1) {
 				segment = segment.slice(0, -2);
 			}
-			segment += "]";
-		} else if (arg && arg.tag === "function_value") {
-			segment = apply(refer(arg, "toString"),_list(),"?");
+			segment += ']';
+		} else if (arg && arg.tag === 'function_value') {
+			segment = apply(refer(arg, 'toString'),_list(),'?');
 		} else {
 			segment = arg;
 		}
-		output += ((output === "" ? "" : " ") + segment);
+		output += ((output === '' ? '' : ' ') + segment);
 	}
 	return output;
 }
@@ -160,13 +160,13 @@ function _print() {
 }
 
 function _input(message, value, show_in_console) {
-	var input_value = prompt(message, value || "");
+	var input_value = prompt(message, value || '');
 	if (show_in_console !== false) {
 		jqconsole.Write(input_value + '\n', 'jqconsole-old-input');
 	}
 	return input_value;
 	/*
 	jqconsole.Input(function(input) {
-		//jqconsole.Write("=> " + input + '\n', 'console-arrow');
+		//jqconsole.Write('=> ' + input + '\n', 'console-arrow');
 	});*/
 }

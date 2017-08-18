@@ -1,5 +1,5 @@
 var debug = false;
-var version = "v0.3.0";
+var version = 'v0.3.0';
 var current_parser = YjloParser();
 
 var hello_world = 'a := 2\n\nfunc double(n) {\n\treturn n * 2\n}\n\nfunc hello(n) {\n\tprint("Hello World! " + n)\n}\n\n// Recursive function\nfunc repeat(f, n) {\n\tif n {\n\t\tf(n)\n\t\trepeat(f, n-1)\n\t} else {\n\t\tprint("Done!")\n\t}\n}\n\nrepeat(hello, double(a))';
@@ -25,27 +25,27 @@ var samplecodes = [hello_world,
 	memento_pattern
 ];
 
-var myCodeMirror = CodeMirror(document.getElementById("editor-area"), {
+var myCodeMirror = CodeMirror(document.getElementById('editor-area'), {
 	value: hello_world,
 	lineNumbers: true,
 	smartIndent: true,
 	indentUnit: 4,
 	indentWithTabs: true,
-	mode: "javascript",
-	theme: "lesser-dark"
+	mode: 'javascript',
+	theme: 'lesser-dark'
 });
 
-var syntaxTreeStr = "";
+var syntaxTreeStr = '';
 var jqconsole = $('#console').jqconsole();
 
 $(document).ready(function () {
-	$("#version").text(version);
-	myCodeMirror.setSize("100%", "100%");
+	$('#version').text(version);
+	myCodeMirror.setSize('100%', '100%');
 	registerEventListeners();
 
 	jqconsole.Write('YJLO Script\n', 'console-gray');
-	jqconsole.Write(version + "\n", 'console-gray');
-	jqconsole.Write("Type :help to see available commands.\n", 'console-gray');
+	jqconsole.Write(version + '\n', 'console-gray');
+	jqconsole.Write('Type :help to see available commands.\n', 'console-gray');
 	jqconsole.SetPromptLabel('  ');
 
 	setup_console_environment();
@@ -55,10 +55,10 @@ $(document).ready(function () {
 			// Output input with the class jqconsole-output.
 			if (input) {
 				switch (input) {
-					case ":ver":
+					case ':ver':
 						jqconsole.Write(version + '\n', 'console-gray');
 						break;
-					case ":help":
+					case ':help':
 						jqconsole.Write(
 							`:run\n  run the current program
 :ver\n  show version
@@ -68,21 +68,21 @@ $(document).ready(function () {
 `,
 							'console-gray');
 						break;
-					case ":clear":
+					case ':clear':
 						jqconsole.Reset();
 						break;
-					case ":reset":
+					case ':reset':
 						setup_console_environment();
 						break;
-					case ":run":
+					case ':run':
 						run();
 						break;
-					case ":tree":
+					case ':tree':
 						printSyntaxTree(myCodeMirror.getValue(), current_parser);
 						break;
 					default:
 						driver_loop(input, current_parser, get_console_environment(), function (result) {
-							jqconsole.Write("=> " + _process_output([result]) + '\n', 'console-arrow');
+							jqconsole.Write('=> ' + _process_output([result]) + '\n', 'console-arrow');
 							startPrompt();
 							return;
 						});
@@ -97,20 +97,20 @@ $(document).ready(function () {
 });
 
 function exec() {
-	//$("#program-result").html('<p class="output-finish">[Processing]</p>');
-	jqconsole.Write("  \n", 'jqconsole-old-prompt');
+	//$('#program-result').html('<p class='output-finish'>[Processing]</p>');
+	jqconsole.Write('  \n', 'jqconsole-old-prompt');
 	var startDate = new Date();
 	setup_global_environment();
 	var source = myCodeMirror.getValue();
 	driver_loop(source, current_parser, the_global_environment, function () {
 		// evaluation finished
-		//jqconsole.Write("=> [Finished]\n", 'console-arrow');
+		//jqconsole.Write('=> [Finished]\n', 'console-arrow');
 		var endDate = new Date();
-		var unit = "ms";
+		var unit = 'ms';
 		var time_used = (endDate.getTime() - startDate.getTime());
 		if (time_used > 1000) {
 			time_used /= 1000;
-			unit = "s";
+			unit = 's';
 		}
 		jqconsole.Write(`[Finished in ${time_used}${unit}]\n`, 'console-gray');
 	});
@@ -118,7 +118,7 @@ function exec() {
 }
 
 function run() {
-	$("#program-result").empty();
+	$('#program-result').empty();
 	try {
 		exec();
 	} catch (error) {
@@ -136,8 +136,8 @@ function printSyntaxTree(program_string, program_parser) {
 			if (debug) {
 				// console.log(JSON.stringify(syntax_tree, null, 4));
 			}
-			syntaxTreeStr = "";
-			printSyntaxTreeNode(syntax_tree, "");
+			syntaxTreeStr = '';
+			printSyntaxTreeNode(syntax_tree, '');
 			jqconsole.Write(syntaxTreeStr + `\n`, 'console-default');
 		}, false);
 	} catch (error) {
@@ -155,22 +155,22 @@ function printSyntaxTreeNode(node, indent) {
 		// print head and tail in the same level
 		printSyntaxTreeNode(_head(node), indent);
 		printSyntaxTreeNode(_tail(node), indent);
-	} else if (typeof node === "object") {
+	} else if (typeof node === 'object') {
 		if (!node) {
 			// null
 			syntaxTreeStr += (indent + node + `\n`);
 			return;
 		}
-		if ("tag" in node) {
+		if ('tag' in node) {
 			// print tag first
 			syntaxTreeStr += (indent + `${node.tag}\n`);
-			indent += "  ";
+			indent += '  ';
 		}
 		
 		let attr_count = Object.keys(node).length;
 		let count = 1;
 		for (let attr in node) {
-			if (attr === "line" || attr === "tag") {
+			if (attr === 'line' || attr === 'tag') {
 				count++;
 				continue;
 			}
@@ -178,13 +178,13 @@ function printSyntaxTreeNode(node, indent) {
 			syntaxTreeStr += (indent + `|-${attr}: `);
 			// member value
 			let next_node = node[attr];
-			if (next_node && _is_list(next_node) && typeof _head(next_node) === "string") {
+			if (next_node && _is_list(next_node) && typeof _head(next_node) === 'string') {
 				// replace \n with \\n
-				next_node = _pair(_head(next_node).replace(/\n/g, "\\n"), _tail(next_node));
+				next_node = _pair(_head(next_node).replace(/\n/g, '\\n'), _tail(next_node));
 			}
 			
 			if (!next_node ||
-				(!_is_list(next_node) && typeof next_node !== "object")) {
+				(!_is_list(next_node) && typeof next_node !== 'object')) {
 				// print simple value in the same line
 				syntaxTreeStr += (`${next_node}\n`);
 			} else {
@@ -192,25 +192,25 @@ function printSyntaxTreeNode(node, indent) {
 				syntaxTreeStr += (`\n`);
 				if ((_is_list(next_node) && _length(next_node) > 1 && _is_empty(_tail(next_node))) ||
 					count === attr_count) {
-					printSyntaxTreeNode(next_node, indent + "    ");
+					printSyntaxTreeNode(next_node, indent + '    ');
 				} else {
-					printSyntaxTreeNode(next_node, indent + "|   ");
+					printSyntaxTreeNode(next_node, indent + '|   ');
 				}
 			}
 			count++;
 		}
 	} else {
 		// function argument name or constant
-		syntaxTreeStr += (indent + `"${node}"\n`);
+		syntaxTreeStr += (indent + `'${node}'\n`);
 	}
 }
 
 function registerEventListeners() {
-	$(".example-option").click(function () {
-		var index = $(".example-option").index(this);
-		$("#current-example").text($(this).text());
+	$('.example-option').click(function () {
+		var index = $('.example-option').index(this);
+		$('#current-example').text($(this).text());
 		myCodeMirror.getDoc().setValue(samplecodes[index]);
-		$("#program-result").empty();
+		$('#program-result').empty();
 	});
 }
 
@@ -219,8 +219,8 @@ Mousetrap.bind(['ctrl+enter'], function (e) {
 	return false;
 });
 
-myCodeMirror.setOption("extraKeys", {
-	"Ctrl-Enter": function (instance) {
+myCodeMirror.setOption('extraKeys', {
+	'Ctrl-Enter': function (instance) {
 		run();
 	}
 });
