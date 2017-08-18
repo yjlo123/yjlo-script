@@ -654,6 +654,8 @@ function refer(fun, member) {
 			evaluate(function_value_body(fun), func_env);
 		}
 		return lookup_variable_value(null, member, func_env);
+	} else if (member === "isList") {
+		return _is_list(fun);
 	} else if (_is_list(fun)) {
 		return list_method(fun, member);
 	} else {
