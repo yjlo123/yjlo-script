@@ -1,33 +1,33 @@
-function pair(x, xs) {
+function _pair(x, xs) {
 	return [x, xs];
 }
 
-function is_pair(x) {
+function _is_pair(x) {
 	return x instanceof Array && x.length == 2;
 }
 
-function head(xs) {
+function _head(xs) {
 	return xs[0];
 }
 
-function tail(xs) {
+function _tail(xs) {
 	return xs[1];
 }
 
-function is_list(xs) {
-	return xs && (is_empty(xs) || (tail(xs) !== undefined && is_list(tail(xs))));
+function _is_list(xs) {
+	return xs && (_is_empty(xs) || (_tail(xs) !== undefined && _is_list(_tail(xs))));
 }
 
-function is_in_list(x, xs) {
-	if (is_empty(xs)) return false;
-	if (x === head(xs)) return true;
-	return is_in_list(x, tail(xs));
+function _is_in_list(x, xs) {
+	if (_is_empty(xs)) return false;
+	if (x === _head(xs)) return true;
+	return _is_in_list(x, _tail(xs));
 }
 
-function list() {
+function _list() {
 	var the_list = [];
 	for (var i = arguments.length - 1; i >= 0; i--)
-		the_list = pair(arguments[i], the_list);
+		the_list = _pair(arguments[i], the_list);
 	return the_list;
 }
 
@@ -39,7 +39,7 @@ function array_test(x) {
 	}
 }
 
-function is_empty(xs) {
+function _is_empty(xs) {
 	if (array_test(xs)) {
 		if (xs.length === 0) {
 			return true;
@@ -61,30 +61,30 @@ function is_string(xs) {
 	return typeof xs == "string";
 }
 
-function length(xs) {
-	return (is_empty(xs)) ? 0 : 1 + length(tail(xs));
+function _length(xs) {
+	return (_is_empty(xs)) ? 0 : 1 + _length(_tail(xs));
 }
 
 function apply(f,xs) {
 	var args = [];
-	var len = length(xs);
+	var len = _length(xs);
 	for (var i=0; i < len; i++) {
-		args[i] = head(xs);
-		xs = tail(xs);
+		args[i] = _head(xs);
+		xs = _tail(xs);
 	}
 	return f.apply(f,args);
 }
 
 function map(f) {
-	if (is_empty(arguments[1])) return [];
+	if (_is_empty(arguments[1])) return [];
 	else {
 		var f_args = [];
 		var map_args = [f];
 		for (var i=1; i < arguments.length; i++) {
-			f_args[i-1] = head(arguments[i]);
-			map_args[i] = tail(arguments[i]);
+			f_args[i-1] = _head(arguments[i]);
+			map_args[i] = _tail(arguments[i]);
 		}
-		return pair(f.apply(f,f_args),map.apply(map,map_args));
+		return _pair(f.apply(f,f_args),map.apply(map,map_args));
 	}
 }
 function runtime() {
@@ -98,11 +98,11 @@ function _now() {
 
 function _string_to_char_list(str) {
 	if (typeof str !== 'string' && !(str instanceof String)) {
-		return list();
+		return _list();
 	}
-	var char_list = list();
+	var char_list = _list();
 	for (var i = str.length - 1; i >= 0; i--) {
-		char_list = pair(str.charAt(i), char_list);
+		char_list = _pair(str.charAt(i), char_list);
 	}
 	return char_list;
 }
@@ -122,17 +122,17 @@ function _process_output(args) {
 	for (var i = 0; i < args.length; i++) {
 		var arg = args[i];
 		var segment = "";
-		if (arg && is_list(arg)) {
+		if (arg && _is_list(arg)) {
 			// print list
 			segment += "[";
-			while (!is_empty(arg)) {
+			while (!_is_empty(arg)) {
 				// nested list
-				if (is_list(head(arg))) {
-					segment += (_process_output([head(arg)]) + ", ");
+				if (_is_list(_head(arg))) {
+					segment += (_process_output([_head(arg)]) + ", ");
 				} else {
-					segment += (_process_output([head(arg)]) + ", ");
+					segment += (_process_output([_head(arg)]) + ", ");
 				}
-				arg = tail(arg);
+				arg = _tail(arg);
 			}
 			// remove ", "
 			if (segment.length !== 1) {
@@ -140,7 +140,7 @@ function _process_output(args) {
 			}
 			segment += "]";
 		} else if (arg && arg.tag === "function_value") {
-			segment = apply(refer(arg, "toString"),list(),"?");
+			segment = apply(refer(arg, "toString"),_list(),"?");
 		} else {
 			segment = arg;
 		}

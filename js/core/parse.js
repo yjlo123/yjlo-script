@@ -822,9 +822,9 @@ class DoWhileNode extends ConditionNode {
 		}
 
 		function array_to_list(arr) {
-			let lst = list();
+			let lst = _list();
 			for (let i = arr.length - 1; i >= 0; i--) {
-				lst = pair(arr[i], lst);
+				lst = _pair(arr[i], lst);
 			}
 			return lst;
 		}
@@ -839,10 +839,10 @@ class DoWhileNode extends ConditionNode {
 			// desugaring
 			let brace_count = 0;
 			let class_level = 0;
-			let class_arg_positions = list();
+			let class_arg_positions = _list();
 			let class_constructor = false;
 			let class_constructor_arg_tokens = [];
-			let class_constructor_stack = list();
+			let class_constructor_stack = _list();
 			for (let i = 0; i < original_tokens.length; i++) {
 				let t = original_tokens[i];
 				if (t.type !== "operator" && t.type !== "name") {
@@ -858,21 +858,21 @@ class DoWhileNode extends ConditionNode {
 						desugared_tokens.push(new Token('operator', ')', t.line));
 						break;
 					case 'class':
-						class_constructor_stack = pair(false, class_constructor_stack);
+						class_constructor_stack = _pair(false, class_constructor_stack);
 						desugared_tokens.push(new Token('name', 'func', t.line));
 						i++;
 						t = original_tokens[i];
 						desugared_tokens.push(t); // class name
 						desugared_tokens.push(new Token('operator', '(', t.line));
-						class_arg_positions = pair(desugared_tokens.length, class_arg_positions);
+						class_arg_positions = _pair(desugared_tokens.length, class_arg_positions);
 						desugared_tokens.push(new Token('operator', ')', t.line));
 						class_level++;
 						break;
 					case '@':
-						class_constructor_stack = pair(true, tail(class_constructor_stack));
+						class_constructor_stack = _pair(true, _tail(class_constructor_stack));
 						// constructor
 						if (class_level > 0 && brace_count === class_level) {
-							if (is_empty(class_arg_positions)){
+							if (_is_empty(class_arg_positions)){
 								throwError(t, "Invalid constructor position.");
 							}
 							desugared_tokens.push(new Token('name', 'func', t.line));
@@ -880,7 +880,7 @@ class DoWhileNode extends ConditionNode {
 							i++;
 							t = original_tokens[i];
 							desugared_tokens.push(t); // "("
-							let position = head(class_arg_positions);
+							let position = _head(class_arg_positions);
 							i++;
 							t = original_tokens[i];
 							class_constructor_arg_tokens = [];
@@ -915,14 +915,14 @@ class DoWhileNode extends ConditionNode {
 					case '}':
 						if (class_level > 0 && brace_count === class_level) {
 							// end of class
-							if (head(class_constructor_stack)) {
+							if (_head(class_constructor_stack)) {
 								desugared_tokens.push(new Token('name', '@', t.line));
 								desugared_tokens.push(new Token('operator', '(', t.line));
 								desugared_tokens = desugared_tokens.concat(class_constructor_arg_tokens);
 								desugared_tokens.push(new Token('operator', ')', t.line));
 								desugared_tokens.push(new Token('operator', ';', t.line));
 							}
-							class_constructor_stack = tail(class_constructor_stack);
+							class_constructor_stack = _tail(class_constructor_stack);
 							
 							desugared_tokens.push(new Token('name', 'return', t.line));
 							desugared_tokens.push(new Token('name', 'func', t.line));
@@ -933,7 +933,7 @@ class DoWhileNode extends ConditionNode {
 							desugared_tokens.push(new Token('operator', ';', t.line));
 							desugared_tokens.push(t);
 							class_level--;
-							class_arg_positions = tail(class_arg_positions);
+							class_arg_positions = _tail(class_arg_positions);
 						} else if(class_level > 0 && class_constructor && brace_count === class_level+1) {
 							// end of constructor
 							desugared_tokens.push(t); // "}"
@@ -975,7 +975,7 @@ class DoWhileNode extends ConditionNode {
 			// parse imports
 			token_nr = 0;
 			token = tokens[token_nr];
-			var libs = list();
+			var libs = _list();
 			while (checkToken("import")) {
 				advance("import");
 				if (token && isVarNameToken(token)) {
@@ -990,7 +990,7 @@ class DoWhileNode extends ConditionNode {
 							throwError(null, "Invalid library path for '" + libPath + "'.");
 						}
 					}
-					libs = pair(libPath, libs);
+					libs = _pair(libPath, libs);
 					advanceOptional(";");
 				} else {
 					throwError(null, "Invalid library '"+token.value()+"'.");
@@ -1018,7 +1018,7 @@ class DoWhileNode extends ConditionNode {
 		};
 		
 		var loadSources = function(evaluate_callback) {
-			var nextSourceName = head(loadingQueue);
+			var nextSourceName = _head(loadingQueue);
 			
 			let libPath = (nextSourceName.indexOf("/")===-1 ? "library/" : "") + nextSourceName + ".yjlo";
 			$.ajax({
@@ -1026,21 +1026,21 @@ class DoWhileNode extends ConditionNode {
 				dataType: 'text',
 				type: 'GET'
 			}).done(function(data){
-				if (is_empty(loadingQueue)) {
+				if (_is_empty(loadingQueue)) {
 					return;
 				}
-				loadingQueue = tail(loadingQueue);
+				loadingQueue = _tail(loadingQueue);
 				var thisSourceObj = processSource(data, nextSourceName);
 				sources.push(thisSourceObj);
 				
 				// add new dependencies to queue
 				var newDependency = thisSourceObj.dependency;
-				while (!is_empty(newDependency)) {
-					loadingQueue = pair(head(newDependency), loadingQueue);
-					newDependency = tail(newDependency);
+				while (!_is_empty(newDependency)) {
+					loadingQueue = _pair(_head(newDependency), loadingQueue);
+					newDependency = _tail(newDependency);
 				}
 				
-				if(!is_empty(loadingQueue)){
+				if(!_is_empty(loadingQueue)){
 					// load next
 					loadSources(evaluate_callback);
 				}else{
@@ -1082,15 +1082,15 @@ class DoWhileNode extends ConditionNode {
 			var resolve = function (node, unresolved){
 				unresolved.push(node);
 				var dependencies = dependencyGraph[node].dependency;
-				while (!is_empty(dependencies)) {
-					var edge = head(dependencies);
+				while (!_is_empty(dependencies)) {
+					var edge = _head(dependencies);
 					if (resolved.indexOf(edge) === -1) {
 						if (unresolved.indexOf(edge) !== -1) {
 							throwError(null, 'Circular dependency detected: '+node+' -> '+edge);
 						}
 						resolve(edge, unresolved);
 					}
-					dependencies = tail(dependencies);
+					dependencies = _tail(dependencies);
 				}
 				resolved.push(node);
 				// remove from unresolved
@@ -1117,11 +1117,11 @@ class DoWhileNode extends ConditionNode {
 			//console.log(tokens);
 			
 			sources = [];
-			loadingQueue = list();
+			loadingQueue = _list();
 			loadingQueue = selfSourceObj.dependency;
 			sources.push(selfSourceObj);
 			
-			if (length(loadingQueue) === 0 || !import_lib) {
+			if (_length(loadingQueue) === 0 || !import_lib) {
 				// no library imported
 				try {
 					parsed_callback(startParsing());

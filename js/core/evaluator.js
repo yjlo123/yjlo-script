@@ -19,46 +19,46 @@ function is_self_evaluating(stmt) {
 
 // =============== ENV ===================
 function enclosing_environment(env) {
-	return tail(env);
+	return _tail(env);
 }
 
 function first_frame(env) {
-	return head(env);
+	return _head(env);
 }
 
 function is_empty_environment(env) {
-	return is_empty(env);
+	return _is_empty(env);
 }
 
 function enclose_by(frame, env) {
-	return pair(frame, env);
+	return _pair(frame, env);
 }
 
 function make_frame(variables, values) {
-	if (is_empty(variables) && is_empty(values)) 
+	if (_is_empty(variables) && _is_empty(values)) 
 		return {};
 	else {
-		var next_tail = is_empty(values) ? values : tail(values);
-		var frame = make_frame(tail(variables),next_tail);
-		frame[head(variables)] = is_empty(values) ? null : head(values);
+		var next_tail = _is_empty(values) ? values : _tail(values);
+		var frame = make_frame(_tail(variables),next_tail);
+		frame[_head(variables)] = _is_empty(values) ? null : _head(values);
 		return frame;
 	}
 }
 
 function duplicateFirstFrame(env) {
 	let frame = first_frame(env);
-	let keys = list();
-	let vals = list();
+	let keys = _list();
+	let vals = _list();
 	for (let key in frame) {
 		// skip loop if the property is from prototype
 		if (!frame.hasOwnProperty(key)) continue;
-		keys = pair(key, keys);
+		keys = _pair(key, keys);
 		let value = frame[key];
 		if (typeof value === 'object') {
 			// shallow copied value
-			vals = pair(jQuery.extend({}, value), vals);
+			vals = _pair(jQuery.extend({}, value), vals);
 		} else {
-			vals = pair(value, vals);
+			vals = _pair(value, vals);
 		}
 	}
 	
@@ -159,10 +159,10 @@ function evaluate_assignment(stmt, env) {
 	var left_value = stmt.returnLeft ? evaluate(left, env) : null;
 	if (is_application(left)){
 		// member reference
-		var member = head(tail(operands(left))).name;
+		var member = _head(_tail(operands(left))).name;
 		set_variable_value(stmt, member, value,
 							function_value_environment(
-								evaluate(head(operands(left)), env)));
+								evaluate(_head(operands(left)), env)));
 	} else {
 		// variable
 		set_variable_value(stmt, left.name, value, env);
@@ -235,11 +235,11 @@ function switch_default(stmt) {
 function evaluate_switch_statement(stmt, env) {
 	var cases = switch_cases(stmt);
 	var found_case = false;
-	while ( !found_case && !is_empty(cases) ) {
+	while ( !found_case && !_is_empty(cases) ) {
 		var result = null;
-		if (is_in_list(evaluate(switch_variable(stmt), env), head(cases).value)){
+		if (_is_in_list(evaluate(switch_variable(stmt), env), _head(cases).value)){
 			found_case = true;
-			result = evaluate(head(cases).stmt, extend_environment([], [], env));
+			result = evaluate(_head(cases).stmt, extend_environment([], [], env));
 		}
 		if (is_return_value(result)) {
 			return result;
@@ -250,7 +250,7 @@ function evaluate_switch_statement(stmt, env) {
 		if (is_fallthrough_value(result)) {
 			found_case = false;
 		}
-		cases = tail(cases);
+		cases = _tail(cases);
 	}
 	if (!found_case && switch_default(stmt)) {
 		evaluate(switch_default(stmt), env);
@@ -334,7 +334,7 @@ function evaluate_for_statement(stmt, env) {
 	} else if (range.tag === "variable" || range.tag === "application") {
 		// list
 		let list_value = evaluate(range, env);
-		if (!is_list(list_value)) throwError(stmt.line, "Invalid range.");
+		if (!_is_list(list_value)) throwError(stmt.line, "Invalid range.");
 		define_variable(for_variable(stmt).name, null, extented_env);
 		return evaluate_for_statement_list_clause(stmt, list_value, extented_env);
 	} else {
@@ -367,9 +367,9 @@ function evaluate_for_statement_range_clause(stmt, range_to_value, range_closed,
 }
 
 function evaluate_for_statement_list_clause(stmt, range_list, env) {
-	if (is_empty(range_list)) return;
+	if (_is_empty(range_list)) return;
 	// set list head as the current variable value
-	set_variable_value(stmt, for_variable(stmt).name, head(range_list), env);
+	set_variable_value(stmt, for_variable(stmt).name, _head(range_list), env);
 	// evaluate consequent
 	let result = evaluate(for_consequent(stmt), env);
 	if (is_return_value(result)) {
@@ -378,7 +378,7 @@ function evaluate_for_statement_list_clause(stmt, range_list, env) {
 	if (is_break_value(result)) {
 		return null;
 	}
-	return evaluate_for_statement_list_clause(stmt, tail(range_list), env);
+	return evaluate_for_statement_list_clause(stmt, _tail(range_list), env);
 }
 
 function is_continue_statement(stmt) {
@@ -462,16 +462,16 @@ function function_value_environment(value) {
 }
 	 
 function is_sequence(stmt) {
-	return is_list(stmt);
+	return _is_list(stmt);
 }
 function is_last_statement(stmts) {
-	return is_empty(tail(stmts));
+	return _is_empty(_tail(stmts));
 }
 function first_statement(stmts) {
-	return head(stmts);
+	return _head(stmts);
 }
 function rest_statements(stmts) {
-	return tail(stmts);
+	return _tail(stmts);
 }
 		
 function evaluate_sequence(stmts, env) {
@@ -497,13 +497,13 @@ function operands(stmt) {
 	return stmt.operands;
 }
 function no_operands(ops) {
-	return is_empty(ops);
+	return _is_empty(ops);
 }
 function first_operand(ops) {
-	return head(ops);
+	return _head(ops);
 }
 function rest_operands(ops) {
-	return tail(ops);
+	return _tail(ops);
 }
 		
 function is_primitive_function(fun) {
@@ -516,9 +516,9 @@ function primitive_implementation(fun) {
 function apply_in_underlying_javascript(prim, argument_list) {
 	var argument_array = new Array();
 	var i = 0;
-	while (!is_empty(argument_list)) {
-		argument_array[i++] = head(argument_list);
-		argument_list = tail(argument_list);
+	while (!_is_empty(argument_list)) {
+		argument_array[i++] = _head(argument_list);
+		argument_list = _tail(argument_list);
 	}
 	return prim.apply(prim, argument_array);
 }
@@ -533,20 +533,20 @@ function apply_primitive_function(fun,argument_list) {
 }
 
 function extend_environment(vars, vals, base_env, line) {
-	if (length(vars) >= length(vals))
+	if (_length(vars) >= _length(vals))
 		return enclose_by(make_frame(vars, vals), base_env);
-	else if (length(vars) < length(vals))
-		throwError(line || "?", "Too many arguments supplied: expect "+length(vars)+", but "+length(vals)+" given");
+	else if (_length(vars) < _length(vals))
+		throwError(line || "?", "Too many arguments supplied: expect "+_length(vars)+", but "+_length(vals)+" given");
 }
 
 function update_environment(vars, vals, base_env) {
-	if (!is_empty(vars) && length(vars) >= length(vals)){
+	if (!_is_empty(vars) && _length(vars) >= _length(vals)){
 		// add var-val pair to env
-		first_frame(base_env)[head(vars)] = is_empty(vals) ? null : head(vals);
-		return update_environment(tail(vars), tail(vals), base_env);
+		first_frame(base_env)[_head(vars)] = _is_empty(vals) ? null : _head(vals);
+		return update_environment(_tail(vars), _tail(vals), base_env);
 	}
-	else if (is_list(vars) && is_list(vals) && length(vars) < length(vals))
-		throwError("?", "Too many arguments supplied: expect "+length(vars)+", but "+length(vals)+" given");
+	else if (_is_list(vars) && _is_list(vals) && _length(vars) < _length(vals))
+		throwError("?", "Too many arguments supplied: expect "+_length(vars)+", but "+_length(vals)+" given");
 }
 	 
 function is_return_statement(stmt) {
@@ -587,7 +587,7 @@ function apply(fun, args, line) {
 											function_value_environment(fun), line);
 		}
 		// define_variable("this", func_env, func_env);
-		var result = evaluate(function_value_body(fun), func_env);
+		let result = evaluate(function_value_body(fun), func_env);
 		if (is_return_value(result)) {
 			return return_value_content(result);
 		}
@@ -598,24 +598,24 @@ function apply(fun, args, line) {
 }
 
 function apply_logic(fun_raw, args, env) {
-	var oprnd1 = evaluate(head(args), env);
+	var oprnd1 = evaluate(_head(args), env);
 	var oprnd2 = false;
 	if ((fun_raw.name === "&&" && oprnd1 === true) ||
 		(fun_raw.name === "||" && oprnd1 === false)) {
-		oprnd2 = evaluate(head(tail(args)), env);
+		oprnd2 = evaluate(_head(_tail(args)), env);
 	}
 	var fun = evaluate(fun_raw, env);
-	var arg_list = pair(oprnd1, pair(oprnd2, list()));
+	var arg_list = _pair(oprnd1, _pair(oprnd2, _list()));
 	return apply_in_underlying_javascript(primitive_implementation(fun), arg_list);
 }
 
 function apply_ternary(fun_raw, args, env) {
-	if (length(args) !== 3) {
+	if (_length(args) !== 3) {
 		throwError("?", "Invalid conditional expression");
 	}
-	var condition = head(args);
-	var expTrue = head(tail(args));
-	var expFalse = head(tail(tail(args)));
+	var condition = _head(args);
+	var expTrue = _head(_tail(args));
+	var expFalse = _head(_tail(_tail(args)));
 	
 	if (evaluate(condition, env)) {
 		return evaluate(expTrue, env);
@@ -625,19 +625,19 @@ function apply_ternary(fun_raw, args, env) {
 }
 
 function is_reference(stmt) {
-	return is_tagged_object(stmt,"reference");
+	return is_tagged_object(stmt, "reference");
 }
 
 function list_method(list, method) {
 	switch (method) {
 		case "head":
-			return head(list);
+			return _head(list);
 		case "tail":
-			return tail(list);
+			return _tail(list);
 		case "isEmpty":
-			return is_empty(list);
-		case "len":
-			return length(list);
+			return _is_empty(list);
+		case "length":
+			return _length(list);
 		default:
 		throwError("?", "Unknown list method: " + member);
 	}
@@ -648,13 +648,13 @@ function refer(fun, member) {
 		throwError("?", "Referencing private members is not allowed.");
 	}
 	if (is_compound_function_value(fun)) {
-		var func_env = extend_environment([],[],function_value_environment(fun));
+		let func_env = extend_environment([],[],function_value_environment(fun));
 		if (function_value_body(fun)) {
 			// evaluate function body to update environment
 			evaluate(function_value_body(fun), func_env);
 		}
 		return lookup_variable_value(null, member, func_env);
-	} else if (is_list(fun)) {
+	} else if (_is_list(fun)) {
 		return list_method(fun, member);
 	} else {
 		throwError("?", "Unknown function type - REFER: " + fun);
@@ -663,17 +663,17 @@ function refer(fun, member) {
 
 function list_of_values(exps, env) {
 	if (no_operands(exps)) return [];
-	else return pair(evaluate(first_operand(exps), env),
+	else return _pair(evaluate(first_operand(exps), env),
 						  list_of_values(rest_operands(exps), env));
 }
 	 
 var primitive_functions = {
-		"$pair": pair,
-		"$head": head,
-		"$tail": tail,
-		"$list": list,
-		"$is_list": is_list,
-		"$is_empty": is_empty,
+		"$pair": _pair,
+		"$head": _head,
+		"$tail": _tail,
+		"$list": _list,
+		"$is_list": _is_list,
+		"$is_empty": _is_empty,
 		
 		"put": _put,
 		"print": _print,
@@ -682,9 +682,6 @@ var primitive_functions = {
 		"$now": _now,
 		"$string_to_char_list": _string_to_char_list,
 		"$char_code": _char_code,
-
-		//true: true,
-		//false: false,
 		
 		"_-": (x) => -x, // negative
 		"**": (x,y) => Math.pow(x,y), // power 
@@ -776,8 +773,8 @@ function evaluate(stmt, env) {
 		} else if (optr.name === ".") {
 			// reference
 			var oprnd = operands(stmt);
-			var fun = head(oprnd);
-			var member = head(tail(oprnd));
+			var fun = _head(oprnd);
+			var member = _head(_tail(oprnd));
 			if (is_application(member)) {
 				// reference function member
 				return apply(refer(evaluate(fun, env), operator(member).name),

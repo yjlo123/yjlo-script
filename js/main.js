@@ -150,11 +150,11 @@ function printSyntaxTree(program_string, program_parser) {
 }
 
 function printSyntaxTreeNode(node, indent) {
-	if (is_list(node) && is_empty(node)) return;
-	if (is_list(node)) {
+	if (_is_list(node) && _is_empty(node)) return;
+	if (_is_list(node)) {
 		// print head and tail in the same level
-		printSyntaxTreeNode(head(node), indent);
-		printSyntaxTreeNode(tail(node), indent);
+		printSyntaxTreeNode(_head(node), indent);
+		printSyntaxTreeNode(_tail(node), indent);
 	} else if (typeof node === "object") {
 		if (!node) {
 			// null
@@ -178,19 +178,19 @@ function printSyntaxTreeNode(node, indent) {
 			syntaxTreeStr += (indent + `|-${attr}: `);
 			// member value
 			let next_node = node[attr];
-			if (next_node && is_list(next_node) && typeof head(next_node) === "string") {
+			if (next_node && _is_list(next_node) && typeof _head(next_node) === "string") {
 				// replace \n with \\n
-				next_node = pair(head(next_node).replace(/\n/g, "\\n"), tail(next_node));
+				next_node = _pair(_head(next_node).replace(/\n/g, "\\n"), _tail(next_node));
 			}
 			
 			if (!next_node ||
-				(!is_list(next_node) && typeof next_node !== "object")) {
+				(!_is_list(next_node) && typeof next_node !== "object")) {
 				// print simple value in the same line
 				syntaxTreeStr += (`${next_node}\n`);
 			} else {
 				// print complex value in a new line
 				syntaxTreeStr += (`\n`);
-				if ((is_list(next_node) && length(next_node) > 1 && is_empty(tail(next_node))) ||
+				if ((_is_list(next_node) && _length(next_node) > 1 && _is_empty(_tail(next_node))) ||
 					count === attr_count) {
 					printSyntaxTreeNode(next_node, indent + "    ");
 				} else {
