@@ -111,34 +111,42 @@ function _char_code(char) {
 	return char.charCodeAt(0);
 }
 
+function _list_to_string(arg, segment) {
+	segment += '[';
+	while (!_is_empty(arg)) {
+		// nested list
+		segment += (_process_output([_head(arg)]) + ', ');
+		arg = _tail(arg);
+	}
+	// remove ', '
+	if (segment.length !== 1) {
+		segment = segment.slice(0, -2);
+	}
+	segment += ']';
+	return segment;
+}
+
+function _pair_to_string(arg) {
+	let str = '';
+	str += '(';
+	str += _process_output([_head(arg)]);
+	str += ', ';
+	str += _process_output([_tail(arg)]);
+	str += ')';
+	return str;
+}
+
 /*  UI Output */
 function _process_output(args) {
-	//window.latestConsole.display(x);
-	//x = x+'';
-	//x = x.replace(/(?:\r\n|\r|\n)/g, '<br />');
+	let output = '';
 
-	var output = '';
-
-	for (var i = 0; i < args.length; i++) {
-		var arg = args[i];
-		var segment = '';
+	for (let i = 0; i < args.length; i++) {
+		let arg = args[i];
+		let segment = '';
 		if (arg && _is_list(arg)) {
-			// print list
-			segment += '[';
-			while (!_is_empty(arg)) {
-				// nested list
-				if (_is_list(_head(arg))) {
-					segment += (_process_output([_head(arg)]) + ', ');
-				} else {
-					segment += (_process_output([_head(arg)]) + ', ');
-				}
-				arg = _tail(arg);
-			}
-			// remove ', '
-			if (segment.length !== 1) {
-				segment = segment.slice(0, -2);
-			}
-			segment += ']';
+			segment += _list_to_string(arg, '');
+		} else if (arg && _is_pair(arg)) {
+			segment += _pair_to_string(arg);
 		} else if (arg && arg.tag === 'function_value') {
 			segment = apply(refer(arg, 'toString'),_list(),'?');
 		} else {
