@@ -32,7 +32,10 @@ var myCodeMirror = CodeMirror(document.getElementById('editor-area'), {
 	indentUnit: 4,
 	indentWithTabs: true,
 	mode: 'javascript',
-	theme: 'lesser-dark'
+	theme: 'lesser-dark',
+	autoCloseBrackets: true,
+	matchBrackets: true,
+	highlightSelectionMatches: {}
 });
 
 var syntaxTreeStr = '';
