@@ -96,6 +96,38 @@ function _now() {
 	return new Date().getTime();
 }
 
+function _array_to_list(arr) {
+	let lst = _list();
+	for (let i = arr.length - 1; i >= 0; i--) {
+		lst = _pair(arr[i], lst);
+	}
+	return lst;
+}
+
+function _list_to_array(list) {
+	let arr = Array();
+	let i = 0;
+	while (!_is_empty(list)) {
+		arr[i++] = _head(list);
+		list = _tail(list);
+	}
+	return arr;
+}
+
+function _nested_list_to_array(list) {
+	let arr = Array();
+	let i = 0;
+	while (!_is_empty(list)) {
+		if (_is_list(_head(list))) {
+			arr[i++] = _nested_list_to_array(_head(list));
+		} else {
+			arr[i++] = _head(list);
+		}
+		list = _tail(list);
+	}
+	return arr;
+}
+
 function _string_to_char_list(str) {
 	if (typeof str !== 'string' && !(str instanceof String)) {
 		return _list();
