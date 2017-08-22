@@ -94,3 +94,21 @@ class RangeNode extends Node {
 		this.closed = true;
 	}
 }
+
+class FuncDefNode extends Node {
+	constructor(line) {
+		super('function_definition', line);
+	}
+	
+	setParent(value) {
+		this.parent = value;
+	}
+	
+	setParameters(value) {
+		this.parameters = value;
+	}
+	
+	setBody(value) {
+		this.body = value;
+	}
+}
