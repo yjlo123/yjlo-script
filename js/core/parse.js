@@ -26,10 +26,6 @@
 
 		const reservedValues = ['true', 'false', 'null'];
 
-		var new_node = function() {
-			return {};
-		};
-
 		var isConstantToken = t => t && (t.type === 'string' || t.type === 'number');
 
 		var isVarNameToken = function (t) {
@@ -39,9 +35,11 @@
 			return t.type === 'name';
 		};
 
+		var isNameToken = t => t && t.type === 'name';
 		var isOperatorToken = t => t && t.type === 'operator';
-		var isOpeningBracketToken = t => t && isOperatorToken(t) && t.value === '(';
-		var isClosingBracketToken = t => t && isOperatorToken(t) && t.value === ')';
+		var isOperatorTokenWithValue = (t, v) => isOperatorToken(t) && t.value === v;
+		var isOpeningBracketToken = t => isOperatorTokenWithValue(t, '(');
+		var isClosingBracketToken = t => isOperatorTokenWithValue(t, ')');
 		var isBracketToken = t => t && (isOpeningBracketToken(t) || isClosingBracketToken(t));
 		var isNonBracketOperatorToken = t => isOperatorToken(t) && !isBracketToken(t);
 		var isNewLineToken = t => t && t.type === 'newline';
@@ -57,6 +55,7 @@
 
 		var precedence = function(operator) {
 			switch(operator){
+			case '[':
 			case '.': // reference
 				return 15;
 			case '**': // power
@@ -159,21 +158,14 @@
 			let left_node;
 			let expression_nodes_infix = [];
 			let bracket_count = 0;
-
-			if (checkToken('func')){
-				// function expression, should be anonymous
-				advance('func');
-				if (isVarNameToken(token)){
-					// ignore given name
-					advance();
-				}
-				return func();
-			}
-
+			
 			// read in the tokens in this expression
 			while (token) {
 				if (isNewLineToken(token)) {
 					skipToken();
+					if (bracket_count > 0) {
+						continue;
+					}
 					if (prev_token && isNonBracketOperatorToken(prev_token)) {
 						// last line ends with an operator
 						if (prev_token.value === '++' || prev_token.value === '--') {
@@ -192,7 +184,8 @@
 				
 				prev_token = token;
 				
-				if (isOperatorToken(token) && token.value === ',' && bracket_count === 0) {
+				if (isOperatorTokenWithValue(token, ',') && bracket_count === 0) {
+					// comma as arguments delimiter in function call
 					break;
 				}
 				if (isOperatorToken(token) && /^[;{}]$/.test(token.value)) {
@@ -204,7 +197,8 @@
 					// TODO parse range
 					break;
 				}
-				if (!isConstantToken(token) && /^(by|in)$/.test(token.value)) {
+				if (isNameToken(token) && token.value !== 'func' &&
+						reservedKeywords.indexOf(token.value) !== -1) {
 					// keyword: 'by', 'in'
 					break;
 				}
@@ -213,9 +207,21 @@
 					break;
 				}
 
-				if (isOpeningBracketToken(token)) bracket_count += 1;
-				if (isClosingBracketToken(token)) bracket_count -= 1;
-				if (isVarNameToken(token) && isOpeningBracketToken(next_token)) {
+				// count brackets
+				if (isOpeningBracketToken(token)) { bracket_count += 1; }
+				if (isClosingBracketToken(token)) { bracket_count -= 1; }
+				
+				// process tokens
+				if (isNameToken(token) && token.value === 'func') {
+					// function expression, should be anonymous
+					advance('func');
+					// ignore given name
+					if (isVarNameToken(token)) {
+						advance();
+					}
+					expression_nodes_infix.push(func());
+					continue;
+				} else if (isVarNameToken(token) && isOpeningBracketToken(next_token)) {
 					// function call in expression
 					let func_token = token;
 					advance();
@@ -233,8 +239,9 @@
 				} else {
 					throwTokenError('expression', token);
 				}
-				expression_nodes_infix.push(left_node);
 				
+				// push and advance for all single token
+				expression_nodes_infix.push(left_node);
 				advance();
 			}
 			
@@ -258,7 +265,9 @@
 				let thisNode = expression_nodes_infix[i];
 				if (thisNode.name === '(') {
 					temp_stack.push(thisNode);
-				} else if (thisNode.type === 'variable' || thisNode instanceof ApplicationNode) {
+				} else if (thisNode.type === 'variable' ||
+						thisNode instanceof ApplicationNode ||
+						thisNode instanceof FuncDefNode) {
 					expression_nodes_postfix.push(thisNode);
 				} else if (thisNode.tag === 'constant') {
 					expression_nodes_postfix.push(thisNode.value);
@@ -308,7 +317,7 @@
 			while (temp_stack.length > 0){
 				expression_nodes_postfix.push(temp_stack.pop());
 			}
-
+			
 			if (expression_nodes_postfix.length == 1) {
 				return expression_nodes_postfix[0];
 			}
@@ -338,7 +347,7 @@
 						
 						let apply_node = new ApplicationNode(exp_node.line);
 						apply_node.setOperator(new VariableNode(operator, 'operator', exp_node.line));
-						apply_node.setOperands(array_to_list([left, right]));
+						apply_node.setOperands(_array_to_list([left, right]));
 						
 						assign_node.setLeft(left);
 						assign_node.setRight(apply_node);
@@ -376,7 +385,7 @@
 						}
 						let apply_node = new ApplicationNode(exp_node.line);
 						apply_node.setOperator(exp_node);
-						apply_node.setOperands(array_to_list(operands));
+						apply_node.setOperands(_array_to_list(operands));
 						tree_stack.push(apply_node);
 					}
 				} else {
@@ -465,7 +474,7 @@
 					stmts.push(stmt);
 				}
 			}
-			return stmts.length === 0 ? null : array_to_list(stmts);
+			return stmts.length === 0 ? null : _array_to_list(stmts);
 		};
 
 	/*===================== FUNC CALL ======================= */
@@ -475,18 +484,17 @@
 			apply_node.setOperator(new VariableNode(t.value, 'variable', t.line));
 			var operands = [];
 			advance('(');
-			if (!isClosingBracketToken(token)) {
-				while (true) {
-					var o = expression();
-					operands.push(o);
-					if (isClosingBracketToken(token)) {
-						break;
-					}
-					advance(',');
+			ignoreNewline();
+			while (!isClosingBracketToken(token)) {
+				operands.push(expression());
+				if (isClosingBracketToken(token)) {
+					break;
 				}
+				advance(',');
+				ignoreNewline();
 			}
 			advance(')');
-			apply_node.setOperands(array_to_list(operands));
+			apply_node.setOperands(_array_to_list(operands));
 			return apply_node;
 		};
 
@@ -497,12 +505,11 @@
 			advanceOptional(';');
 			return node;
 		};
-
+		
 	/*===================== FUNC ======================= */
 		var func = function() {
 			log('parsing function. '+token.value);
 			var args = [];
-			var funcbody = {};
 			let node = null;
 			if (isVarNameToken(token)) {
 				node = new VarDefNode(token.line);
@@ -529,27 +536,25 @@
 				}
 			}
 			advance(')');
-
+			
+			let parent = null;
 			if (checkToken('extends')) {
 				// inheritance
 				advance('extends');
 				if (!isVarNameToken(token)){
 					throwTokenError('a variable name', token);
 				}
-				funcbody.parent = token.value;
+				parent = token.value;
 				advance(); // parent name
-			} else {
-				funcbody.parent = null;
 			}
-
-			funcbody.tag = 'function_definition';
-			funcbody.parameters = array_to_list(args);
-			funcbody.line = token.line;
+			
+			let funcbody = new FuncDefNode(token.line);
+			funcbody.setParent(parent);
+			funcbody.setParameters(_array_to_list(args));
 			advance('{');
-			funcbody.body = statements();
+			funcbody.setBody(statements());
 			advance('}');
 			
-
 			if (node) {
 				node.setRight(funcbody);
 				return node;
@@ -588,34 +593,10 @@
 				advance(',');
 			}
 			advanceOptional(';');
-			return array_to_list(var_arr);
+			return _array_to_list(var_arr);
 		};
 
 	/*===================== IF ======================= */
-class ConditionNode extends Node {
-	constructor(type, line) {
-		super(type, line);
-	}
-	
-	setPredicate(value) {
-		this.predicate = value;
-	}
-	
-	setConsequent(value) {
-		this.consequent = value;
-	}
-	
-	setAlternative(value) {
-		this.alternative = value;
-	}
-}
-	
-class IfNode extends ConditionNode {
-	constructor(line) {
-		super('if', line);
-	}
-}
-	
 		var if_stmt = function() {
 			log('parsing if.');
 			let node = new IfNode(token.line);
@@ -640,19 +621,17 @@ class IfNode extends ConditionNode {
 	/*===================== SWITCH ======================= */
 		var switch_stmt = function () {
 			log('parsing switch.');
-			var n = new_node();
-			n.tag = 'switch';
-			n.variable = expression();
-			n.default = null;
-			var cases = [];
+			let node = new SwitchNode(token.line);
+			node.setVariable(expression());
+			node.setDefault(null);
+			let cases = [];
 			advance('{');
 			/* cases */
 			while (!checkToken('}')) {
 				if (checkToken('case')) {
 					advance('case');
-					var case_node = new_node();
-					case_node.tag = 'case';
-					var case_value = [];
+					let case_node = new CaseNode(token.line);
+					let case_value = [];
 					if (!isConstantToken(token)) {
 						throwTokenError('a constant value', token);
 					}
@@ -666,30 +645,24 @@ class IfNode extends ConditionNode {
 						case_value.push(token.value);
 						advance(); // advance value
 					}
-					case_node.value = array_to_list(case_value);
+					case_node.setValue(_array_to_list(case_value));
 					advance(':');
-					case_node.stmt = statements();
+					case_node.setStmt(statements());
 					cases.push(case_node);
 				} else if (checkToken('default')) {
 					advance('default');
 					advance(':');
-					n.default = statements();
+					node.setDefault(statements());
 				} else {
 					throwTokenError('"case" or "default"', token);
 				}
 
 			}
 			advance('}');
-			n.cases = array_to_list(cases);
-			return n;
+			node.setCases(_array_to_list(cases));
+			return node;
 		};
-
-class WhileNode extends ConditionNode {
-	constructor(line) {
-		super('while', line);
-	}
-}
-		
+	
 	/*===================== WHILE ======================= */
 		var while_stmt = function () {
 			log('parsing while.');
@@ -699,11 +672,6 @@ class WhileNode extends ConditionNode {
 			return node;
 		};
 
-class DoWhileNode extends ConditionNode {
-	constructor(line) {
-		super('do', line);
-	}
-}
 	/*===================== DO WHILE ======================= */
 		var do_while_stmt = function () {
 			log('parsing do.');
@@ -720,23 +688,21 @@ class DoWhileNode extends ConditionNode {
 			log('parsing for.');
 			var hasBracket = isOpeningBracketToken(token);
 			if (hasBracket) advance('(');
-			var n = new_node();
-			n.tag = 'for';
-			n.line = token.line;
+			let node = new ForNode(token.line);
 			// variable
 			if (!isVarNameToken(token)) {
 				throwTokenError('a variable name', token);
 			}
-			n.variable = new VariableNode(token.value, 'variable', token.line);
+			node.setVariable(new VariableNode(token.value, 'variable', token.line));
 			advance();
 			// range
 			advance('in');
-			n.range = parse_range();
+			node.setRange(parse_range());
 			// increment
-			n.increment = parse_increment();
+			node.setIncrement(parse_increment());
 			if (hasBracket) advance(')');
-			n.consequent = block();
-			return n;
+			node.setConsequent(block());
+			return node;
 		};
 
 		var parse_range = function () {
@@ -773,7 +739,7 @@ class DoWhileNode extends ConditionNode {
 			var block_stmts = null;
 			if (!checkToken('{')) {
 				// single statement block
-				block_stmts = array_to_list([statement()]);
+				block_stmts = _array_to_list([statement()]);
 			} else {
 				advance('{');
 				block_stmts = statements();
@@ -826,13 +792,6 @@ class DoWhileNode extends ConditionNode {
 			}
 		}
 
-		function array_to_list(arr) {
-			let lst = _list();
-			for (let i = arr.length - 1; i >= 0; i--) {
-				lst = _pair(arr[i], lst);
-			}
-			return lst;
-		}
 	/* ============= end of helper functions =========== */
 
 		function tokenizeAndDesugaring(source){
@@ -856,7 +815,18 @@ class DoWhileNode extends ConditionNode {
 				}
 				switch (t.value) {
 					case '[':
-						desugared_tokens.push(new Token('name', '$list', t.line));
+						if (i > 0 && 
+							// array[x]
+							(isVarNameToken(original_tokens[i-1]) ||
+								// ...[x][x]
+								isOperatorTokenWithValue(original_tokens[i-1], ']') ||
+								// application[x]
+								isOperatorTokenWithValue(original_tokens[i-1], ')'))) {
+							desugared_tokens.push(original_tokens[i]); // '['
+						} else {
+							// list
+							desugared_tokens.push(new Token('name', '$list', t.line));
+						}
 						desugared_tokens.push(new Token('operator', '(', t.line));
 						break;
 					case ']':
@@ -916,6 +886,16 @@ class DoWhileNode extends ConditionNode {
 					case '{':
 						desugared_tokens.push(t);
 						brace_count++;
+						if (class_level > 0 && brace_count === class_level) {
+							// start of class
+							desugared_tokens.push(new Token('name', 'this', t.line));
+							desugared_tokens.push(new Token('operator', ':=', t.line));
+							desugared_tokens.push(new Token('name', 'func', t.line));
+							desugared_tokens.push(new Token('operator', '(', t.line));
+							desugared_tokens.push(new Token('operator', ')', t.line));
+							desugared_tokens.push(new Token('operator', '{', t.line));
+							desugared_tokens.push(new Token('operator', '}', t.line));
+						}
 						break;
 					case '}':
 						if (class_level > 0 && brace_count === class_level) {
@@ -925,27 +905,17 @@ class DoWhileNode extends ConditionNode {
 								desugared_tokens.push(new Token('operator', '(', t.line));
 								desugared_tokens = desugared_tokens.concat(class_constructor_arg_tokens);
 								desugared_tokens.push(new Token('operator', ')', t.line));
-								desugared_tokens.push(new Token('operator', ';', t.line));
 							}
 							class_constructor_stack = _tail(class_constructor_stack);
-							
 							desugared_tokens.push(new Token('name', 'return', t.line));
-							desugared_tokens.push(new Token('name', 'func', t.line));
-							desugared_tokens.push(new Token('operator', '(', t.line));
-							desugared_tokens.push(new Token('operator', ')', t.line));
-							desugared_tokens.push(new Token('operator', '{', t.line));
-							desugared_tokens.push(new Token('operator', '}', t.line));
-							desugared_tokens.push(new Token('operator', ';', t.line));
-							desugared_tokens.push(t);
+							desugared_tokens.push(new Token('name', 'this', t.line));
 							class_level--;
 							class_arg_positions = _tail(class_arg_positions);
 						} else if(class_level > 0 && class_constructor && brace_count === class_level+1) {
 							// end of constructor
-							desugared_tokens.push(t); // '}'
 							class_constructor = false;
-						} else {
-							desugared_tokens.push(t);
 						}
+						desugared_tokens.push(t); // '}'
 						brace_count--;
 						break;
 					default:
@@ -959,6 +929,11 @@ class DoWhileNode extends ConditionNode {
 						desugared_tokens.push(t);
 				}
 			}
+			/*
+			for (let i = 0 ; i < desugared_tokens.length; i++) {
+				console.log(desugared_tokens[i].value);
+			}*/
+			
 			return desugared_tokens;
 		}
 

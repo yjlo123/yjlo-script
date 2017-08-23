@@ -75,9 +75,22 @@ function duplicateFirstFrame(env) {
 	return new_env;
 }
 
-function add_binding_to_frame(variable, value, frame) {
-	frame[variable] = value; // object field assignment
+function set_value_to_array(variable, indices, value) {
+	if (_length(indices) === 1) {
+		variable[_head(indices)] = value;
+	} else {
+		set_value_to_array(variable[_head(indices)], _tail(indices), value);
+	}
 }
+
+function add_binding_to_frame(variable, value, frame, optional_indices) {
+	if (typeof optional_indices !== 'undefined') {
+		set_value_to_array(frame[variable], optional_indices, value);
+	} else {
+		frame[variable] = value; // object field assignment
+	}
+}
+
 function has_binding_in_frame(variable, frame) {
 	return frame.hasOwnProperty(variable);
 }
@@ -138,15 +151,15 @@ function assignment_right(stmt) {
 	return stmt.right;
 }
 	
-function set_variable_value(stmt, variable, value, env) {
-	if(!isValidVariableName(variable)) {
+function set_variable_value(stmt, variable, value, env, optional_indices) {
+	if (!isValidVariableName(variable)) {
 		throwError(stmt.line, `Invalid variable name: ${variable}`);
 	}
 	function env_loop(env) {
 		if (is_empty_environment(env))
-			throwError(stmt&&stmt.line?stmt.line:'?', 'Cannot find variable: '+variable);
-		else if (has_binding_in_frame(variable,first_frame(env)))
-			add_binding_to_frame(variable,value,first_frame(env));
+			throwError(stmt && stmt.line ? stmt.line : '?', 'Cannot find variable: ' + variable);
+		else if (has_binding_in_frame(variable, first_frame(env)))
+			add_binding_to_frame(variable, value, first_frame(env), optional_indices);
 		else env_loop(enclosing_environment(env));
 	}
 	env_loop(env);
@@ -154,15 +167,30 @@ function set_variable_value(stmt, variable, value, env) {
 }
 	 
 function evaluate_assignment(stmt, env) {
-	var value = evaluate(assignment_right(stmt),env);
-	var left = assignment_left(stmt);
-	var left_value = stmt.returnLeft ? evaluate(left, env) : null;
-	if (is_application(left)){
-		// member reference
-		var member = _head(_tail(operands(left))).name;
-		set_variable_value(stmt, member, value,
-							function_value_environment(
-								evaluate(_head(operands(left)), env)));
+	let value = evaluate(assignment_right(stmt),env);
+	let left = assignment_left(stmt);
+	let left_value = stmt.returnLeft ? evaluate(left, env) : null;
+	if (is_application(left)) {
+		if (operator(left).name === '[') {
+			// array indexing
+			let indices = [];
+			let array = left;
+			
+			while (is_application(array) && operator(array).name === '[') {
+				let array_left = _head(operands(array));
+				let array_right = _head(_tail(operands(array)));
+				let index = evaluate(array_right, env);
+				indices = _pair(index, indices);
+				array = array_left;
+			}
+			set_variable_value(stmt, array.name, value, env, indices);
+		} else {
+			// member reference
+			let member = _head(_tail(operands(left))).name;
+			set_variable_value(stmt, member, value,
+								function_value_environment(
+									evaluate(_head(operands(left)), env)));
+		}
 	} else {
 		// variable
 		set_variable_value(stmt, left.name, value, env);
@@ -636,10 +664,21 @@ function list_method(list, method) {
 			return _tail(list);
 		case 'isEmpty':
 			return _is_empty(list);
-		case 'length':
+		case 'len':
 			return _length(list);
 		default:
 		throwError('?', 'Unknown list method: ' + member);
+	}
+}
+
+function pair_method(pair, method) {
+	switch (method) {
+		case 'head':
+			return _head(pair);
+		case 'tail':
+			return _tail(pair);
+		default:
+		throwError('?', 'Unknown pair method: ' + member);
 	}
 }
 
@@ -658,6 +697,15 @@ function refer(fun, member) {
 		return _is_list(fun);
 	} else if (_is_list(fun)) {
 		return list_method(fun, member);
+	} else if (_is_pair(fun)) {
+		return pair_method(fun, member);
+	} else if (fun instanceof Array) {
+		switch (member) {
+			case 'len':
+				return fun.length;
+			default:
+			throwError('?', 'Unknown array method: ' + fun);
+		}
 	} else {
 		throwError('?', 'Unknown function type - REFER: ' + fun);
 	}
@@ -668,7 +716,17 @@ function list_of_values(exps, env) {
 	else return _pair(evaluate(first_operand(exps), env),
 						  list_of_values(rest_operands(exps), env));
 }
-	 
+
+function _create_array(length) {
+	var arr = new Array(length || 0),
+		i = length;
+	if (arguments.length > 1) {
+		var args = Array.prototype.slice.call(arguments, 1);
+		while(i--) arr[length-1 - i] = _create_array.apply(this, args);
+	}
+	return arr;
+}
+
 var primitive_functions = {
 		'$pair': _pair,
 		'$head': _head,
@@ -684,6 +742,15 @@ var primitive_functions = {
 		'$now': _now,
 		'$string_to_char_list': _string_to_char_list,
 		'$char_code': _char_code,
+		
+		'Array': function (x) {
+			if (_is_list(x)) {
+				return _nested_list_to_array(x);
+			} else {
+				return _create_array.apply(this, arguments);
+			}
+		},
+		'[': (arr, index) => arr[index],
 		
 		'_-': (x) => -x, // negative
 		'**': (x,y) => Math.pow(x,y), // power 
