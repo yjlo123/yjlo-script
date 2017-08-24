@@ -1,0 +1,33 @@
+/*
+	Bubble Sort
+	
+	- Best O(n)
+	- Average O(n^2)
+	- Worst O(n^2)
+*/
+func sort(arr) {
+	func swap(i, j) {
+		temp := arr[i]
+		arr[i] = arr[j]
+		arr[j] = temp
+	}
+	
+	if arr == null || arr.len <= 1 {
+		return arr
+	}
+	
+	for i in 1..<arr.len {
+		sorted := true
+		for j in arr.len...i by -1 {
+			if arr[j] < arr[j-1] {
+				sorted = false
+				swap(j, j-1)
+			}
+		}
+		if sorted { return arr }
+	}
+	
+	return arr
+}
+
+print(sort(Array([70,47,58,44,10,34,33,10,14,82,49,52,20])))
