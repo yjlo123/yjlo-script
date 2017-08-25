@@ -501,7 +501,7 @@
 	/*===================== RETURN ======================= */
 		var return_stmt = function() {
 			log('parsing return. '+token.value);
-			let node = new ReturnStatementNode(token.line, expression());
+			let node = new ReturnNode(token.line, expression());
 			advanceOptional(';');
 			return node;
 		};
@@ -756,7 +756,7 @@
 	/*===================== CONTINUE ======================= */
 		var continue_stmt = function () {
 			log('parsing continue. ' + token.value);
-			let node = new Node('continue', token.line);
+			let node = new ContinueNode(token.line);
 			advanceOptional(';');
 			return node;
 		};
@@ -764,7 +764,7 @@
 	/*===================== BREAK ======================= */
 		var break_stmt = function () {
 			log('parsing break. ' + token.value);
-			let node = new Node('break', token.line);
+			let node = new BreakNode(token.line);
 			advanceOptional(';');
 			return node;
 		};
@@ -772,7 +772,7 @@
 	/*===================== FALLTHROUGH ======================= */
 		var fallthrough_stmt = function () {
 			log('parsing fallthrough. ' + token.value);
-			let node = new Node('fallthrough', token.line);
+			let node = new FallthroughNode(token.line);
 			advanceOptional(';');
 			return node;
 		};

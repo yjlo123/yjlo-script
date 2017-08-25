@@ -104,10 +104,6 @@ function define_variable(variable, value, env) {
 
 // ===================================================
 
-function is_variable(stmt) {
-	return is_tagged_object(stmt, 'variable');
-}
-
 function isBuiltInVariable(variable) {
 	if (variable && variable.length > 0) {
 		let firstChar = variable.charAt(0);
@@ -140,10 +136,7 @@ function lookup_variable_value(stmt, variable, env) {
 	}
 	return env_loop(env);
 }
-	 
-function is_assignment(stmt) {
-	return is_tagged_object(stmt, 'assignment');
-}
+
 function assignment_left(stmt) {
 	return stmt.left;
 }
@@ -170,13 +163,13 @@ function evaluate_assignment(stmt, env) {
 	let value = evaluate(assignment_right(stmt),env);
 	let left = assignment_left(stmt);
 	let left_value = stmt.returnLeft ? evaluate(left, env) : null;
-	if (is_application(left)) {
+	if (left instanceof ApplicationNode) {
 		if (operator(left).name === '[') {
 			// array indexing
 			let indices = [];
 			let array = left;
 			
-			while (is_application(array) && operator(array).name === '[') {
+			while (array instanceof ApplicationNode && operator(array).name === '[') {
 				let array_left = _head(operands(array));
 				let array_right = _head(_tail(operands(array)));
 				let index = evaluate(array_right, env);
@@ -200,10 +193,7 @@ function evaluate_assignment(stmt, env) {
 	}
 	return value;
 }
-	 
-function is_var_definition(stmt) {
-	return is_tagged_object(stmt, 'var_definition');
-}
+
 function var_definition_variable(stmt) {
 	return stmt.left;
 }
@@ -220,10 +210,7 @@ function evaluate_var_definition(stmt, env) {
 		evaluate(var_definition_value(stmt), env),
 		env);
 }
-	 
-function is_if_statement(stmt) {
-	return is_tagged_object(stmt, 'if');
-}
+
 function if_predicate(stmt) {
 	return stmt.predicate;
 }
@@ -242,10 +229,6 @@ function evaluate_if_statement(stmt, env) {
 			return evaluate(if_alternative(stmt), extend_environment([], [], env));
 		}
 	}
-}
-
-function is_switch_statement(stmt) {
-	return is_tagged_object(stmt, 'switch');
 }
 
 function switch_variable(stmt) {
@@ -272,10 +255,10 @@ function evaluate_switch_statement(stmt, env) {
 		if (is_return_value(result)) {
 			return result;
 		}
-		if (is_break_value(result)) {
+		if (result instanceof BreakValue) {
 			return;
 		}
-		if (is_fallthrough_value(result)) {
+		if (result instanceof FallthroughValue) {
 			found_case = false;
 		}
 		cases = _tail(cases);
@@ -298,16 +281,6 @@ function for_consequent(stmt) {
 	return stmt.consequent;
 }
 
-function is_while_statement(stmt) {
-	return is_tagged_object(stmt,'while');
-}
-function is_do_while_statement(stmt) {
-	return is_tagged_object(stmt,'do');
-}
-function is_for_statement(stmt) {
-	return is_tagged_object(stmt,'for');
-}
-
 function is_true(x) {
 	return ! is_false(x);
 }
@@ -323,7 +296,7 @@ function evaluate_while_statement(stmt, env) {
 			// encounter return statement in while loop
 			return result;
 		}
-		if (is_break_value(result)){
+		if (result instanceof BreakValue){
 			return;
 		}
 
@@ -336,7 +309,7 @@ function evaluate_do_while_statement(stmt, env) {
 		if (is_return_value(result)){
 			return result;
 		}
-		if (is_break_value(result)){
+		if (result instanceof BreakValue){
 			return;
 		}
 	if (is_true(evaluate(if_predicate(stmt), env))){
@@ -383,7 +356,7 @@ function evaluate_for_statement_range_clause(stmt, range_to_value, range_closed,
 			// encounter return statement in for loop
 			return result;
 		}
-		if (is_break_value(result)) {
+		if (result instanceof BreakValue) {
 			return null;
 		}
 		// increment
@@ -403,45 +376,12 @@ function evaluate_for_statement_list_clause(stmt, range_list, env) {
 	if (is_return_value(result)) {
 		return result;
 	}
-	if (is_break_value(result)) {
+	if (result instanceof BreakValue) {
 		return null;
 	}
 	return evaluate_for_statement_list_clause(stmt, _tail(range_list), env);
 }
 
-function is_continue_statement(stmt) {
-	return is_tagged_object(stmt,'continue');
-}
-function make_continue_value(stmt, env) {
-	return { tag: 'continue_value', line: stmt.line };
-}
-function is_continue_value(value) {
-	return is_tagged_object(value,'continue_value');
-}
-
-function is_break_statement(stmt) {
-	return is_tagged_object(stmt,'break');
-}
-function make_break_value(stmt, env) {
-	return { tag: 'break_value', line: stmt.line };
-}
-function is_break_value(value) {
-	return is_tagged_object(value,'break_value');
-}
-
-function is_fallthrough_statement(stmt) {
-	return is_tagged_object(stmt,'fallthrough');
-}
-function make_fallthrough_value(stmt, env) {
-	return { tag: 'fallthrough_value', line: stmt.line };
-}
-function is_fallthrough_value(value) {
-	return is_tagged_object(value,'fallthrough_value');
-}
-
-function is_function_definition(stmt) {
-	return is_tagged_object(stmt,'function_definition');
-}
 function function_definition_parameters(stmt) {
 	return stmt.parameters;
 }
@@ -459,23 +399,15 @@ function evaluate_function_definition(stmt, env) {
 		var parent = lookup_variable_value(null, parent_name, env);
 		var parent_env = extend_environment([],[],function_value_environment(parent));
 		evaluate(function_value_body(parent), parent_env);
-		return make_function_value(
-				 function_definition_parameters(stmt),
-				 function_definition_body(stmt),
-				 parent_env, true);
+		return new FunctionValue(function_definition_parameters(stmt),
+							function_definition_body(stmt), parent_env,
+							true, stmt.line);
 	}
-	return make_function_value(
-				 function_definition_parameters(stmt),
-				 function_definition_body(stmt),
-				 env, false);
+	return new FunctionValue(function_definition_parameters(stmt),
+							function_definition_body(stmt), env,
+							false, stmt.line);
 }
-function make_function_value(parameters, body, env, hasParent) {
-	return { tag: 'function_value',
-				parameters: parameters,
-				body: body,
-				environment: env,
-				has_parent: hasParent };
-}
+
 function is_compound_function_value(f) {
 	return is_tagged_object(f,'function_value');
 }
@@ -508,16 +440,13 @@ function evaluate_sequence(stmts, env) {
 	else {
 		var first_stmt_value = evaluate(first_statement(stmts),env);
 		if (is_return_value(first_stmt_value) ||
-			is_continue_value(first_stmt_value) ||
-			is_break_value(first_stmt_value))
+			first_stmt_value instanceof ContinueValue ||
+			first_stmt_value instanceof BreakValue)
 			return first_stmt_value;
 		else return evaluate_sequence(rest_statements(stmts),env);
 	}
 }
 
-function is_application(stmt) {
-	return is_tagged_object(stmt, 'application');
-}
 function operator(stmt) {
 	return stmt.operator;
 }
@@ -576,17 +505,11 @@ function update_environment(vars, vals, base_env) {
 	else if (_is_list(vars) && _is_list(vals) && _length(vars) < _length(vals))
 		throwError('?', 'Too many arguments supplied: expect '+_length(vars)+', but '+_length(vals)+' given');
 }
-	 
-function is_return_statement(stmt) {
-	return is_tagged_object(stmt, 'return_statement');
-}
+
 function return_statement_expression(stmt) {
 	return stmt.expression;
 }
-	
-function make_return_value(line, content) {
-	return { tag: 'return_value', content: content, line: line};
-}
+
 function is_return_value(value) {
 	return is_tagged_object(value, 'return_value');
 }
@@ -650,10 +573,6 @@ function apply_ternary(fun_raw, args, env) {
 	} else {
 		return evaluate(expFalse, env);
 	}
-}
-
-function is_reference(stmt) {
-	return is_tagged_object(stmt, 'reference');
 }
 
 function list_method(list, method) {
@@ -799,9 +718,9 @@ function evaluate_toplevel(stmt, env) {
 	var value = evaluate(stmt, env);
 	if (is_return_value(value))
 		throwError(value.line, 'return not allowed outside of function definition.');
-	if (is_continue_value(value))
+	if (value instanceof ContinueValue)
 		throwError(value.line, 'Invalid continue statement.');
-	if (is_break_value(value))
+	if (value instanceof BreakValue)
 		throwError(value.line, 'Invalid break statement.');
 	else return value;
 }
@@ -810,33 +729,33 @@ function evaluate(stmt, env) {
 	// console.log(`[EVAL] ${stmt.line}`);
 	if (is_self_evaluating(stmt)) 
 		return stmt;
-	else if (is_variable(stmt))
+	else if (stmt instanceof VariableNode)
 		return lookup_variable_value(stmt, variable_name(stmt), env);
-	else if (is_assignment(stmt)) 
+	else if (stmt instanceof AssignmentNode) 
 		return evaluate_assignment(stmt, env);
-	else if (is_var_definition(stmt)) 
+	else if (stmt instanceof VarDefNode) 
 		return evaluate_var_definition(stmt, env);
-	else if (is_if_statement(stmt))
+	else if (stmt instanceof IfNode)
 		return evaluate_if_statement(stmt, env);
-	else if (is_switch_statement(stmt))
+	else if (stmt instanceof SwitchNode)
 		return evaluate_switch_statement(stmt, env);
-	else if (is_while_statement(stmt))
+	else if (stmt instanceof WhileNode)
 		return evaluate_while_statement(stmt, env);
-	else if (is_do_while_statement(stmt))
+	else if (stmt instanceof DoWhileNode)
 		return evaluate_do_while_statement(stmt, env);
-	else if (is_for_statement(stmt))
+	else if (stmt instanceof ForNode)
 		return evaluate_for_statement(stmt, env);
-	else if (is_continue_statement(stmt))
-		return make_continue_value(stmt, env);
-	else if (is_break_statement(stmt))
-		return make_break_value(stmt, env);
-	else if (is_fallthrough_statement(stmt))
-		return make_fallthrough_value(stmt, env);
-	else if (is_function_definition(stmt))
+	else if (stmt instanceof ContinueNode)
+		return new ContinueValue(stmt.line);
+	else if (stmt instanceof BreakNode)
+		return new BreakValue(stmt.line);
+	else if (stmt instanceof FallthroughNode)
+		return new fallthrough_value(stmt.line);
+	else if (stmt instanceof FuncDefNode)
 		return evaluate_function_definition(stmt, env);
 	else if (is_sequence(stmt))
 		return evaluate_sequence(stmt, env);
-	else if (is_application(stmt)){
+	else if (stmt instanceof ApplicationNode){
 		var optr = operator(stmt);
 		if (optr.name === '&&' || optr.name === '||'){
 			// short-circuit evaluation
@@ -846,7 +765,7 @@ function evaluate(stmt, env) {
 			var oprnd = operands(stmt);
 			var fun = _head(oprnd);
 			var member = _head(_tail(oprnd));
-			if (is_application(member)) {
+			if (member instanceof ApplicationNode) {
 				// reference function member
 				return apply(refer(evaluate(fun, env), operator(member).name),
 						list_of_values(operands(member), env), stmt.line);
@@ -860,11 +779,10 @@ function evaluate(stmt, env) {
 		} else {
 			return apply(evaluate(optr,env), list_of_values(operands(stmt), env), stmt.line);
 		}
-	} else if (is_return_statement(stmt)) {
-		return make_return_value(stmt.line, 
-					 evaluate(return_statement_expression(stmt), env));
+	} else if (stmt instanceof ReturnNode) {
+		return new ReturnValue(evaluate(return_statement_expression(stmt), env), stmt.line);
 	} else {
-		throwError('?', 'Unknown expression type - evaluate: ' + stmt);
+		throwError(stmt.line, 'Unknown expression type - evaluate: ' + stmt);
 	}
 }
 

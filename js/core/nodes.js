@@ -69,9 +69,9 @@ class VarDefNode extends Node {
 	}
 }
 
-class ReturnStatementNode extends Node {
+class ReturnNode extends Node {
 	constructor(line, expression) {
-		super("return_statement", line);
+		super("return", line);
 		this.expression = expression;
 	}
 }
@@ -182,5 +182,59 @@ class ForNode extends Node {
 	}
 	setConsequent(value) {
 		this.consequent = value;
+	}
+}
+
+class ContinueNode extends Node {
+	constructor(line) {
+		super("continue", line);
+	}
+}
+
+class BreakNode extends Node {
+	constructor(line) {
+		super("break", line);
+	}
+}
+
+class FallthroughNode extends Node {
+	constructor(line) {
+		super("fallthrough", line);
+	}
+}
+
+class ContinueValue extends Node {
+	constructor(line) {
+		super("continue_value", line);
+	}
+}
+
+class BreakValue extends Node {
+	constructor(line) {
+		super("break_value", line);
+	}
+}
+
+class FallthroughValue extends Node {
+	constructor(line) {
+		super("fallthrough_value", line);
+	}
+}
+
+class ReturnValue extends Node {
+	constructor(content, line) {
+		super("return_value", line);
+		this.content = content;
+	}
+}
+
+class FunctionValue extends Node {
+	constructor(parameters, body, env, hasParent, line) {
+		super("function_value", line);
+		this.parameters = parameters;
+		this.body = body;
+		this.environment = env;
+		this.has_parent = hasParent;
+		this.line = line;
 	}
 }
