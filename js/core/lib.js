@@ -1,3 +1,23 @@
+function _type(x) {
+	if (x === null) {
+		return null;
+	} else if (_is_number(x)) {
+		return 'number';
+	} else if (_is_string(x)) {
+		return 'string';
+	} else if (x === true || x === false) {
+		return 'boolean';
+	} else if (_is_list(x)) {
+		return 'list';
+	} else if (_is_pair(x)) {
+		return 'pair';
+	} else if (_is_array(x)) {
+		return 'array';
+	} else {
+		return null;
+	}
+}
+
 function _pair(x, xs) {
 	return [x, xs];
 }
@@ -31,7 +51,7 @@ function _list() {
 	return the_list;
 }
 
-function array_test(x) {
+function _is_array(x) {
 	if (this.Array.isArray === undefined) {
 		return x instanceof Array;
 	} else {
@@ -40,7 +60,7 @@ function array_test(x) {
 }
 
 function _is_empty(xs) {
-	if (array_test(xs)) {
+	if (_is_array(xs)) {
 		if (xs.length === 0) {
 			return true;
 		} else if (xs.length === 2) {
@@ -53,11 +73,11 @@ function _is_empty(xs) {
 	}
 }
 
-function is_number(xs) {
+function _is_number(xs) {
 	return typeof xs == 'number';
 }
 
-function is_string(xs) {
+function _is_string(xs) {
 	return typeof xs == 'string';
 }
 

@@ -586,7 +586,7 @@ function list_method(list, method) {
 		case 'len':
 			return _length(list);
 		default:
-		throwError('?', 'Unknown list method: ' + member);
+		throwError('?', 'Unknown list method: ' + method);
 	}
 }
 
@@ -605,6 +605,8 @@ function refer(fun, member) {
 	if (member.charAt(0) === '_'){
 		throwError('?', 'Referencing private members is not allowed.');
 	}
+	
+	let types = ['isList', 'isPair', 'isArray', 'isString', 'isNumber', 'isBoolean', 'isNull'];
 	if (is_compound_function_value(fun)) {
 		let func_env = extend_environment([],[],function_value_environment(fun));
 		if (function_value_body(fun)) {
@@ -612,8 +614,23 @@ function refer(fun, member) {
 			evaluate(function_value_body(fun), func_env);
 		}
 		return lookup_variable_value(null, member, func_env);
-	} else if (member === 'isList') {
-		return _is_list(fun);
+	} else if (types.indexOf(member) !== -1) {
+		switch(member) {
+			case 'isList':
+				return _is_list(fun);
+			case 'isPair':
+				return _is_pair(fun);
+			case 'isArray':
+				return _is_array(fun);
+			case 'isString':
+				return _is_string(fun);
+			case 'isNumber':
+				return _is_number(fun);
+			case 'isBoolean':
+				return fun === true || fun === false;
+			case 'isNull':
+				return fun === null;
+		}
 	} else if (_is_list(fun)) {
 		return list_method(fun, member);
 	} else if (_is_pair(fun)) {
@@ -653,6 +670,7 @@ var primitive_functions = {
 		'$list': _list,
 		'$is_list': _is_list,
 		'$is_empty': _is_empty,
+		'$type': _type,
 		
 		'put': _put,
 		'print': _print,
