@@ -1,0 +1,37 @@
+/*
+	Quick Sort
+	
+	- Best/Average O(n log(n))
+	- Worst O(n^2)
+*/
+func sort(arr) {
+	func swap(i, j) {
+		temp := arr[i]
+		arr[i] = arr[j]
+		arr[j] = temp
+	}
+	
+	func quick_sort(low, high) {
+		i := low
+		j := high
+		pivot := arr[low + (high-low)/2]
+		while i <= j {
+			while arr[i] < pivot { i++ }
+			while arr[j] > pivot { j-- }
+			if i <= j {
+				swap(i, j)
+				i++; j--
+			}
+		}
+		if low < j { quick_sort(low, j) }
+		if i < high { quick_sort(i, high) }
+	}
+	
+	if arr == null || arr.len <= 1 {
+		return arr
+	}
+	quick_sort(0, arr.len - 1)
+	return arr
+}
+
+print(sort(Array([70,47,58,44,10,34,33,10,14,82,49,52,20])))
