@@ -1,0 +1,34 @@
+/*
+	Selection Sort
+	
+	- Best O(n^2)
+	- Average O(n^2)
+	- Worst O(n^2)
+*/
+func sort(arr) {
+	func swap(i, j) {
+		temp := arr[i]
+		arr[i] = arr[j]
+		arr[j] = temp
+	}
+	
+	if arr == null || arr.len <= 1 {
+		return arr
+	}
+	
+	for i in 0..<arr.len-1 {
+		minimum := i
+		for j in i+1...arr.len {
+			if arr[j] < arr[minimum] {
+				minimum = j
+			}
+		}
+		if minimum != i {
+			swap(i, minimum)
+		}
+	}
+	
+	return arr
+}
+
+print(sort(Array([70,47,58,44,10,34,33,10,14,82,49,52,20])))
