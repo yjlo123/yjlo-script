@@ -20,7 +20,7 @@
 		var tokens;
 		var token_nr;
 		
-		const reservedKeywords = ['var', 'func', 'import',
+		const reservedKeywords = ['var', 'func', 'import', 'class',
 		'if', 'else', 'switch', 'fallthrough', 'case', 'default',
 		'continue', 'break', 'while', 'do', 'for', 'in', 'by', 'return'];
 
@@ -841,6 +841,15 @@
 						desugared_tokens.push(new Token('operator', '(', t.line));
 						class_arg_positions = _pair(desugared_tokens.length, class_arg_positions);
 						desugared_tokens.push(new Token('operator', ')', t.line));
+						// inheritance (Python-like)
+						if (original_tokens[i+1].value === '(') {
+							i++;
+							t = original_tokens[i];
+							desugared_tokens.push(new Token('name', 'extends', t.line));
+							i++;
+							desugared_tokens.push(original_tokens[i]); // parent name
+							i++; // for skipping ')'
+						}
 						class_level++;
 						break;
 					case '@':
