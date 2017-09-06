@@ -591,6 +591,7 @@
 					break;
 				}
 				advance(',');
+				ignoreNewline();
 			}
 			advanceOptional(';');
 			return _array_to_list(var_arr);
