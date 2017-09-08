@@ -20,59 +20,57 @@ isMatch("aab", "c*a*b") → false
 */
 
 func isMatch(str, pattern) {
-	str = $string_to_char_list(str);
-	pattern = $string_to_char_list(pattern);
-	var star_pattern, star_str;
-	while !$is_empty(str) {
+	str = $string_to_char_list(str)
+	pattern = $string_to_char_list(pattern)
+	var star_pattern, star_str
+	while !str.isEmpty {
 		// advancing both pointers
-		if !$is_empty(pattern) && ($head(pattern) == '?' || $head(str) == $head(pattern)) {
-			// print($head(str), $head(pattern));
-			str = $tail(str);
-			pattern = $tail(pattern);
+		if !pattern.isEmpty && (pattern.head == '?' || str.head == pattern.head) {
+			str = str.tail
+			pattern = pattern.tail
 		}
 		// * found, only advancing pattern pointer
-		else if !$is_empty(pattern) && $head(pattern) == '*' {
-			// print("*");
-			star_pattern = pattern;
-			star_str = str;
-			pattern = $tail(pattern);
+		else if !pattern.isEmpty && pattern.head == '*' {
+			// print("*")
+			star_pattern = pattern
+			star_str = str
+			pattern = pattern.tail
 		}
 		// last pattern pointer was *, advancing string pointer
 		else if star_pattern != null {
-			// print($head(str), "*");
-			pattern = $tail(star_pattern);
-			star_str = $tail(star_str);
-			str = star_str;
+			pattern = star_pattern.tail
+			star_str = star_str.tail
+			str = star_str
 		}
 		//current pattern pointer is not star, last patter pointer was not *
 		//characters do not match
-		else { return false; }
+		else { return false }
 	}
 
 	//check for remaining characters in pattern
-	while !$is_empty(pattern) && $head(pattern) == '*' {
-		pattern = $tail(pattern);
+	while !pattern.isEmpty && pattern.head == '*' {
+		pattern = pattern.tail
 	}
 
-	return $is_empty(pattern);
+	return pattern.isEmpty
 }
 
 func test(str, pattern, result) {
 	if isMatch(str, pattern) == result {
-		print("Pass");
+		print("Pass")
 	} else {
-		print("Fail [", str, pattern, "] expected:", result);
+		print("Fail [", str, pattern, "] expected:", result)
 	}
 }
 
-test("aa", "a", false);
-test("aa", "aa", true);
-test("aaa", "aa", false);
-test("aa", "*", true);
-test("aa", "a*", true);
-test("aa", "?*", true);
-test("aab", "c*a*b", false);
-test("abc", "*c", true);
-test("aabbcc", "a*c", true);
-test("aabbcc", "a*bc", false);
-test("wabc", "wa*f*", false);
+test("aa", "a", false)
+test("aa", "aa", true)
+test("aaa", "aa", false)
+test("aa", "*", true)
+test("aa", "a*", true)
+test("aa", "?*", true)
+test("aab", "c*a*b", false)
+test("abc", "*c", true)
+test("aabbcc", "a*c", true)
+test("aabbcc", "a*bc", false)
+test("wabc", "wa*f*", false)
