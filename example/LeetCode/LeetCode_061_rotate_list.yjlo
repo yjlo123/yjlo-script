@@ -6,54 +6,54 @@ Given 1->2->3->4->5->NULL and k = 2,
 return 4->5->1->2->3->NULL.
 */
 class ListNode {
-	var val;
-	var next;
-	@(x) { val = x; }
+	var val
+	var next
+	@(x) { val = x }
 }
 
 func listToLinkedList(lst) {
-	if $is_empty(lst) { return null; }
-	var head = ListNode($head(lst));
-	lst = $tail(lst);
-	var current = head;
+	if lst.isEmpty { return null }
+	var head = ListNode(lst.head)
+	lst = lst.tail
+	var current = head
 	for v in lst {
-		current.next = ListNode(v);
-		current = current.next;
+		current.next = ListNode(v)
+		current = current.next
 	}
-	return head;
+	return head
 }
 
 func linkedListToList(ll) {
-	if ll == null { return []; }
-	return $pair(ll.val, linkedListToList(ll.next));
+	if ll == null { return [] }
+	return (ll.val, linkedListToList(ll.next))
 }
 
 func rotateRight(head, k) {
-	if head == null { return head; }
+	if head == null { return head }
 
-	len := 1; // number of nodes
-	var newH, tail;
-	tail = head;
+	len := 1 // number of nodes
+	var newH, tail
+	tail = head
 	
 	while tail.next != null {
 		// get the number of nodes in the list
-		tail = tail.next;
-		len++;
+		tail = tail.next
+		len++
 	}
-	tail.next = head; // circle the link
+	tail.next = head // circle the link
 
-	k %= len;
+	k %= len
 	if k != 0 {
 		for i in 0..<len-k {
 			// the tail node is the (len-k)-th node (1st node is head)
-			tail = tail.next;
+			tail = tail.next
 		}
 	}
-	newH = tail.next; 
-	tail.next = null;
-	return newH;
+	newH = tail.next 
+	tail.next = null
+	return newH
 }
 
-var list = [1,2,3,4,5];
-var result = rotateRight(listToLinkedList(list), 12);
-print(linkedListToList(result));
+var list = [1,2,3,4,5]
+var result = rotateRight(listToLinkedList(list), 12)
+print(linkedListToList(result))
