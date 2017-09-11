@@ -13,6 +13,13 @@ class Node {
 	}
 }
 
+class Primitive {
+	constructor(implementation) {
+		this.tag = "primitive";
+		this.implementation = implementation;
+	}
+}
+
 // Includs variable, operator
 class VariableNode extends Node {
 	constructor(name, type, line) {
