@@ -252,7 +252,7 @@ function evaluate_switch_statement(stmt, env) {
 			found_case = true;
 			result = evaluate(_head(cases).stmt, extend_environment([], [], env));
 		}
-		if (is_return_value(result)) {
+		if (result instanceof ReturnValue) {
 			return result;
 		}
 		if (result instanceof BreakValue) {
@@ -292,7 +292,7 @@ function is_false(x) {
 function evaluate_while_statement(stmt, env) {
 	if (is_true(evaluate(if_predicate(stmt), env))){
 		var result = evaluate(if_consequent(stmt), extend_environment([], [], env));
-		if (is_return_value(result)){
+		if (result instanceof ReturnValue){
 			// encounter return statement in while loop
 			return result;
 		}
@@ -306,7 +306,7 @@ function evaluate_while_statement(stmt, env) {
 
 function evaluate_do_while_statement(stmt, env) {
 	var result = evaluate(if_consequent(stmt), extend_environment([], [], env));
-		if (is_return_value(result)){
+		if (result instanceof ReturnValue){
 			return result;
 		}
 		if (result instanceof BreakValue){
@@ -352,7 +352,7 @@ function evaluate_for_statement_range_clause(stmt, range_to_value, range_closed,
 			((!range_closed && variable_value > range_to_value) ||
 				(range_closed && variable_value >= range_to_value)))) {
 		let result = evaluate(for_consequent(stmt), env);
-		if (is_return_value(result)) {
+		if (result instanceof ReturnValue) {
 			// encounter return statement in for loop
 			return result;
 		}
@@ -373,7 +373,7 @@ function evaluate_for_statement_list_clause(stmt, range_list, env) {
 	set_variable_value(stmt, for_variable(stmt).name, _head(range_list), env);
 	// evaluate consequent
 	let result = evaluate(for_consequent(stmt), env);
-	if (is_return_value(result)) {
+	if (result instanceof ReturnValue) {
 		return result;
 	}
 	if (result instanceof BreakValue) {
@@ -439,7 +439,7 @@ function evaluate_sequence(stmts, env) {
 		return evaluate(first_statement(stmts),env);
 	else {
 		var first_stmt_value = evaluate(first_statement(stmts),env);
-		if (is_return_value(first_stmt_value) ||
+		if (first_stmt_value instanceof ReturnValue ||
 			first_stmt_value instanceof ContinueValue ||
 			first_stmt_value instanceof BreakValue)
 			return first_stmt_value;
@@ -462,16 +462,13 @@ function first_operand(ops) {
 function rest_operands(ops) {
 	return _tail(ops);
 }
-		
-function is_primitive_function(fun) {
-	return is_tagged_object(fun, 'primitive');
-}
+
 function primitive_implementation(fun) {
 	return fun.implementation;
 }
-	 
+
 function apply_in_underlying_javascript(prim, argument_list) {
-	var argument_array = new Array();
+	var argument_array = [];
 	var i = 0;
 	while (!_is_empty(argument_list)) {
 		argument_array[i++] = _head(argument_list);
@@ -479,11 +476,11 @@ function apply_in_underlying_javascript(prim, argument_list) {
 	}
 	return prim.apply(prim, argument_array);
 }
-	 
+
 function primitive_implementation(fun) {
 	return fun.implementation;
 }
-	 
+
 function apply_primitive_function(fun,argument_list) {
 	 return apply_in_underlying_javascript(primitive_implementation(fun),
 														argument_list);
@@ -510,15 +507,12 @@ function return_statement_expression(stmt) {
 	return stmt.expression;
 }
 
-function is_return_value(value) {
-	return is_tagged_object(value, 'return_value');
-}
 function return_value_content(value) {
 	return value.content;
 }
- 
+
 function apply(fun, args, line) {
-	if (is_primitive_function(fun)) {
+	if (fun instanceof Primitive) {
 		return apply_primitive_function(fun, args);
 	} else if (is_compound_function_value(fun)) {
 		let func_env = null;
@@ -539,7 +533,7 @@ function apply(fun, args, line) {
 		}
 		// define_variable('this', func_env, func_env);
 		let result = evaluate(function_value_body(fun), func_env);
-		if (is_return_value(result)) {
+		if (result instanceof ReturnValue) {
 			return return_value_content(result);
 		}
 	} else {
@@ -723,10 +717,7 @@ var primitive_functions = {
 function setup_environment() {
 	var initial_env = enclose_by(an_empty_frame, the_empty_environment);
 	for (var prop in primitive_functions) {
-		define_variable(prop,
-							 { tag: 'primitive',
-								implementation: primitive_functions[prop] },
-							 initial_env);
+		define_variable(prop, new Primitive(primitive_functions[prop]), initial_env);
 	}
 	define_variable('undefined', undefined, initial_env);
 	return initial_env;
@@ -734,7 +725,7 @@ function setup_environment() {
 	 
 function evaluate_toplevel(stmt, env) {
 	var value = evaluate(stmt, env);
-	if (is_return_value(value))
+	if (value instanceof ReturnValue)
 		throwError(value.line, 'return not allowed outside of function definition.');
 	if (value instanceof ContinueValue)
 		throwError(value.line, 'Invalid continue statement.');
