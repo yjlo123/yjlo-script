@@ -1,11 +1,20 @@
+.cm-matchhighlight {
+	background-color: #505860
+}
+
+.ui-layout-north {
+	overflow:hidden;
+	padding: 5px;
+}
+
 button:focus {
 	outline: none;
 }
 
 .top-button {
 	color: white;
-	padding: 8px;
-	min-width: 120px;
+	padding: 6px;
+	min-width: 100px;
 	font-size: 16px;
 	cursor: pointer;
 	margin-left: 40px;
@@ -16,6 +25,10 @@ button:focus {
 .top-button.green {
 	background-color: #4CAF50;
 	border: 1px solid #2E7D32;
+}
+
+.top-button.square {
+	min-width: 34px;
 }
 
 .top-button.green:hover {
@@ -49,7 +62,7 @@ button:focus {
 	
 .tool-label{
 	font-size:16px;
-	padding: 10px 8px 0 8px;
+	padding: 8px 10px 6px;
 	float: left;
 }
 
@@ -124,4 +137,40 @@ button:focus {
 
 .tooltip:hover .tooltiptext {
 	visibility: visible;
+}
+
+.loading-icon {
+	display: none;
+	position: absolute;
+	z-index: 10;
+	color: #e0e0e0;
+	left: 50%;
+	top: 40%;
+}
+
+.loading-icon i {
+	position: relative;
+	left: -50%;
+}
+
+/* menu */
+@media (min-width: 768px) {
+	#main-nav {
+		line-height: 0;
+		text-align: left;
+	}
+	#main-menu {
+		display: inline-block;
+		float: left;
+		background: none;;
+	}
+}
+
+.sm-clean a, .sm-clean a:hover, .sm-clean a:focus, .sm-clean a:active{
+	font-size: 16px!important;
+	padding: 11px 12px 8px!important;
+}
+
+.sm-clean a.has-submenu {
+	padding-right: 24px!important;
 }

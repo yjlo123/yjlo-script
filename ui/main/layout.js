@@ -71,7 +71,7 @@ $(document).ready(function () {
 	//	some resizing/toggling settings
 	,	north__slidable:			false	// OVERRIDE the pane-default of 'slidable=true'
 	,	north__togglerLength_closed: '100%'	// toggle-button is full-width of resizer-bar
-	,	north__spacing_closed:		20		// big resizer-bar when open (zero height)
+	,	north__spacing_closed:		15		// big resizer-bar when open (zero height)
 	,	south__resizable:			false	// OVERRIDE the pane-default of 'resizable=true'
 	,	south__spacing_open:		0		// no resizer-bar when open (zero height)
 	,	south__spacing_closed:		20		// big resizer-bar when open (zero height)
@@ -97,6 +97,7 @@ $(document).ready(function () {
 	,	stateManagement__enabled:	true // automatic cookie load & save enabled by default
 
 	,	showDebugMessages:			true // log and/or display messages from debugging & testing code
+	,	north__spacing_open:			0		// no resizer-bar when open (zero height)
 	});
 
 	// if there is no state-cookie, then DISABLE state management initially
@@ -132,4 +133,5 @@ $(document).ready(function () {
 		.disableSelection() // affects only the resizer element
 		.on('mousedown', $.layout.disableTextSelection ); // affects entire document
 
+	myLayout.bindButton('.north-toggler', 'toggle', 'north');
 });
