@@ -8,22 +8,22 @@ output “Buzz”. For numbers which are multiples of
 both three and five output “FizzBuzz”.
 */
 
-import LinkedList;
+import LinkedList
 
 func fizzBuzz(n) {
-	var list = LinkedList();
+	var list = LinkedList()
 	for i in 1...n {
 		if (i % 15 == 0) {
-			list.add("FizzBuzz");
+			list.add("FizzBuzz")
 		} else if (i % 3 == 0) {
-			list.add("Fizz");
+			list.add("Fizz")
 		} else if (i % 5 == 0) {
-			list.add("Buzz");
+			list.add("Buzz")
 		} else {
-			list.add(i + "");
+			list.add(i + "")
 		}
 	}
-	return list;
+	return list
 }
 
-print(fizzBuzz(20).toList());
+print(fizzBuzz(20).toList())
