@@ -580,7 +580,18 @@ function list_method(list, method) {
 		case 'len':
 			return _length(list);
 		default:
-		throwError('?', 'Unknown list method: ' + method);
+			throwError('?', 'Unknown list method: ' + method);
+	}
+}
+
+function string_method(str, method) {
+	switch (method) {
+		case 'len':
+			return str.length;
+		case 'toCharList':
+			return _string_to_char_list(str);
+		default:
+			throwError('?', 'Unknown string method: ' + method);
 	}
 }
 
@@ -591,7 +602,7 @@ function pair_method(pair, method) {
 		case 'tail':
 			return _tail(pair);
 		default:
-		throwError('?', 'Unknown pair method: ' + member);
+			throwError('?', 'Unknown pair method: ' + member);
 	}
 }
 
@@ -627,6 +638,8 @@ function refer(fun, member) {
 		}
 	} else if (_is_list(fun)) {
 		return list_method(fun, member);
+	} else if (_is_string(fun)) {
+		return string_method(fun, member);
 	} else if (_is_pair(fun)) {
 		return pair_method(fun, member);
 	} else if (fun instanceof Array) {
