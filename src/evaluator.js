@@ -590,6 +590,19 @@ function string_method(str, method) {
 			return str.length;
 		case 'toCharList':
 			return _string_to_char_list(str);
+		case 'charCode':
+			if (str.length === 0){
+				return null;
+			} else if (str.length === 1) {
+				return _char_code(str);
+			} else {
+				let char_list = _list();
+				for (let i = str.length-1; i >= 0; i--) {
+					char_list = _pair(_char_code(str.charAt(i)), char_list)
+				}
+				return char_list;
+			}
+			return null;
 		default:
 			throwError('?', 'Unknown string method: ' + method);
 	}
