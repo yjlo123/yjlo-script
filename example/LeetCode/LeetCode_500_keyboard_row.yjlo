@@ -11,40 +11,40 @@ Input: ["Hello", "Alaska", "Dad", "Peace"]
 Output: ["Alaska", "Dad"]
 */
 
-import HeapList;
-import LinkedList;
+import HeapList
+import LinkedList
 
 // keyboard row numbers for 26 English letters
-var map = HeapList();
-map.init([2,3,3,2,1,2,2,2,1,2,2,2,3,3,1,1,1,1,2,1,1,3,1,3,1,3]);
+var map = HeapList()
+map.init([2,3,3,2,1,2,2,2,1,2,2,2,3,3,1,1,1,1,2,1,1,3,1,3,1,3])
 
 func letterToRowNumber(char) {
-	var code = $char_code(char);
+	var code = $char_code(char)
 	// to lower case
-	if code < 97 { code += 32; }
-	return map.get(code - 97);
+	if code < 97 { code += 32 }
+	return map.get(code - 97)
 }
 
 func findWords(words) {
-	var result = LinkedList();
+	var result = LinkedList()
 	for word in words {
-		var letters = $string_to_char_list(word);
+		var letters = $string_to_char_list(word)
 		// previous letter row number
-		var row = letterToRowNumber($head(letters));
-		letters = $tail(letters);
-		var same = true;
+		var row = letterToRowNumber($head(letters))
+		letters = $tail(letters)
+		var same = true
 		for letter in letters {
 			if letterToRowNumber(letter) != row {
-				same = false;
-				break;
+				same = false
+				break
 			}
 		}
 		if same {
-			result.add(word);
+			result.add(word)
 		}
 	}
-	return result;
+	return result
 }
 
-var words = findWords(["Hello", "Alaska", "Dad", "Peace"]);
-print(words.toList());
+var words = findWords(["Hello", "Alaska", "Dad", "Peace"])
+print(words.toList())
