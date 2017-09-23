@@ -1,3 +1,25 @@
+class Environment {
+	constructor() {
+		this.env = [];
+	}
+}
+
+class Frame {
+	constructor() {
+		this.frame = {};
+	}
+	
+	init() {
+		this.add_constant('null', null);
+		this.add_constant('true', true);
+		this.add_constant('false', false);
+	}
+	
+	add_constant(name, value) {
+		this.frame[name] = value;
+	}
+}
+
 var the_global_environment = null;
 var the_console_environment = null;
 var the_empty_environment = [];
