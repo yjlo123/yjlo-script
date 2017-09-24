@@ -1,0 +1,32 @@
+class B {
+	var a = 3;
+	
+	func getA() {
+		print(a);
+	}
+}
+
+class A extends B {
+	var a = 6;
+	var b = 9;
+}
+
+print("==== A1 ====");
+myA1 := A();
+myA1.getA();
+myA1.a = 100;
+
+print(myA1.a);
+/*
+myA1.getA();
+print("==== B ====");
+myB := B();
+myB.getA();*/
+
+print("==== A2 ====");
+myA2 := A();
+myA2.getA();
+
+print("==== A1 ====");
+print(myA1.a); // 100
+myA1.getA(); // 100
