@@ -831,6 +831,13 @@
 						desugared_tokens.push(new Token('operator', '(', t.line));
 						break;
 					case ']':
+						if (desugared_tokens.length > 0) {
+							let prev_token = desugared_tokens[desugared_tokens.length-1];
+							if (isOperatorTokenWithValue(',')) {
+								// remove trailing comma
+								desugared_tokens.pop();
+							}
+						}
 						desugared_tokens.push(new Token('operator', ')', t.line));
 						break;
 					case 'class':
