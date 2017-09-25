@@ -1,31 +1,37 @@
-import Math;
+import Math
 
 class Util {
 	func atoi(str) {
-		var chars = $string_to_char_list(str);
-		var sign = 1, base = 0, i = 0;
+		var chars = $string_to_char_list(str)
+		var sign = 1, base = 0, i = 0
 
 		// discards all leading whitespaces
-		while $head(chars) == ' ' { chars = $tail(chars); }
+		while $head(chars) == ' ' { chars = $tail(chars) }
 
 		if $head(chars) == '-' || $head(chars) == '+' {
-			sign = $head(chars) == '-' ? -1 : 1; 
-			chars = $tail(chars);
+			sign = $head(chars) == '-' ? -1 : 1 
+			chars = $tail(chars)
 		}
 
 		while $head(chars) >= '0' && $head(chars) <= '9' {
-			var digit = $head(chars) - '0';
-			var prev_base = base;
-			base = 10 * base + digit;
+			var digit = $head(chars) - '0'
+			var prev_base = base
+			base = 10 * base + digit
 			
 			// overflow
 			if base - 10 * prev_base != digit {
-				if sign == 1 { return Math.MAX_INT; }
-				else { return Math.MIN_INT; }
+				if sign == 1 { return Math.MAX_INT }
+				else { return Math.MIN_INT }
 			}
 			
-			chars = $tail(chars);
+			chars = $tail(chars)
 		}
-		return base * sign;
+		return base * sign
 	}
+	
+	func range(x) {
+		if x == 0 { return [] }
+		return (x, range(x-1))
+	}
+
 }
