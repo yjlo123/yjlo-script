@@ -1,12 +1,3 @@
-.cm-matchhighlight {
-	background-color: #505860
-}
-
-.ui-layout-north {
-	overflow:hidden;
-	padding: 5px;
-}
-
 button:focus {
 	outline: none;
 }
@@ -66,8 +57,9 @@ button:focus {
 	float: left;
 }
 
-.tool-label #version{
+.tool-label .version{
 	font-size: 14px;
+	color: #D1D1D1;
 }
 
 .dropbtn {
@@ -153,6 +145,28 @@ button:focus {
 	left: -50%;
 }
 
+/* Layout */
+.ui-layout-north {
+	overflow:hidden;
+	padding: 5px;
+}
+
+.ui-layout-resizer {
+	background: #7C7C7C;
+	border: 0px;
+}
+.ui-layout-pane {
+	border: 0px;
+}
+.ui-layout-north {
+	background: #3D3D3D;
+}
+
+/* CodeMirror */
+.cm-matchhighlight { background-color: #505860 }
+.cm-s-lesser-dark .CodeMirror-gutters { background: #262626; border-right:0px }
+.cm-s-lesser-dark .CodeMirror-linenumber { color: #5A5A5A; }
+
 /* menu */
 @media (min-width: 768px) {
 	#main-nav {
@@ -166,11 +180,50 @@ button:focus {
 	}
 }
 
-.sm-clean a, .sm-clean a:hover, .sm-clean a:focus, .sm-clean a:active{
+.sm-clean a, .sm-clean a:hover, .sm-clean a:focus, .sm-clean a:active {
 	font-size: 16px!important;
 	padding: 11px 12px 8px!important;
+	color: #A0A0A0;
+}
+.sm-clean a, .sm-clean a:hover, .sm-clean a:focus, .sm-clean a:hover {
+	color: #E0E0E0!important;
+}
+.sm-clean a, .sm-clean a:hover, .sm-clean a:focus, .sm-clean a:highlighted {
+	color: #E0E0E0!important;
+}
+.sm-clean ul {
+	background: #3D3D3D;
+	border: 0;
+	-webkit-border-radius: 0 !important;
+	-moz-border-radius: 0 !important;
+	-ms-border-radius: 0 !important;
+	-o-border-radius: 0 !important;
+	border-radius: 0 !important;
 }
 
+.sm-clean ul a:hover {
+	background: #585858;
+}
+.sm-clean ul a.highlighted {
+	background: #585858!important;
+}
+.sm-clean ul a:active {
+	background: #585858;
+}
+.sm-clean a span.sub-arrow {
+	border-color: #E0E0E0 transparent transparent transparent;
+}
+
+.sm-clean ul a span.sub-arrow {
+	border-color: transparent transparent transparent #E0E0E0;
+}
+.sm-clean > li > ul:before,
+.sm-clean > li > ul:after {
+	border-color: transparent transparent #3D3D3D transparent;
+}
+.sm-clean > li > ul:after {
+	border-color: transparent transparent #3D3D3D transparent;
+}
 .sm-clean a.has-submenu {
 	padding-right: 24px!important;
 }
