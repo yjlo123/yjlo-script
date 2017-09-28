@@ -3,37 +3,56 @@ button:focus {
 }
 
 .top-button {
-	color: white;
-	padding: 6px;
-	min-width: 100px;
-	font-size: 16px;
+	float:left;
+	min-width: 80px;
+	font-size: 15px;
 	cursor: pointer;
-	margin-left: 40px;
+	margin: 3px 0 3px 40px;
 	text-align: center;
 	text-decoration: none;
 }
 
 .top-button.green {
-	background-color: #4CAF50;
 	border: 1px solid #2E7D32;
+	color: #4CAF50;
+	padding: 4px;
 }
 
 .top-button.square {
-	min-width: 34px;
+	min-width: 32px;
 }
 
 .top-button.green:hover {
 	background-color: #2E7D32;
+	color: white;
 }
 
 .top-button.gray {
-	background-color: #E0E0E0;
-	border: 1px solid #BDBDBD;
-	color: #111111;
+	border: 1px solid #A0A0A0;
+	color: #A0A0A0;
+	background: none;
+	height: 30px;
 }
 
 .top-button.gray:hover {
-	background-color: #BDBDBD;
+	color: #D3D3D3;
+	border: 1px solid #D3D3D3;
+}
+
+.top-button.icon {
+	color: #E0E0E0;
+	height: 30px;
+	line-height: 30px;
+	opacity: 0.6;
+	background: none;
+	border: 0;
+	font-size: 27px;
+	min-width: 32px;
+	padding: 0;
+}
+
+.top-button.icon:hover {
+	opacity: 1;
 }
 
 .hidden {
@@ -114,7 +133,7 @@ button:focus {
 .tooltip .tooltiptext {
 	visibility: hidden;
 	width: 120px;
-	background-color: rgba(0,0,0,0.4);
+	background-color: rgba(0,0,0,0.3);
 	color: #fff;
 	text-align: center;
 	border-radius: 6px;
@@ -123,7 +142,7 @@ button:focus {
 	/* Position the tooltip */
 	position: absolute;
 	z-index: 1;
-	top: 2px;
+	top: -1px;
 	left: 105%; 
 }
 
@@ -212,6 +231,7 @@ button:focus {
 }
 .sm-clean a span.sub-arrow {
 	border-color: #E0E0E0 transparent transparent transparent;
+	margin-top: 0px;
 }
 
 .sm-clean ul a span.sub-arrow {
@@ -226,4 +246,31 @@ button:focus {
 }
 .sm-clean a.has-submenu {
 	padding-right: 24px!important;
+}
+
+/* Scrollbar (Webkit only) */
+::-webkit-scrollbar-track {
+	background: none;
+}
+
+::-webkit-scrollbar {
+	right: 3px;
+	width: 8px;
+	height: 8px;
+	background: none;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	background-color: rgba(100,100,100,.6);
+}
+
+.CodeMirror-scrollbar-filler {
+	background: none;
+}
+
+#editor-area {
+	padding-right: 3px;
+	padding-bottom: 3px;
+	background: #262626;
 }
