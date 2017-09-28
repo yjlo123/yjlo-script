@@ -39,10 +39,6 @@
 		<!-- shortcut -->
 		<script src="ui/hotkey/mousetrap.js"></script>
 		
-		<!-- fork me on github -->
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css" />
-		<style>.github-fork-ribbon.right-bottom:before {background-color: #090;}</style>
-		
 		<!-- menu -->
 		<link rel="stylesheet" href="ui/menu/sm-core-css.css"/>
 		<link rel="stylesheet" href="ui/menu/sm-clean.css"/>
@@ -60,23 +56,20 @@
 	</head>
 	
 	<body>
-		<a class="github-fork-ribbon right-bottom fixed" href="https://github.com/yjlo123/yjlo-script" title="Fork me on GitHub" target="_blank">Fork me on GitHub</a>
 		<div class="ui-layout-north ui-layout-pane ui-layout-pane-north" onmouseover="myLayout.allowOverflow('north')" onmouseout="myLayout.resetOverflow(this)">
 			<div class="tool-label"><span class="version"></span></div>
 
 			<nav id="main-nav" role="navigation">
 				<ul id="main-menu" class="sm sm-clean">
 					<li><a href="https://github.com/yjlo123/yjlo-script/wiki" target="_blank">Documentation</a></li>
-					<li id="example-menu" ><a href="#">Examples</a>
-					</li>
+					<li id="library-menu" ><a href="#">Library</a></li>
+					<li id="example-menu" ><a href="#">Examples</a></li>
 					<li><a href="#">About</a>
 						<ul class="mega-menu">
 						<li>
-							<div style="width:250px;max-width:100%;">
-							<div style="padding:5px 24px;">
+							<div style="width:250px;max-width:100%;padding:5px 24px;color:#E0E0E0">
 								<p>YJLO Script Language</p>
 								<p><span class="version"></span></p>
-							</div>
 							</div>
 						</li>
 						</ul>
@@ -89,6 +82,7 @@
 				<span class="tooltiptext">Ctrl + Enter</span>
 			</a>
 			<div style="float:right;">
+				<a class="top-button icon" href="https://github.com/yjlo123/yjlo-script" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
 				<button class="north-toggler top-button gray square"><i class="fa fa-angle-double-up" aria-hidden="true"></i></button>
 			</div>
 		</div>
