@@ -59,23 +59,8 @@ let basic_example =
 ];
 
 let example_list =
-[
-	{
-		"title": "LeetCode",
-		"url": "LeetCode",
-		"menu":[
-		{
-			"title": "1. Two sum",
-			"url": "LeetCode_001_two_sum"
-		},
-		{
-			"title": "2. Add two numbers",
-			"url": "LeetCode_002_add_two_numbers"
-		},
-		{
-			"title": "3. Longest substring without repeating characters",
-			"url": "LeetCode_003_longest_substring_without_repeating_characters"
-		}
-		]
-	}
-];
+[{"url": "algorithm", "menu": [{"url": "sorting", "menu": [{"url": "bubble_sort.yjlo", "title": "Bubble Sort"}, {"url": "insertion_sort.yjlo", "title": "Insertion Sort"}, {"url": "quick_sort.yjlo", "title": "Quick Sort"}, {"url": "selection_sort.yjlo", "title": "Selection Sort"}], "title": "Sorting"}], "title": "Algorithm"}, {"url": "LeetCode", "menu": [{"url": "LeetCode_001_two_sum.yjlo", "title": "Leetcode 001 Two Sum"}, {"url": "LeetCode_002_add_two_numbers.yjlo", "title": "Leetcode 002 Add Two Numbers"}, {"url": "LeetCode_003_longest_substring_without_repeating_characters.yjlo", "title": "Leetcode 003 Longest Substring Without Repeating Characters"}, {"url": "LeetCode_004_median_of_two_sorted_arrays.yjlo", "title": "Leetcode 004 Median Of Two Sorted Arrays"}, {"url": "LeetCode_005_longest_palindromic_substring.yjlo", "title": "Leetcode 005 Longest Palindromic Substring"}, {"url": "LeetCode_006_zigzag_conversion.yjlo", "title": "Leetcode 006 Zigzag Conversion"}, {"url": "LeetCode_007_ reverse_integer.yjlo", "title": "Leetcode 007  Reverse Integer"}, {"url": "LeetCode_008_string_to_integer_atoi.yjlo", "title": "Leetcode 008 String To Integer Atoi"}, {"url": "LeetCode_009_palindrome_number.yjlo", "title": "Leetcode 009 Palindrome Number"}, {"url": "LeetCode_044_wildcard_matching.yjlo", "title": "Leetcode 044 Wildcard Matching"}, {"url": "LeetCode_056_merge_intervals.yjlo", "title": "Leetcode 056 Merge Intervals"}, {"url": "LeetCode_061_rotate_list.yjlo", "title": "Leetcode 061 Rotate List"}, {"url": "LeetCode_066_plus_one.yjlo", "title": "Leetcode 066 Plus One"}, {"url": "LeetCode_167_two_sum_II.yjlo", "title": "Leetcode 167 Two Sum Ii"}, {"url": "LeetCode_412_fizz_buzz.yjlo", "title": "Leetcode 412 Fizz Buzz"}, {"url": "LeetCode_500_keyboard_row.yjlo", "title": "Leetcode 500 Keyboard Row"}], "title": "Leetcode"}, {"url": "min_algo", "menu": [{"url": "circular_counter.yjlo", "title": "Circular Counter"}, {"url": "flatten.yjlo", "title": "Flatten"}, {"url": "garage.yjlo", "title": "Garage"}, {"url": "rotate_list.yjlo", "title": "Rotate List"}, {"url": "summary_ranges.yjlo", "title": "Summary Ranges"}], "title": "Min Algo"}, {"url": "dependency_resolving.yjlo", "title": "Dependency Resolving"}, {"url": "expression_eval.yjlo", "title": "Expression Eval"}];
+
+
+let library_list =
+[{"url": "HashMap.yjlo", "title": "Hashmap"}, {"url": "HashSet.yjlo", "title": "Hashset"}, {"url": "Heap.yjlo", "title": "Heap"}, {"url": "HeapList.yjlo", "title": "Heaplist"}, {"url": "LinkedList.yjlo", "title": "Linkedlist"}, {"url": "List.yjlo", "title": "List"}, {"url": "ListUtil.yjlo", "title": "Listutil"}, {"url": "Math.yjlo", "title": "Math"}, {"url": "Stack.yjlo", "title": "Stack"}, {"url": "StringUtil.yjlo", "title": "Stringutil"}, {"url": "Tokenizer.yjlo", "title": "Tokenizer"}, {"url": "UnitTest.yjlo", "title": "Unittest"}, {"url": "Util.yjlo", "title": "Util"}];

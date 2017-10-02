@@ -4,7 +4,7 @@ var current_parser = YjloParser();
 
 
 function getCodeUrl(path) {
-	return 'https://raw.githubusercontent.com/yjlo123/yjlo-script/master/example/'+path+'.yjlo';
+	return 'https://raw.githubusercontent.com/yjlo123/yjlo-script/master/' + path;
 }
 
 function getCode(path) {
@@ -93,30 +93,33 @@ $(document).ready(function () {
 
 	// initial prompt
 	startPrompt();
-
-	var html = [];
+	
 	var basic_example_counter = 0;
-	function createList(arr, path, source, ul_start, ul_end) {
-		html.push(ul_start?'<ul>':'');
+	function createList(html_list, arr, path, source, ul_start, ul_end) {
+		html_list.push(ul_start?'<ul>':'');
 		$.each(arr, function(i, val) {
 			if (val.menu) {
-				html.push('<li><a href="#">' + val.title+'</a>');
-				createList(val.menu, path+path+val.url+'/', source, true, true);
+				html_list.push('<li><a href="#">' + val.title+'</a>');
+				createList(html_list, val.menu, path+val.url+'/', source, true, true);
 			} else {
 				if (source) {
-					html.push('<li><a href="#" onclick="load_basic_example('+(basic_example_counter++)+')">' + val.title+'</a>');
+					html_list.push('<li><a href="#" onclick="load_basic_example('+(basic_example_counter++)+')">' + val.title+'</a>');
 				} else {
-					html.push('<li><a href="#" onclick="getCode(\''+path+val.url+'\')">' + val.title+'</a>');
+					html_list.push('<li><a href="#" onclick="getCode(\''+path+val.url+'\')">' + val.title+'</a>');
 				}
 			}
-			html.push('</li>');
+			html_list.push('</li>');
 		});
-		html.push(ul_end?'</ul>':'');
+		html_list.push(ul_end?'</ul>':'');
+		return html_list;
 	}
 
-	createList(basic_example, '', true, true, false);
-	createList(example_list, '', false, false, true);
-	$('#example-menu').append(html.join(''));
+	let example_menu_html = createList([], basic_example, 'example/', true, true, false);
+	example_menu_html = createList(example_menu_html, example_list, 'example/', false, false, true);
+	$('#example-menu').append(example_menu_html.join(''));
+	
+	let libray_menu_html = createList([], library_list, 'library/', false, true, true);
+	$('#library-menu').append(libray_menu_html.join(''));
 	
 	$(function() {
 		$('#main-menu').smartmenus({
@@ -126,16 +129,19 @@ $(document).ready(function () {
 			subMenusSubOffsetY: -6
 		});
 	});
+
 });
 
+
 function exec() {
+	$('#processing-source-icon').show();
 	jqconsole.Write('  \n', 'jqconsole-old-prompt');
 	var startDate = new Date();
 	setup_global_environment();
 	var source = myCodeMirror.getValue();
 	driver_loop(source, current_parser, the_global_environment, function () {
 		// evaluation finished
-		//jqconsole.Write('=> [Finished]\n', 'console-arrow');
+		$('#processing-source-icon').hide();
 		var endDate = new Date();
 		var unit = 'ms';
 		var time_used = (endDate.getTime() - startDate.getTime());
@@ -156,6 +162,7 @@ function run() {
 			console.error(error);
 		} else {
 			jqconsole.Write(error.message + '\n', 'console-error');
+			$('#processing-source-icon').hide();
 		}
 	}
 }
