@@ -848,7 +848,7 @@ function parse_program(program_string, program_parser, evaluate_callback) {
 		return {tag: 'exit'};
 	} else {
 		if(program_parser) {
-			program_parser(program_string, evaluate_callback, true);
+			program_parser(program_string, evaluate_callback, tokenizeAndDesugaring, true);
 		} else {
 			alert('No parser available.');
 		}

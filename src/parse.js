@@ -20,6 +20,8 @@
 		var tokens;
 		var token_nr;
 		
+		let sugar_processor = null;
+		
 		const reservedKeywords = ['var', 'func', 'import', 'class',
 		'if', 'else', 'switch', 'fallthrough', 'case', 'default',
 		'continue', 'break', 'while', 'do', 'for', 'in', 'by', 'return'];
@@ -789,170 +791,13 @@
 			if (debug) {
 				console.error(error);
 			} else {
+				// TODO pass in stdout from caller
+				$('#processing-source-icon').hide();
 				jqconsole.Write(error.message + '\n', 'console-error');
 			}
 		}
 
 	/* ============= end of helper functions =========== */
-
-		function tokenizeAndDesugaring(source){
-			// var program_string_without_comments 
-			// = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
-			let original_tokens = source.tokens('=<>!+-*&|/%^*.:,', '=<>&|*+-.');
-			let desugared_tokens = [];
-			
-			// desugaring
-			let brace_count = 0;
-			let class_level = 0;
-			let class_arg_positions = _list();
-			let class_constructor = false;
-			let class_constructor_arg_tokens = [];
-			let class_constructor_stack = _list();
-			for (let i = 0; i < original_tokens.length; i++) {
-				let t = original_tokens[i];
-				if (t.type !== 'operator' && t.type !== 'name') {
-					desugared_tokens.push(t);
-					continue;
-				}
-				switch (t.value) {
-					case '[':
-						if (i > 0 && 
-							// array[x]
-							(isVarNameToken(original_tokens[i-1]) ||
-								// ...[x][x]
-								isOperatorTokenWithValue(original_tokens[i-1], ']') ||
-								// application[x]
-								isOperatorTokenWithValue(original_tokens[i-1], ')'))) {
-							desugared_tokens.push(original_tokens[i]); // '['
-						} else {
-							// list
-							desugared_tokens.push(new Token('name', '$list', t.line));
-						}
-						desugared_tokens.push(new Token('operator', '(', t.line));
-						break;
-					case ']':
-						if (desugared_tokens.length > 0) {
-							let prev_token = desugared_tokens[desugared_tokens.length-1];
-							if (isOperatorTokenWithValue(',')) {
-								// remove trailing comma
-								desugared_tokens.pop();
-							}
-						}
-						desugared_tokens.push(new Token('operator', ')', t.line));
-						break;
-					case 'class':
-						class_constructor_stack = _pair(false, class_constructor_stack);
-						desugared_tokens.push(new Token('name', 'func', t.line));
-						i++;
-						t = original_tokens[i];
-						desugared_tokens.push(t); // class name
-						desugared_tokens.push(new Token('operator', '(', t.line));
-						class_arg_positions = _pair(desugared_tokens.length, class_arg_positions);
-						desugared_tokens.push(new Token('operator', ')', t.line));
-						// inheritance (Python-like)
-						if (original_tokens[i+1].value === '(') {
-							i++;
-							t = original_tokens[i];
-							desugared_tokens.push(new Token('name', 'extends', t.line));
-							i++;
-							desugared_tokens.push(original_tokens[i]); // parent name
-							i++; // for skipping ')'
-						}
-						class_level++;
-						break;
-					case '@':
-						class_constructor_stack = _pair(true, _tail(class_constructor_stack));
-						// constructor
-						if (class_level > 0 && brace_count === class_level) {
-							if (_is_empty(class_arg_positions)){
-								throwError(t, 'Invalid constructor position.');
-							}
-							desugared_tokens.push(new Token('name', 'func', t.line));
-							desugared_tokens.push(t); // '@'
-							i++;
-							t = original_tokens[i];
-							desugared_tokens.push(t); // '('
-							let position = _head(class_arg_positions);
-							i++;
-							t = original_tokens[i];
-							class_constructor_arg_tokens = [];
-							while (t.value !== ')') {
-								
-								desugared_tokens.push(t);
-								let trans_token;
-								if (t.type === 'name') {
-									// prepend @ to argument name
-									// to prevent conflict with other vars in the class
-									trans_token = new Token('name', '@' + t.value, t.line);
-								} else {
-									trans_token = t;
-								}
-								
-								desugared_tokens.splice(position++, 0, trans_token);
-								class_constructor_arg_tokens.push(trans_token);
-								i++;
-								t = original_tokens[i];
-							}
-							desugared_tokens.push(t); // ')'
-							class_constructor = true;
-						} else {
-							// other usage of '@'
-							desugared_tokens.push(t);
-						}
-						break;
-					case '{':
-						desugared_tokens.push(t);
-						brace_count++;
-						if (class_level > 0 && brace_count === class_level) {
-							// start of class
-							desugared_tokens.push(new Token('name', 'this', t.line));
-							desugared_tokens.push(new Token('operator', ':=', t.line));
-							desugared_tokens.push(new Token('name', 'func', t.line));
-							desugared_tokens.push(new Token('operator', '(', t.line));
-							desugared_tokens.push(new Token('operator', ')', t.line));
-							desugared_tokens.push(new Token('operator', '{', t.line));
-							desugared_tokens.push(new Token('operator', '}', t.line));
-						}
-						break;
-					case '}':
-						if (class_level > 0 && brace_count === class_level) {
-							// end of class
-							if (_head(class_constructor_stack)) {
-								desugared_tokens.push(new Token('name', '@', t.line));
-								desugared_tokens.push(new Token('operator', '(', t.line));
-								desugared_tokens = desugared_tokens.concat(class_constructor_arg_tokens);
-								desugared_tokens.push(new Token('operator', ')', t.line));
-							}
-							class_constructor_stack = _tail(class_constructor_stack);
-							desugared_tokens.push(new Token('name', 'return', t.line));
-							desugared_tokens.push(new Token('name', 'this', t.line));
-							class_level--;
-							class_arg_positions = _tail(class_arg_positions);
-						} else if(class_level > 0 && class_constructor && brace_count === class_level+1) {
-							// end of constructor
-							class_constructor = false;
-						}
-						desugared_tokens.push(t); // '}'
-						brace_count--;
-						break;
-					default:
-						if (t.type === 'name' && t.value && t.value.length > 0) {
-							let firstChar = t.value.charAt(0);
-							if (firstChar === '@') {
-								// prevent defining system generated variables
-								throwError(t, 'Invalid variable name: ' + t.value);
-							}
-						}
-						desugared_tokens.push(t);
-				}
-			}
-			/*
-			for (let i = 0 ; i < desugared_tokens.length; i++) {
-				console.log(desugared_tokens[i].value);
-			}*/
-			
-			return desugared_tokens;
-		}
 
 		var newSourceObj = function(name) {
 			var obj = {};
@@ -963,7 +808,7 @@
 		};
 		
 		var processSource = function(source, name) {
-			tokens = tokenizeAndDesugaring(source);
+			tokens = this.sugar_processor(source);
 			if (!tokens || tokens.length === 0) {
 				throwError(null, 'Empty source code.');
 			}
@@ -1042,7 +887,7 @@
 					loadSources(evaluate_callback);
 				}else{
 					// finished all loading
-					tokens = resolveDependency();
+					tokens = resolveDependency(sources);
 					try {
 						evaluate_callback(startParsing());
 					} catch (error) {
@@ -1053,61 +898,14 @@
 				try {
 					throwError(null, 'Importing "' + nextSourceName + '" failed.');
 				} catch (error) {
-						outputError(error);
+					outputError(error);
 				}
 			});
 		};
 		
-		/* Resolve dependencies in sources
-		* return concatenated tokens
-		*/
-		var resolveDependency = function() {
-			var dependencyNode = function(data) {
-				this.data = data;
-				this.dependency = [];
-			};
+		return function (source, parsed_callback, sugar_processor, import_lib=true) {
+			this.sugar_processor = sugar_processor;
 			
-			// build dependency graph
-			var dependencyGraph = {};
-			sources.forEach(function(source){
-				if (!dependencyGraph.hasOwnProperty(source.name)){
-					dependencyGraph[source.name] = new dependencyNode(source);
-					dependencyGraph[source.name].dependency = source.dependency;
-				}
-			});
-			
-			var resolve = function (node, unresolved){
-				unresolved.push(node);
-				var dependencies = dependencyGraph[node].dependency;
-				while (!_is_empty(dependencies)) {
-					var edge = _head(dependencies);
-					if (resolved.indexOf(edge) === -1) {
-						if (unresolved.indexOf(edge) !== -1) {
-							throwError(null, 'Circular dependency detected: '+node+' -> '+edge);
-						}
-						resolve(edge, unresolved);
-					}
-					dependencies = _tail(dependencies);
-				}
-				resolved.push(node);
-				// remove from unresolved
-				var index = unresolved.indexOf(node);
-				if (index > -1) {
-					unresolved.splice(index, 1);
-				}
-			};
-			var resolved = [];
-			resolve('self', []);
-
-			var resolvedTokens = [];
-			for (let i in resolved){
-				// append source tokens
-				resolvedTokens = resolvedTokens.concat(dependencyGraph[resolved[i]].data.tokens);
-			}
-			return resolvedTokens;
-		};
-
-		return function (source, parsed_callback, import_lib=true) {
 			// current source code is identified as 'self'
 			var selfSourceObj = processSource(source, 'self');
 			tokens = selfSourceObj.tokens;
