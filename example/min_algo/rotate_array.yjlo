@@ -1,0 +1,26 @@
+/*
+Rotate an array of n elements to the right by k steps.
+For example, with n = 7 and k = 3,
+the array 1,2,3,4,5,6,7 is rotated to 5,6,7,1,2,3,4
+*/
+
+func rotate(arr, k) {
+	n := arr.len
+	k = k % n
+	
+	func reverse(i, j) {
+		while i < j {
+			temp := arr[i]
+			arr[i] = arr[j]
+			arr[j] = temp
+			i++; j--
+		}
+	}
+	
+	reverse(0, n-1-k)
+	reverse(n-k, n-1)
+	reverse(0, n-1)
+	return arr
+}
+
+print(rotate(Array([1,2,3,4,5,6,7]), 3))
