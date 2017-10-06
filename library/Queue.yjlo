@@ -1,0 +1,49 @@
+class Queue {
+	_inbox := []
+	_outbox := []
+	_size := 0
+	
+	EMPTY_QUEUE_EXCEPTION := "Empty queue exception"
+	
+	func size() {
+		return _size
+	}
+	
+	func isEmpty() {
+		return _size == 0
+	}
+	
+	func offer(n) {
+		_inbox = (n, _inbox)
+		_size++
+	}
+	
+	func poll() {
+		if _size == 0 {
+			throw(EMPTY_QUEUE_EXCEPTION)
+		}
+		
+		if _outbox.isEmpty {
+			for e in _inbox {
+				_outbox = (e, _outbox)
+			}
+			_inbox = []
+		}
+		e := _outbox.head
+		_outbox = _outbox.tail
+		_size--
+		return e
+	}
+}
+
+/*
+q := Queue()
+
+q.offer(3)
+q.offer(5)
+
+print(q.size())
+print(q.poll())
+print(q.poll())
+print(q.isEmpty())
+*/
