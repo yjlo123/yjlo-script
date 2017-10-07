@@ -558,6 +558,8 @@ function apply(fun, args, line) {
 		if (result instanceof ReturnValue) {
 			return return_value_content(result);
 		}
+	} else if (is_native_function(fun)) {
+		return fun(_nested_list_to_array(args));
 	} else {
 		throwError(line, 'Unknown function type - APPLY: ' + fun);
 	}
@@ -739,7 +741,13 @@ var primitive_functions = {
 		'/': (x,y) => Math.trunc(x / y),
 		'/.': (x,y) => x / y,
 		'%': (x,y) => x % y,
-		'==': (x,y) => x === y,
+		'==': function (x,y) {
+			if (_is_array(x) && _is_array(y)) {
+				return array_equal(x, y);
+			} else {
+				return x === y;
+			}
+		},
 		'!=': (x,y) => x !== y,
 		'<': (x,y) => x < y,
 		'<=': (x,y) => x <= y,
@@ -761,6 +769,20 @@ var primitive_functions = {
 		
 		'throw': (x) => { throw Error(x); }
 };
+
+function array_equal(x, y) {
+	if (x.length != y.length)
+		return false;
+	for (let i = 0, l = x.length; i < l; i++) {
+		if (x[i] instanceof Array && y[i] instanceof Array) {
+			if (!array_equal(x[i], y[i]))
+				return false;
+		} else if (x[i] != y[i]) { 
+			return false;
+		}
+	}
+	return true;
+}
 	
 function setup_environment() {
 	var initial_env = enclose_by(an_empty_frame, the_empty_environment);
