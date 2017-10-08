@@ -683,12 +683,20 @@ function refer(fun, member) {
 		switch (member) {
 			case 'len':
 				return fun.length;
+			case 'index':
+				return function(args) {
+					return fun.indexOf(args[0]);
+				};
 			default:
 			throwError('?', 'Unknown array method: ' + fun);
 		}
 	} else {
 		throwError('?', 'Unknown function type - REFER: ' + fun);
 	}
+}
+
+function is_native_function(v) {
+	return typeof v === "function";
 }
 
 function list_of_values(exps, env) {
