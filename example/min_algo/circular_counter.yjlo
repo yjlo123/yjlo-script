@@ -8,27 +8,27 @@ Input: consider 123456789 members sitting in a circular fashion,
 Output: 369485271
 */
 
-import LinkedList;
+import Queue
+import ListUtil
 
 func circularCount(list, skip){
-	var queue = LinkedList();
-	var result = LinkedList();
+	queue := Queue()
+	result := []
 	
 	// add list to queue
-	while !$is_empty(list) {
-		queue.add($head(list));
-		list = $tail(list);
+	for item in list {
+		queue.offer(item)
 	}
 	
-	while queue.size() > 0 {
+	while !queue.isEmpty() {
 		for i in 0..<skip - 1 {
-			queue.addLast(queue.removeFirst());
+			queue.offer(queue.poll())
 		}
-		result.add(queue.removeFirst());
+		result = (queue.poll(), result)
 	}
 	
-	return result.toList();
+	return ListUtil.reverse(result)
 }
 
-var a = ['1','2','3','4','5','6','7','8','9'];
-print( circularCount(a, 3) );
+a := ['1','2','3','4','5','6','7','8','9']
+print( circularCount(a, 3) )
