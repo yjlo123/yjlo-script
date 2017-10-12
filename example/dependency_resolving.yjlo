@@ -9,71 +9,75 @@
      \ v     v
      [C] --> [E]
 */
-func Node(n) {
-	var name = n;
-	var edges = [];
+class Node {
+	var name = ''
+	var edges = []
+	
+	@(n) {
+		this.name = n
+	}
+	
 	func addEdge(node) {
 		func help(node, head) {
-			if $is_empty(head) {
-				return $pair(node, head);
+			if head.isEmpty {
+				return (node, head)
 			}
-			return $pair($head(head), help(node, $tail(head)));
+			return (head.head, help(node, head.tail))
 		}
-		edges = help(node, edges);
+		edges = help(node, edges)
 	}
-	return func(){};
 }
 
-var a = Node('a');
-var b = Node('b');
-var c = Node('c');
-var d = Node('d');
-var e = Node('e');
+a := Node('a')
+b := Node('b')
+c := Node('c')
+d := Node('d')
+e := Node('e')
 
-a.addEdge(b);
-a.addEdge(d);
-b.addEdge(c);
-b.addEdge(e);
-c.addEdge(d);
-c.addEdge(e);
+a.addEdge(b)
+a.addEdge(d)
+b.addEdge(c)
+b.addEdge(e)
+c.addEdge(d)
+c.addEdge(e)
 
-//d.addEdge(b); // circular dependency
+//d.addEdge(b) // circular dependency
 
 func isInList(node, list) {
-	if $is_empty(list) { return false; }
-	if node.name == $head(list).name { return true; }
-	return isInList(node, $tail(list));
+	if list.isEmpty { return false }
+	if node.name == list.head.name { return true }
+	return isInList(node, list.tail)
 }
 
 func removeFromList(node, list) {
-	if $is_empty(list) { return []; }
-	if $head(list).name == node.name { return $tail(list); }
-	return $pair($head(list), removeFromList(node, $tail(list)));
+	if list.isEmpty { return [] }
+	if list.head.name == node.name { return list.tail }
+	return (list.head, removeFromList(node, list.tail))
 }
 
 func depResolve(node, unresolved){
-	unresolved = $pair(node, unresolved);
-	var edges = node.edges;
+	unresolved = (node, unresolved)
+	var edges = node.edges
 	for edge in edges {
 		if !isInList(edge, resolved) {
 			if isInList(edge, unresolved) {
 			throw('Circular dependency detected: '
-					+node.name+' -> '+edge.name);
+					+node.name+' -> '+edge.name)
 			}
-			depResolve(edge, unresolved);
+			depResolve(edge, unresolved)
 		}
 	}
-	resolved = $pair(node, resolved);
-	unresolved = removeFromList(node, unresolved);
+	resolved = (node, resolved)
+	unresolved = removeFromList(node, unresolved)
 }
-var resolved = [];
-depResolve(a, []);
+resolved := []
+depResolve(a, [])
 
 func printReverse(list) {
-	if $is_empty(list) {
-		return;
+	if list.isEmpty {
+		return
 	}
-	printReverse($tail(list));
-	print($head(list).name);
+	printReverse(list.tail)
+	print(list.head.name)
 }
-printReverse(resolved);
+printReverse(resolved)
