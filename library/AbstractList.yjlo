@@ -1,0 +1,42 @@
+class AbstractList {
+	
+	/* To be overridden */
+	func size() { return 0 }
+	
+	
+	class ListIterator {
+		_index := 0
+		var _current
+		var _next
+		
+		
+		@(current) {
+			_current = current
+		}
+		
+		func setNextFunc(next_func) {
+			_next = next_func
+		}
+		
+		func getCurrent() {
+			return _current
+		}
+		
+		func setCurrent(new_current) {
+			_current = new_current
+		}
+		
+		func hasNext() {
+			return nextIndex() < size()
+		}
+		
+		func nextIndex() {
+			return _index + 1
+		}
+		
+		func next() {
+			_index++
+			return _next()
+		}
+	}
+}
