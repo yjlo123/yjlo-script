@@ -644,9 +644,12 @@ function pair_method(pair, method) {
 }
 
 function refer(fun, member) {
+	// TODO prevent call private member outside class
+	/*
 	if (member.charAt(0) === '_'){
 		throwError('?', 'Referencing private members is not allowed.');
 	}
+	*/
 	
 	let types = ['isList', 'isPair', 'isArray', 'isString', 'isNumber', 'isBoolean', 'isNull'];
 	if (is_compound_function_value(fun)) {
