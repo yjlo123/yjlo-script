@@ -176,7 +176,7 @@ function printSyntaxTree(program_string, program_parser) {
 			syntaxTreeStr = '';
 			printSyntaxTreeNode(syntax_tree, '');
 			jqconsole.Write(syntaxTreeStr + `\n`, 'console-default');
-		}, false);
+		}, tokenizeAndDesugaring, false);
 	} catch (error) {
 		if (debug) {
 			console.error(error);
