@@ -1,10 +1,14 @@
-class AbstractList {
+/* Iterator
+ * @author Siwei Liu
+ * An abstract iterator
+ */
+class Iterator {
 	
 	/* To be overridden */
 	func size() { return 0 }
 	
 	
-	class ListIterator {
+	class Iterator {
 		_index := 0
 		var _current
 		var _next
