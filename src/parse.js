@@ -539,19 +539,26 @@
 			}
 			advance(')');
 			
-			let parent = null;
+			let parents = [];
 			if (checkToken('extends')) {
 				// inheritance
 				advance('extends');
-				if (!isVarNameToken(token)){
-					throwTokenError('a variable name', token);
+				
+				while (true) {
+					if (!isVarNameToken(token)){
+						throwTokenError('a variable name', token);
+					}
+					parents.push(token.value);
+					advance(); // parent name
+					if (!checkToken(',')) {
+						break;
+					}
+					advance(',');
 				}
-				parent = token.value;
-				advance(); // parent name
 			}
 			
 			let funcbody = new FuncDefNode(token.line);
-			funcbody.setParent(parent);
+			funcbody.setParent(_array_to_list(parents));
 			funcbody.setParameters(_array_to_list(args));
 			advance('{');
 			funcbody.setBody(statements());

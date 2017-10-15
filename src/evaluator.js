@@ -410,17 +410,28 @@ function function_definition_parameters(stmt) {
 function function_definition_body(stmt) {
 	return stmt.body;
 }
-function function_definition_parent(stmt) {
+function function_definition_parents(stmt) {
 	return stmt.parent;
 }
 
 function evaluate_function_definition(stmt, env) {
-	let parent_name = function_definition_parent(stmt);
-	if (parent_name) {
-		// extends parent
-		var parent = lookup_variable_value(null, parent_name, env);
-		var parent_env = extend_environment([],[],function_value_environment(parent));
-		evaluate(function_value_body(parent), parent_env);
+	let parent_names = function_definition_parents(stmt);
+	if (!_is_empty(parent_names)) {
+		// extends major parent
+		let major_parent_name = _head(parent_names);
+		let major_parent = lookup_variable_value(null, major_parent_name, env);
+		let parent_env = extend_environment([],[],function_value_environment(major_parent));
+		evaluate(function_value_body(major_parent), parent_env);
+		parent_names = _tail(parent_names);
+		
+		// extends minor parents
+		while (!_is_empty(parent_names)) {
+			let mixin_name = _head(parent_names);
+			let mixin = lookup_variable_value(null, mixin_name, env);
+			evaluate(function_value_body(mixin), parent_env);
+			parent_names = _tail(parent_names);
+		}
+		
 		return new FunctionValue(function_definition_parameters(stmt),
 							function_definition_body(stmt), parent_env,
 							true, stmt.line);

@@ -9,6 +9,7 @@ function tokenizeAndDesugaring(source){
 	};
 	var isOperatorToken = t => t && t.type === 'operator';
 	var isOperatorTokenWithValue = (t, v) => isOperatorToken(t) && t.value === v;
+	var isClosingBracketToken = t => isOperatorTokenWithValue(t, ')');
 	const reservedKeywords = ['var', 'func', 'import', 'class',
 	'if', 'else', 'switch', 'fallthrough', 'case', 'default',
 	'continue', 'break', 'while', 'do', 'for', 'in', 'by', 'return'];
@@ -66,14 +67,16 @@ function tokenizeAndDesugaring(source){
 				desugared_tokens.push(new Token('operator', '(', t.line));
 				class_arg_positions = _pair(desugared_tokens.length, class_arg_positions);
 				desugared_tokens.push(new Token('operator', ')', t.line));
+				
 				// inheritance (Python-like)
 				if (original_tokens[i+1].value === '(') {
-					i++;
-					t = original_tokens[i];
+					t = original_tokens[++i]; // '('
 					desugared_tokens.push(new Token('name', 'extends', t.line));
-					i++;
-					desugared_tokens.push(original_tokens[i]); // parent name
-					i++; // for skipping ')'
+					t = original_tokens[++i]; // first parent
+					while (!isClosingBracketToken(t)) {
+						desugared_tokens.push(t); // parent name or ','
+						t = original_tokens[++i];
+					}
 				}
 				class_level++;
 				break;
