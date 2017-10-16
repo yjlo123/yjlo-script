@@ -1,0 +1,79 @@
+/*
+Array List
+@author Siwei Liu
+*/
+
+import Iterator
+
+class ArrayList (Iterator) {
+	DEFAULT_CAPACITY := 10
+	_size := 0
+	
+	elementData := null
+	
+	@(initialCapacity) {
+		if initialCapacity == null {
+			this.elementData = Array(DEFAULT_CAPACITY)
+		} else if initialCapacity > 0 {
+			this.elementData = Array(initialCapacity)
+		} else {
+			throw("Illegal Capacity: " + initialCapacity)
+		}
+	}
+	
+	func rangeCheck(index) {
+		if index >= _size {
+			throw("IndexOutOfBoundsException " +
+				  "Index: " + index + ", Size: " + size)
+		}
+	}
+	
+	func ensureCapacity(minCapacity) {
+		if minCapacity - elementData.len > 0 {
+			oldCapacity := elementData.len
+			newCapacity := oldCapacity + (oldCapacity >> 1)
+			grownElementData := Array(newCapacity)
+			for i in 0..<_size {
+				grownElementData[i] = elementData[i]
+			}
+			elementData = grownElementData
+		}
+	}
+	
+	func size() {
+		return _size
+	}
+	
+	func capacity() {
+		return elementData.len
+	}
+	
+	func add(e) {
+		ensureCapacity(_size + 1)
+		elementData[_size++] = e
+		return true
+	}
+	
+	func set(index, element) {
+		rangeCheck(index)
+		oldValue = elementData[index]
+		elementData[index] = element
+		return oldValue
+	}
+	
+	func get(index) {
+		rangeCheck(index)
+		return elementData[index]
+	}
+	
+	
+	func iterator() {
+		it := Iterator(0)
+		it.setNextFunc(func() {
+			next_element := elementData[it.getCurrent()]
+			it.setCurrent(it.getCurrent() + 1) 
+			return next_element
+		})
+		return it
+	}
+}
