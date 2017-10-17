@@ -1,0 +1,17 @@
+import HeapList
+
+var arr = HeapList();
+
+arr.init(["zero", "one", "two", "three", "four", "five", "six"]);
+arr.put(7, "seven");
+print(arr.toList());
+print(arr.size());
+print(arr.get(5));
+
+
+/* test iterator */
+it := arr.iterator()
+print(it.hasNext())
+print(it.next())
+print(it.next())
+print(it.next())
