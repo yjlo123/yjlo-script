@@ -1,0 +1,31 @@
+import ArrayList
+
+mal := ArrayList(5)
+
+//print(mal.capacity())
+
+mal.add(3)
+mal.add(2)
+mal.add(8)
+mal.add(6)
+/*
+mal.add(2)
+mal.add(8)
+mal.add(3)
+mal.add(2)
+mal.add(8)
+mal.add(6)
+mal.add(2)
+mal.add(8)
+*/
+
+//print(mal.capacity())
+
+it := mal.iterator()
+
+print(it.hasNext())
+print(it.next())
+print(it.next())
+print(it.next())
+print(it.next())
+print(it.hasNext())
