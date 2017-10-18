@@ -1,55 +1,56 @@
-func Stack() {
-	var _list = null;
-	var _size = 0;
+class Stack {
+	var _list = null
+	var _size = 0
 	
-	_list = [];
+	@() {
+		_list = []
+	}
 	
 	/* Pushes an item onto the top of this stack. */
 	func push(n) {
-		_list = $pair(n, _list);
-		_size++;
+		_list = (n, _list)
+		_size++
 	}
 	
 	/* Removes the item at the top of this stack 
 	 * and returns that item. */
 	func pop() {
-		if $is_empty(_list) { throw("Exception: empty stack."); }
-		var value = $head(_list);
-		_list = $tail(_list);
-		_size--;
-		return value;
+		if _list.isEmpty { throw("Exception: empty stack.") }
+		value := _list.head
+		_list = _list.tail
+		_size--
+		return value
 	}
 	
 	/* Looks at the item at the top of this stack
 	 * without removing it from the stack. */
 	func peek() {
 		if !empty() {
-			return $head(_list);
+			return _list.head
 		} else {
-			throw("Exception: empty stack.");
+			throw("Exception: empty stack.")
 		}
 	}
 	
 	/* Returns the number of items in this stack. */
-	func size() { return _size; }
+	func size() { return _size }
 	
 	/* Tests if this stack is empty. */
-	func empty() { return size() == 0; }
+	func empty() { return size() == 0 }
 	
 	/* Removes all of the elements from this stack. */
 	func clear() {
-		_list = [];
-		_size = 0;
+		_list = []
+		_size = 0
 	}
 	
 	/* Returns a string representation of the stack. */
 	func toString() {
 		func help(lst, str) {
-			if $is_empty(lst) { return str; }
-			return help($tail(lst), $head(lst)+" ) "+str);
+			if lst.isEmpty { return str }
+			return help(lst.tail, lst.head + " ) " + str)
 		}
-		return help(_list, "");
+		return help(_list, "")
 	}
-	
-	return func(){};
+
 }
