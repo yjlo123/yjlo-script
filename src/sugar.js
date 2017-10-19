@@ -16,7 +16,7 @@ function tokenizeAndDesugaring(source){
 	
 	// var program_string_without_comments 
 	// = source.replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
-	let original_tokens = source.tokens('=<>!+-*&|/%^*.:,', '=<>&|*+-.');
+	let original_tokens = source.tokens('=<>!+-*&|/%^*.:', '=<>&|*+-.');
 	let desugared_tokens = [];
 	
 	// desugaring

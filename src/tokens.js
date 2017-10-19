@@ -77,6 +77,7 @@ String.prototype.tokens = function (prefix, suffix) {
 		suffix = '=>&:';
 	}
 
+	single = ',';
 
 // Loop through this text, one character at a time.
 
@@ -302,6 +303,11 @@ String.prototype.tokens = function (prefix, suffix) {
 			str = c;
 			i += 1;
 			while (true) {
+				if (single.indexOf(c) >= 0) {
+					// single char operator
+					c = this.charAt(i);
+					break;
+				}
 				c = this.charAt(i);
 				if (i >= length || suffix.indexOf(c) < 0) {
 					break;
