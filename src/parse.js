@@ -833,7 +833,12 @@
 					if (checkToken('from')) {
 						advance('from');
 						if (token && token.type === 'string') {
-							libPath = token.value + (token.value.slice(-1)==='/'?'':'/') + libPath;
+							if (CONFIG && token.value in CONFIG.library) {
+								configPath = CONFIG.library[token.value];
+								libPath = configPath + (configPath.slice(-1)==='/'?'':'/') + libPath;
+							} else {
+								libPath = token.value + (token.value.slice(-1)==='/'?'':'/') + libPath;
+							}
 							advance(); // path
 						} else {
 							throwError(null, 'Invalid library path for "' + libPath + '".');
