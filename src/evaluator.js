@@ -76,7 +76,9 @@ function duplicateFirstFrame(env) {
 		if (!frame.hasOwnProperty(key)) continue;
 		keys = _pair(key, keys);
 		let value = frame[key];
-		if (typeof value === 'object') {
+		
+		// array should not be copied as an object
+		if (typeof value === 'object' && !(value instanceof Array)) {
 			// shallow copied value
 			vals = _pair(jQuery.extend({}, value), vals);
 		} else {
