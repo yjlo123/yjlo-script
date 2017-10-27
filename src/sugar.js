@@ -10,6 +10,7 @@ function tokenizeAndDesugaring(source){
 	var isOperatorToken = t => t && t.type === 'operator';
 	var isOperatorTokenWithValue = (t, v) => isOperatorToken(t) && t.value === v;
 	var isClosingBracketToken = t => isOperatorTokenWithValue(t, ')');
+	var isNewlineToken = t => t && t.type === 'newline';
 	const reservedKeywords = ['var', 'func', 'import', 'class',
 	'if', 'else', 'switch', 'fallthrough', 'case', 'default',
 	'continue', 'break', 'while', 'do', 'for', 'in', 'by', 'return'];
@@ -26,6 +27,9 @@ function tokenizeAndDesugaring(source){
 	let class_constructor = false;
 	let class_constructor_arg_tokens = [];
 	let class_constructor_stack = _list();
+	let decorator_stack = _list();
+	let decorator_positions = _list();
+	let decorated_funcs = _list();
 	for (let i = 0; i < original_tokens.length; i++) {
 		let t = original_tokens[i];
 		if (t.type !== 'operator' && t.type !== 'name') {
@@ -120,6 +124,32 @@ function tokenizeAndDesugaring(source){
 					desugared_tokens.push(t);
 				}
 				break;
+			case '#':
+				// decorator
+				let decorators = [];
+				let func_arg_tokens = [];
+				while (isOperatorTokenWithValue(t, '#')) {
+					t = original_tokens[++i];
+					if (isVarNameToken(t)) {
+						decorators.push(t);
+					} else {
+						throwError(t, 'Invalid decorator: ' + t.value);
+					}
+					
+					t = original_tokens[++i];
+					if (isNewlineToken(t)) {
+						t = original_tokens[++i];
+					}
+				}
+
+				decorator_stack = _pair(decorators, decorator_stack);
+				decorator_positions = _pair(brace_count, decorator_positions);
+				//desugared_tokens.push(t); // func
+				t = original_tokens[i+1];
+				decorated_funcs = _pair(t, decorated_funcs);
+				i--;
+				//desugared_tokens.push(t); // func name
+				break;
 			case '{':
 				desugared_tokens.push(t);
 				brace_count++;
@@ -153,7 +183,26 @@ function tokenizeAndDesugaring(source){
 					class_constructor = false;
 				}
 				desugared_tokens.push(t); // '}'
+				
 				brace_count--;
+				
+				if (!_is_empty(decorator_positions) && brace_count === _head(decorator_positions)) {
+					let decorators = _head(decorator_stack);
+					let decorated_func = _head(decorated_funcs);
+					for (let i = 0; i < decorators.length; i++) {
+						let decorator = decorators[i];
+						desugared_tokens.push(new Token('name', decorated_func.value, decorator.line));
+						desugared_tokens.push(new Token('operator', '=', decorator.line));
+						desugared_tokens.push(new Token('name', decorator.value, decorator.line));
+						desugared_tokens.push(new Token('operator', '(', decorator.line));
+						desugared_tokens.push(new Token('name', decorated_func.value, decorator.line));
+						desugared_tokens.push(new Token('operator', ')', decorator.line));
+						desugared_tokens.push(new Token('newline', '', decorator.line));
+					}
+					decorator_positions = _tail(decorator_positions);
+					decorator_stack = _tail(decorator_stack);
+					decorated_funcs = _tail(decorated_funcs);
+				}
 				break;
 			default:
 				if (t.type === 'name' && t.value && t.value.length > 0) {
@@ -166,7 +215,7 @@ function tokenizeAndDesugaring(source){
 				desugared_tokens.push(t);
 		}
 	}
-	/*
+/*
 	for (let i = 0 ; i < desugared_tokens.length; i++) {
 		console.log(desugared_tokens[i].value);
 	}*/
