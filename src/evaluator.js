@@ -406,6 +406,9 @@ function evaluate_for_statement_list_clause(stmt, range_list, env) {
 	return evaluate_for_statement_list_clause(stmt, _tail(range_list), env);
 }
 
+function function_definition_name(stmt) {
+	return stmt.name;
+}
 function function_definition_parameters(stmt) {
 	return stmt.parameters;
 }
@@ -434,11 +437,13 @@ function evaluate_function_definition(stmt, env) {
 			parent_names = _tail(parent_names);
 		}
 		
-		return new FunctionValue(function_definition_parameters(stmt),
+		return new FunctionValue(function_definition_name(stmt),
+							function_definition_parameters(stmt),
 							function_definition_body(stmt), parent_env,
 							true, stmt.line);
 	}
-	return new FunctionValue(function_definition_parameters(stmt),
+	return new FunctionValue(function_definition_name(stmt),
+							function_definition_parameters(stmt),
 							function_definition_body(stmt), env,
 							false, stmt.line);
 }
@@ -666,6 +671,9 @@ function refer(fun, member) {
 	
 	let types = ['isList', 'isPair', 'isArray', 'isString', 'isNumber', 'isBoolean', 'isNull'];
 	if (is_compound_function_value(fun)) {
+		if (member === '_name_') {
+			return fun.name;
+		}
 		let func_env = extend_environment([],[],function_value_environment(fun));
 		if (function_value_body(fun)) {
 			// evaluate function body to update environment

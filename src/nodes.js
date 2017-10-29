@@ -103,6 +103,9 @@ class FuncDefNode extends Node {
 	constructor(line) {
 		super('function_definition', line);
 	}
+	setName(value) {
+		this.name = value;
+	}
 	setParent(value) {
 		this.parent = value;
 	}
@@ -236,8 +239,9 @@ class ReturnValue extends Node {
 }
 
 class FunctionValue extends Node {
-	constructor(parameters, body, env, hasParent, line) {
+	constructor(name, parameters, body, env, hasParent, line) {
 		super("function_value", line);
+		this.name = name;
 		this.parameters = parameters;
 		this.body = body;
 		this.environment = env;

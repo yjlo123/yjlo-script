@@ -511,9 +511,11 @@
 	/*===================== FUNC ======================= */
 		var func = function() {
 			log('parsing function. '+token.value);
-			var args = [];
+			let args = [];
 			let node = null;
+			let func_name = '';
 			if (isVarNameToken(token)) {
+				func_name = token.value;
 				node = new VarDefNode(token.line);
 				node.setLeft(token.value);
 				advance(); // func name
@@ -558,6 +560,7 @@
 			}
 			
 			let funcbody = new FuncDefNode(token.line);
+			funcbody.setName(func_name);
 			funcbody.setParent(_array_to_list(parents));
 			funcbody.setParameters(_array_to_list(args));
 			advance('{');
