@@ -9,6 +9,7 @@ function tokenizeAndDesugaring(source){
 	};
 	var isOperatorToken = t => t && t.type === 'operator';
 	var isOperatorTokenWithValue = (t, v) => isOperatorToken(t) && t.value === v;
+	var isOpeningBracketToken = t => isOperatorTokenWithValue(t, '(');
 	var isClosingBracketToken = t => isOperatorTokenWithValue(t, ')');
 	var isNewlineToken = t => t && t.type === 'newline';
 	const reservedKeywords = ['var', 'func', 'import', 'class',
@@ -197,11 +198,28 @@ function tokenizeAndDesugaring(source){
 						desugared_tokens.push(new Token('name', decorated_func.value, decorator.line));
 						desugared_tokens.push(new Token('operator', '=', decorator.line));
 						
-						desugared_tokens = desugared_tokens.concat(decorator_stmt);
-						//desugared_tokens.push(new Token('name', decorator.value, decorator.line));
+						let has_args = false;
+						let decorator_args = [];
+						if (isClosingBracketToken(decorator_stmt[decorator_stmt.length-1])) {
+							has_args = true;
+							let decorator_func = [];
+							let index = 0;
+							while (!isOpeningBracketToken(decorator_stmt[index]) && index < decorator_stmt.length) {
+								decorator_func.push(decorator_stmt[index]);
+								index++;
+							}
+							decorator_args = decorator_stmt.slice(index, decorator_stmt.length);
+							desugared_tokens = desugared_tokens.concat(decorator_func);
+						} else {
+							desugared_tokens = desugared_tokens.concat(decorator_stmt);
+						}
 						
 						desugared_tokens.push(new Token('operator', '(', decorator.line));
 						desugared_tokens.push(new Token('name', decorated_func.value, decorator.line));
+						if (has_args) {
+							desugared_tokens.push(new Token('operator', ',', decorator.line));
+							desugared_tokens = desugared_tokens.concat(decorator_args);
+						}
 						desugared_tokens.push(new Token('operator', ')', decorator.line));
 						desugared_tokens.push(new Token('newline', '', decorator.line));
 					}
