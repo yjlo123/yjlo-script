@@ -159,7 +159,7 @@ function tokenizeAndDesugaring(source){
 					// start of class
 					desugared_tokens.push(new Token('name', 'this', t.line));
 					desugared_tokens.push(new Token('operator', ':=', t.line));
-					desugared_tokens.push(new Token('name', 'func', t.line));
+					desugared_tokens.push(new Token('name', 'class', t.line));
 					desugared_tokens.push(new Token('operator', '(', t.line));
 					desugared_tokens.push(new Token('operator', ')', t.line));
 					desugared_tokens.push(new Token('operator', '{', t.line));

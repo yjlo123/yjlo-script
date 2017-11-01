@@ -102,6 +102,7 @@ class RangeNode extends Node {
 class FuncDefNode extends Node {
 	constructor(line) {
 		super('function_definition', line);
+		this.is_class = false;
 	}
 	setName(value) {
 		this.name = value;
@@ -114,6 +115,9 @@ class FuncDefNode extends Node {
 	}
 	setBody(value) {
 		this.body = value;
+	}
+	setClass() {
+		this.is_class = true;
 	}
 }
 
@@ -239,13 +243,14 @@ class ReturnValue extends Node {
 }
 
 class FunctionValue extends Node {
-	constructor(name, parameters, body, env, hasParent, line) {
+	constructor(name, parameters, body, env, hasParent, isClass, line) {
 		super("function_value", line);
 		this.name = name;
 		this.parameters = parameters;
 		this.body = body;
 		this.environment = env;
 		this.has_parent = hasParent;
+		this.is_class = isClass;
 		this.line = line;
 	}
 }

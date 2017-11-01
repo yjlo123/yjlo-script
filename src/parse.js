@@ -38,6 +38,8 @@
 		};
 
 		var isNameToken = t => t && t.type === 'name';
+		var isNameTokenWithValue = (t, v) => isNameToken(t) && t.value === v;
+		var isFuncToken = t => isNameTokenWithValue(t, 'func') || isNameTokenWithValue(t, 'class');
 		var isOperatorToken = t => t && t.type === 'operator';
 		var isOperatorTokenWithValue = (t, v) => isOperatorToken(t) && t.value === v;
 		var isOpeningBracketToken = t => isOperatorTokenWithValue(t, '(');
@@ -199,7 +201,7 @@
 					// TODO parse range
 					break;
 				}
-				if (isNameToken(token) && token.value !== 'func' &&
+				if (isNameToken(token) && !isFuncToken(token) &&
 						reservedKeywords.indexOf(token.value) !== -1) {
 					// keyword: 'by', 'in'
 					break;
@@ -214,14 +216,15 @@
 				if (isClosingBracketToken(token)) { bracket_count -= 1; }
 				
 				// process tokens
-				if (isNameToken(token) && token.value === 'func') {
+				if (isNameToken(token) && isFuncToken(token)) {
+					let is_class = token.value === 'class';
 					// function expression, should be anonymous
-					advance('func');
+					advance(); // func or class
 					// ignore given name
 					if (isVarNameToken(token)) {
 						advance();
 					}
-					expression_nodes_infix.push(func());
+					expression_nodes_infix.push(func(is_class));
 					continue;
 				} else if (isVarNameToken(token) && isOpeningBracketToken(next_token)) {
 					// function call in expression
@@ -411,7 +414,11 @@
 					break;
 				case 'func':
 					advance();
-					stmt_tree = func();
+					stmt_tree = func(false);
+					break;
+				case 'class':
+					advance();
+					stmt_tree = func(true);
 					break;
 				case 'if':
 					advance();
@@ -509,7 +516,7 @@
 		};
 		
 	/*===================== FUNC ======================= */
-		var func = function() {
+		var func = function(is_class) {
 			log('parsing function. '+token.value);
 			let args = [];
 			let node = null;
@@ -566,6 +573,10 @@
 			advance('{');
 			funcbody.setBody(statements());
 			advance('}');
+			
+			if (is_class) {
+				funcbody.setClass();
+			}
 			
 			if (node) {
 				node.setRight(funcbody);

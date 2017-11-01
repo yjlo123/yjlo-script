@@ -421,6 +421,7 @@ function function_definition_parents(stmt) {
 
 function evaluate_function_definition(stmt, env) {
 	let parent_names = function_definition_parents(stmt);
+	let is_class = stmt.is_class;
 	if (!_is_empty(parent_names)) {
 		// extends major parent
 		let major_parent_name = _head(parent_names);
@@ -440,12 +441,12 @@ function evaluate_function_definition(stmt, env) {
 		return new FunctionValue(function_definition_name(stmt),
 							function_definition_parameters(stmt),
 							function_definition_body(stmt), parent_env,
-							true, stmt.line);
+							true, is_class, stmt.line);
 	}
 	return new FunctionValue(function_definition_name(stmt),
 							function_definition_parameters(stmt),
 							function_definition_body(stmt), env,
-							false, stmt.line);
+							false, is_class, stmt.line);
 }
 
 function is_compound_function_value(f) {
