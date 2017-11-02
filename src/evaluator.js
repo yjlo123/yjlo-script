@@ -57,7 +57,7 @@ function enclose_by(frame, env) {
 }
 
 function make_frame(variables, values) {
-	if (_is_empty(variables) && _is_empty(values)) 
+	if (_is_empty(variables))
 		return {};
 	else {
 		var next_tail = _is_empty(values) ? values : _tail(values);
@@ -539,9 +539,9 @@ function update_environment(vars, vals, base_env) {
 		// add var-val pair to env
 		first_frame(base_env)[_head(vars)] = _is_empty(vals) ? null : _head(vals);
 		return update_environment(_tail(vars), _tail(vals), base_env);
+	} else if (_is_list(vars) && _is_list(vals) && _length(vars) < _length(vals)) {
+		return enclose_by(make_frame(vars, vals), base_env);
 	}
-	else if (_is_list(vars) && _is_list(vals) && _length(vars) < _length(vals))
-		throwError('?', 'Too many arguments supplied: expect '+_length(vars)+', but '+_length(vals)+' given');
 }
 
 function return_statement_expression(stmt) {
