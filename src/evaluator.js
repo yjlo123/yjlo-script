@@ -528,13 +528,14 @@ function apply_primitive_function(fun,argument_list) {
 }
 
 function extend_environment(vars, vals, base_env, line) {
-	if (_length(vars) >= _length(vals))
+	first_frame(base_env)['_args_'] = vals;
 		return enclose_by(make_frame(vars, vals), base_env);
-	else if (_length(vars) < _length(vals))
-		throwError(line || '?', 'Too many arguments supplied: expect '+_length(vars)+', but '+_length(vals)+' given');
 }
 
 function update_environment(vars, vals, base_env) {
+	// _args_
+	first_frame(base_env)['_args_'] = vals;
+	
 	if (!_is_empty(vars) && _length(vars) >= _length(vals)){
 		// add var-val pair to env
 		first_frame(base_env)[_head(vars)] = _is_empty(vals) ? null : _head(vals);
