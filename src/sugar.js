@@ -208,7 +208,12 @@ function tokenizeAndDesugaring(source){
 								decorator_func.push(decorator_stmt[index]);
 								index++;
 							}
-							decorator_args = decorator_stmt.slice(index, decorator_stmt.length);
+							if (index === decorator_stmt.length-2) {
+								// empty args
+								has_args = false;
+							} else {
+								decorator_args = decorator_stmt.slice(index, decorator_stmt.length);
+							}
 							desugared_tokens = desugared_tokens.concat(decorator_func);
 						} else {
 							desugared_tokens = desugared_tokens.concat(decorator_stmt);
