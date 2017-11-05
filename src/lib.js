@@ -200,7 +200,11 @@ function _process_output(args) {
 		} else if (arg && _is_pair(arg)) {
 			segment += _pair_to_string(arg);
 		} else if (arg && arg.tag === 'function_value') {
-			segment = apply(refer(arg, 'toString'),_list(),'?');
+			if (arg.is_class) {
+				segment = apply(refer(arg, 'toString'),_list(),'?');
+			} else {
+				segment = '{func}';
+			}
 		} else {
 			segment = arg;
 		}
