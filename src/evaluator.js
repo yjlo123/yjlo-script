@@ -529,7 +529,7 @@ function apply_primitive_function(fun,argument_list) {
 
 function extend_environment(vars, vals, base_env, line) {
 	first_frame(base_env)['_args_'] = vals;
-		return enclose_by(make_frame(vars, vals), base_env);
+	return enclose_by(make_frame(vars, vals), base_env);
 }
 
 function update_environment(vars, vals, base_env) {
@@ -879,8 +879,12 @@ function evaluate(stmt, env) {
 			var fun = _head(oprnd);
 			var member = _head(_tail(oprnd));
 			if (member instanceof ApplicationNode) {
-				// reference function member
-				return apply(refer(evaluate(fun, env), operator(member).name),
+				// reference function member func
+				let member_func_name = operator(member).name;
+				if (member_func_name === '_apply_') {
+					return apply(evaluate(fun, env), _head(list_of_values(operands(member), env)), stmt.line);
+				}
+				return apply(refer(evaluate(fun, env), member_func_name),
 						list_of_values(operands(member), env), stmt.line);
 			} else {
 				// reference function field
