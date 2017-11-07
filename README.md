@@ -36,6 +36,7 @@ Hello YJLO!
 - closures
 - function member reference
 - classes and inheritance
+- decorator
 - utility libraries
 - online IDE and REPL
 

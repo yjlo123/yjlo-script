@@ -1,5 +1,5 @@
 var debug = false;
-var version = 'v0.3.2';
+var version = 'v0.3.3';
 var current_parser = YjloParser();
 
 
