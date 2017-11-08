@@ -1,228 +1,241 @@
 /* LinkedList
  * @author Liu Siwei (liusiwei.yjlo@gmail.com)
- * Followed JDK 8 java.util.LinkedList
  */
+import Iterator
 
-func LinkedList() {
-	func _Node(prev_, element_, next_) {
-		var item = element_;
-		var next = next_;
-		var prev = prev_;
+class LinkedList(Iterator) {
+	class _Node {
+		var item, next, prev
 		
-		return func(){};
+		@(prev_, element_, next_) {
+			item = element_
+			next = next_
+			prev = prev_
+		}
+		
+		func toString() { return item + "" }
 	}
 	
-	var _EMPTY_LIST_EXCEPTION_MESSAGE = "Exception: empty list.";
-	var _INDEX_OUT_OF_BOUNDS_EXCEPTION_MESSAGE = "Exception: index out of bounds.";
+	var _EMPTY_LIST_EXCEPTION_MESSAGE = "Exception: empty list."
+	var _INDEX_OUT_OF_BOUNDS_EXCEPTION_MESSAGE = "Exception: index out of bounds."
 	
-	var _size = 0;
+	var _size = 0
 	
 	/* Pointer to first node. */
-	var _first = null;
+	var _first = null
 	
 	/* Pointer to last node. */
-	var _last = null;
+	var _last = null
 
 	/* Returns the number of elements in this list. */
 	func size() {
-		return _size;
+		return _size
 	}
 	
 	/* Appends the specified element to the end of this list.
 	 * This method is equivalent to addLast */
 	func add(e) {
-		_linkLast(e);
-		return true;
+		_linkLast(e)
+		return true
 	}
 	
 	/* Inserts the specified element at the beginning of this list. */
 	func addFirst(e) {
-		_linkFirst(e);
+		_linkFirst(e)
 	}
 	
 	/* Appends the specified element to the end of this list. */
 	func addLast(e) {
-		_linkLast(e);
+		_linkLast(e)
 	}
 	
 	/* Links e as first element. */
 	func _linkFirst(e) {
-		var f = _first;
-		var newNode = _Node(null, e, f);
-		_first = newNode;
+		var f = _first
+		var newNode = _Node(null, e, f)
+		_first = newNode
 		if f == null {
-			_last = newNode;
+			_last = newNode
 		} else {
-			f.prev = newNode;
+			f.prev = newNode
 		}
-		_size++;
+		_size++
 	}
 
 	/* Links e as last element. */
 	func _linkLast(e) {
-		var l = _last;
-		var newNode = _Node(l, e, null);
-		_last = newNode;
+		var l = _last
+		var newNode = _Node(l, e, null)
+		_last = newNode
 		if l == null {
-			_first = newNode;
+			_first = newNode
 		} else {
-			l.next = newNode;
+			l.next = newNode
 		}
-		_size++;
+		_size++
 	}
 	
 	func clear() {
-		var x = _first;
+		var x = _first
 		while x != null {
-			var next = x.next;
-			x.item = null;
-			x.next = null;
-			x.prev = null;
-			x = next;
+			var next = x.next
+			x.item = null
+			x.next = null
+			x.prev = null
+			x = next
 		}
-		_first = null;
-		_last = null;
-		_size = 0;
+		_first = null
+		_last = null
+		_size = 0
 	}
 	
 	func _checkElementIndex(index) {
 		if !(index >= 0 && index < _size) {
-			throw(_INDEX_OUT_OF_BOUNDS_EXCEPTION_MESSAGE);
+			throw(_INDEX_OUT_OF_BOUNDS_EXCEPTION_MESSAGE)
 		}
 	}
 	
 	/* Returns the (non-null) Node at the specified element index. */
 	func _node(index) {
 		if index < (_size >> 1) {
-			var x = _first;
+			var x = _first
 			for i in 0..<index {
-				x = x.next;
+				x = x.next
 			}
-			return x;
+			return x
 		} else {
-			var x = _last;
+			var x = _last
 			for i in size - 1..>index by -1 {
-				x = x.prev;
+				x = x.prev
 			}
-			return x;
+			return x
 		}
 	}
 	
 	/* Returns the element at the specified position in this list. */
 	func get(index) {
-		_checkElementIndex(index);
-		return _node(index).item;
+		_checkElementIndex(index)
+		return _node(index).item
 	}
 	
 	/* Returns the first element in this list. */
 	func getFirst() {
-		var f = _first;
+		var f = _first
 		if f == null {
-			throw(_EMPTY_LIST_EXCEPTION_MESSAGE);
+			throw(_EMPTY_LIST_EXCEPTION_MESSAGE)
 		}
-		return f.item;
+		return f.item
 	}
 	
 	/* Returns the last element in this list. */
 	func getLast() {
-		var l = _last;
+		var l = _last
 		if l == null {
-			throw(_EMPTY_LIST_EXCEPTION_MESSAGE);
+			throw(_EMPTY_LIST_EXCEPTION_MESSAGE)
 		}
-		return l.item;
+		return l.item
 	}
 	
 	/* Removes and returns the first element from this list. */
 	func removeFirst() {
-		var f = _first;
+		var f = _first
 		if f == null {
-			throw(_EMPTY_LIST_EXCEPTION_MESSAGE);
+			throw(_EMPTY_LIST_EXCEPTION_MESSAGE)
 		}
-		return _unlinkFirst(f);
+		return _unlinkFirst(f)
 	}
 	
 	/* Removes and returns the last element from this list. */
 	func removeLast() {
-		var l = _last;
+		var l = _last
 		if l == null {
-			throw(_EMPTY_LIST_EXCEPTION_MESSAGE);
+			throw(_EMPTY_LIST_EXCEPTION_MESSAGE)
 		}
-		return _unlinkLast(l);
+		return _unlinkLast(l)
 	}
 	
 	/* Unlinks non-null first node f. */
 	func _unlinkFirst(f) {
-		// assert f == first && f != null;
-		var element = f.item;
-		var next = f.next;
-		f.item = null;
-		f.next = null;
-		_first = next;
+		// assert f == first && f != null
+		var element = f.item
+		var next = f.next
+		f.item = null
+		f.next = null
+		_first = next
 		if next == null {
-			_last = null;
+			_last = null
 		} else {
-			next.prev = null;
+			next.prev = null
 		}
-		_size--;
-		return element;
+		_size--
+		return element
 	}
 	
 	/* Unlinks non-null last node l. */
 	func _unlinkLast(l) {
-		// assert l == last && l != null;
-		var element = l.item;
-		var prev = l.prev;
-		l.item = null;
-		l.prev = null;
-		_last = prev;
+		// assert l == last && l != null
+		var element = l.item
+		var prev = l.prev
+		l.item = null
+		l.prev = null
+		_last = prev
 		if prev == null {
-			_first = null;
+			_first = null
 		} else {
-			prev.next = null;
+			prev.next = null
 		}
-		_size--;
-		return element;
+		_size--
+		return element
 	}
 	
 	/* Returns the index of the first occurrence
 	 * of the specified element in this list,
 	 * or -1 if this list does not contain the element.*/
 	func indexOf(o) {
-		var index = 0;
+		var index = 0
 		if o == null {
-			var x = _first;
+			var x = _first
 			while x != null {
 				if x.item == null {
-					return index;
+					return index
 				}
-				index++;
-				x = x.next;
+				index++
+				x = x.next
 			}
 		} else {
 			
-			var x = _first;
+			var x = _first
 			while x != null {
 				// if o.equals(x.item_) ...
 				if o == x.item {
-					return index;
+					return index
 				}
-				index++;
-				x = x.next;
+				index++
+				x = x.next
 			}
 		}
-		return -1;
+		return -1
 	}
 	
 	/* Return built-in list type */
 	func toList() {
 		func help(node) {
 			if node == null {
-				return [];
+				return []
 			}
-			return $pair(node.item, help(node.next));
+			return $pair(node.item, help(node.next))
 		}
-		return help(_first);
+		return help(_first)
+	}
+
+	func iterator() {
+		it := Iterator(_first)
+		it.setNextFunc(func() {
+			next_element := it.getCurrent()
+			it.setCurrent(it.getCurrent().next) 
+			return next_element
+		})
+		return it
 	}
 	
-	return func(){};
 }
