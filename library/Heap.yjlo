@@ -1,18 +1,19 @@
 /* Heap
- * @author Liu Siwei (liusiwei.yjlo@gmail.com)
+ * @author Siwei Liu
  * An abstract heap
  */
 
-func Heap() {
+class Heap {
 	
-	func _Node() {
-		var value = null;
-		var left = null;
-		var right = null;
-		return func(){};
+	class _Node {
+		var value, left, right
 	}
 
-	var _root = _Node();
+	var _root
+
+	@() {
+		_root = _Node()
+	}
 
 	/**
 	 * given an index, return the path from root 
@@ -20,15 +21,15 @@ func Heap() {
 	 * 0: go right
 	 */
 	func _getPathByIndex(n) {
-		var pathList = [];
-		if n == 0 { return pathList; }
-		pathList = $pair(n % 2, pathList);
-		n = (n - 1) / 2;
+		var pathList = []
+		if n == 0 { return pathList }
+		pathList = $pair(n % 2, pathList)
+		n = (n - 1) / 2
 		while n != 0 {
-			pathList = $pair(n % 2, pathList);
-			n = (n - 1) / 2;
+			pathList = $pair(n % 2, pathList)
+			n = (n - 1) / 2
 		}
-		return pathList;
+		return pathList
 	}
 
 	/**
@@ -36,24 +37,23 @@ func Heap() {
 	 * while going through the path
 	 */
 	func _getNodeByPath(path, create) {
-		if $is_empty(path) { return _root; }
-		var current = _root;
+		if $is_empty(path) { return _root }
+		var current = _root
 		while !$is_empty(path) && current != null {
 			if $head(path) == 1 {
 				if current.left == null && create {
-					current.left = _Node();
+					current.left = _Node()
 				}
-				current = current.left;
+				current = current.left
 			} else {
 				if current.right == null && create {
-					current.right = _Node();
+					current.right = _Node()
 				}
-				current = current.right;
+				current = current.right
 			}
-			path = $tail(path);
+			path = $tail(path)
 		}
-		return current;
+		return current
 	}
 
-	return func(){};
 }
