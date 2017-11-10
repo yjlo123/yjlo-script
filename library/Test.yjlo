@@ -1,0 +1,62 @@
+class Test {
+	
+	_registered_funcs := []
+	_test_set_count := 0
+	_success_set_count := 0
+	_current_set_pass := true
+	_current_set_name := null
+	
+	func test(f) {
+		_registered_funcs = (f, _registered_funcs)
+		_test_set_count++
+		return f
+	}
+	
+	func assertEqual(expect, actual, optional_tag) {
+		if expect != actual {
+			_process_error(expect, actual, optional_tag)
+		}
+	}
+	
+	func assertTrue(actual, optional_tag) {
+		if actual != true {
+			_process_error("true", actual, optional_tag)
+		}
+	}
+	
+	func assertFalse(actual, optional_tag) {
+		if actual != false {
+			_process_error("false", actual, optional_tag)
+		}
+	}
+	
+	func _process_error(expect, actual, optional_tag) {
+		print("[" + _current_set_name +
+				(optional_tag==null?"":("|"+optional_tag)) +
+				"] Expect: " + expect + ", but actual: " + actual)
+			_current_set_pass = false
+	}
+	
+	func run() {
+		func recursion(func_list) {
+			if func_list.isEmpty {
+				return
+			}
+			recursion(func_list.tail)
+			f := func_list.head
+			_current_set_name = f._name_
+			_current_set_pass = true
+			f()
+			if _current_set_pass {
+				_success_set_count++
+			}
+		}
+		recursion(_registered_funcs)
+		print(_success_set_count + " / " + _test_set_count)
+	}
+}
+
+func run_test(c) {
+	testClass := c()
+	testClass.run()
+}
