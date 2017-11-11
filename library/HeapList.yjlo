@@ -1,84 +1,85 @@
 /* HeapList
- * @author Liu Siwei (liusiwei.yjlo@gmail.com)
+ * @author Siwei Liu
  * A heap that works like an array list
  */
 
-import Heap;
+import Heap
+import Iterator
 
-class HeapList extends Heap {
+class HeapList (Heap, Iterator) {
 
-	var _size = 0;
-	_root = _Node();
+	var _size = 0
+	_root = _Node()
 
 	@(arg) {
 		if arg != null && $is_list(arg) {
-			init(arg);
+			init(arg)
 		}
 	}
 
 	func init(lst) {
-		_size = 0;
-		var i = 0;
+		_size = 0
+		var i = 0
 		for e in lst {
-			put(i++, e);
+			put(i++, e)
 		}
 	}
 
 	func put(index, value) {
-		_getNodeByPath(_getPathByIndex(index), true).value = value;
+		_getNodeByPath(_getPathByIndex(index), true).value = value
 		if index + 1 > _size {
-			_size = index + 1;
+			_size = index + 1
 		}
 	}
 
 	func get(index) {
-		index /= 1;
-		if !(index >= 0) { return null; }
-		var target = _getNodeByPath(_getPathByIndex(index), false);
+		index /= 1
+		if !(index >= 0) { return null }
+		var target = _getNodeByPath(_getPathByIndex(index), false)
 		if target {
-			return target.value;
+			return target.value
 		} else {
-			return null;
+			return null
 		}
 	}
 
 	func size() {
-		return _size;
+		return _size
 	}
 	
 	func clear() {
-		_root = _Node();
-		_size = 0;
+		_root = _Node()
+		_size = 0
 	}
 	
 	func toList() {
-		var list = [];
+		var list = []
 		for i in size()-1...0 by -1 {
-			list = $pair(get(i), list);
+			list = $pair(get(i), list)
 		}
-		return list;
+		return list
 	}
 	
 	func toString() {
-		var str = "[";
+		var str = "["
 		for i in 0..<size()-1 {
-			str += (get(i) + ", ");
+			str += (get(i) + ", ")
 		}
 		if size() > 0 {
-			str += (get(size()-1) + "]");
+			str += (get(size()-1) + "]")
 		} else {
-			str += "]";
+			str += "]"
 		}
-		return str;
+		return str
+	}
+	
+	func iterator() {
+		it := Iterator(0)
+		it.setNextFunc(func() {
+			next_element := get(it.getCurrent())
+			it.setCurrent(it.getCurrent() + 1) 
+			return next_element
+		})
+		return it
 	}
 }
-
-/*
-var arr = HeapList();
-
-arr.init(["zero", "one", "two", "three", "four", "five", "six"]);
-arr.put(7, "seven");
-print(arr.toList());
-print(arr.size());
-print(arr.get(5));
-*/
