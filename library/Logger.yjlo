@@ -1,0 +1,25 @@
+class Logger {
+
+	func before(f) {
+		content := _args_.tail.head
+		return func() {
+			print(content)
+			f._apply_(_args_)
+		}
+	}
+	
+	func after(f) {
+		content := _args_.tail.head
+		return func() {
+			f._apply_(_args_)
+			print(content)
+		}
+	}
+	
+	func params(f) {
+		return func() {
+			print(_args_)
+			f._apply_(_args_)
+		}
+	}
+}
