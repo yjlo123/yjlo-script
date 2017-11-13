@@ -1,0 +1,17 @@
+import LinkedList
+
+/* test iterator */
+ll := LinkedList()
+ll.add(3)
+ll.add(2)
+ll.add(8)
+ll.add(6)
+
+it := ll.iterator()
+
+print(it.hasNext())
+print(it.next())
+print(it.next())
+print(it.next())
+print(it.next())
+print(it.hasNext())
