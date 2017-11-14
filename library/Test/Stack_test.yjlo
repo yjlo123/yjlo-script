@@ -1,0 +1,27 @@
+import Test
+import Stack
+
+#run_test
+class StackTest (Test) {
+	
+	#test
+	func test1() {
+		s := Stack()
+		assertEqual(0, s.size())
+		s.push(3)
+		s.push(2)
+		s.push(8)
+		assertEqual(3, s.size())
+		v := s.pop()
+		assertEqual(8, v)
+		assertEqual(2, s.size())
+	}
+
+	#test
+	func test2() {
+		s := Stack()
+		assertTrue(s.empty())
+		s.push(5)
+		assertFalse(s.empty())
+	}
+}
