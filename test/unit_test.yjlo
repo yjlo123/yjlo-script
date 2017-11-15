@@ -1,138 +1,138 @@
-import UnitTest;
+import UnitTest
 
 func testArithmetic() {
-	ut = UnitTest("Test Arithmetic");
+	ut = UnitTest("Test Arithmetic")
 	
 	/* basic */
-	ut.assertEquals( -10,	-5 * 2		);
-	ut.assertEquals( -10,	(-5) * 2	);
-	ut.assertEquals( -10,	(-5 * 2)	);
-	ut.assertEquals( -10,	2 * (-5)	);
-	ut.assertEquals( 11,	8 + 3		);
-	ut.assertEquals( 5,		8 - 3		);
-	ut.assertEquals( 11,	8 - (-3)	);
-	ut.assertEquals( 24,	8 * 3		);
-	ut.assertEquals( 2,		8 / 3		);
-	ut.assertEquals( 1.6,	8 /. 5		);
-	ut.assertEquals( 2,		8 % 3		);
-	ut.assertEquals( 512,	8 ** 3		);
+	ut.assertEquals( -10,	-5 * 2		)
+	ut.assertEquals( -10,	(-5) * 2	)
+	ut.assertEquals( -10,	(-5 * 2)	)
+	ut.assertEquals( -10,	2 * (-5)	)
+	ut.assertEquals( 11,	8 + 3		)
+	ut.assertEquals( 5,		8 - 3		)
+	ut.assertEquals( 11,	8 - (-3)	)
+	ut.assertEquals( 24,	8 * 3		)
+	ut.assertEquals( 2,		8 / 3		)
+	ut.assertEquals( 1.6,	8 /. 5		)
+	ut.assertEquals( 2,		8 % 3		)
+	ut.assertEquals( 512,	8 ** 3		)
 	
 	/* variable */
-	var a = 4;
-	var b = 9;
-	var c = -5;
-	ut.assertEquals( 13,	a + b		);
-	ut.assertEquals( -5,	a - b		);
-	ut.assertEquals( 36,	a * b		);
-	ut.assertEquals( 2,		b / a		);
-	ut.assertEquals( 2.25,	b /. a		);
-	ut.assertEquals( 5,		(b - a)		);
-	ut.assertEquals( 13,	(b - (-a))	);
-	ut.assertEquals( 25,	c ** 2		);
-	ut.assertEquals( 1,		c ** 0		);
-	ut.assertEquals( 1,		b % a		);
-	ut.assertEquals( 14,	b - c		);
-	ut.assertEquals( -14,	c - b		);
+	a := 4
+	b := 9
+	c := -5
+	ut.assertEquals( 13,	a + b		)
+	ut.assertEquals( -5,	a - b		)
+	ut.assertEquals( 36,	a * b		)
+	ut.assertEquals( 2,		b / a		)
+	ut.assertEquals( 2.25,	b /. a		)
+	ut.assertEquals( 5,		(b - a)		)
+	ut.assertEquals( 13,	(b - (-a))	)
+	ut.assertEquals( 25,	c ** 2		)
+	ut.assertEquals( 1,		c ** 0		)
+	ut.assertEquals( 1,		b % a		)
+	ut.assertEquals( 14,	b - c		)
+	ut.assertEquals( -14,	c - b		)
 	
 	/* complex */
-	ut.assertEquals( 1,		b - a * 2		);
-	ut.assertEquals( -1,	c + b / 2		);
-	ut.assertEquals( -0.5,	c + b /. 2		);
-	ut.assertEquals( 64,	(b + c) ** 3	);
-	ut.assertEquals( 5,		c ** 2 / 5		);
-	ut.assertEquals( 40,	(a + 4) * (b - 4)	);
-	ut.assertEquals( 40,	((a + 4) * (b - 4))	);
-	ut.assertEquals( 0,		-5 + (b - 4)		);
-	ut.assertEquals( 5,		(-a) + b			);
-	ut.assertEquals( -17,	-a - b * 2 - c		);
-	ut.assertEquals( 108,	a * 3 * b			);
-	ut.assertEquals( 4,		a * 9 / b			);
-	ut.assertEquals( 9,		a * 0 + b % 10		);
-	ut.assertEquals( 29,	a * b + c - (-3 - c));
+	ut.assertEquals( 1,		b - a * 2		)
+	ut.assertEquals( -1,	c + b / 2		)
+	ut.assertEquals( -0.5,	c + b /. 2		)
+	ut.assertEquals( 64,	(b + c) ** 3	)
+	ut.assertEquals( 5,		c ** 2 / 5		)
+	ut.assertEquals( 40,	(a + 4) * (b - 4)	)
+	ut.assertEquals( 40,	((a + 4) * (b - 4))	)
+	ut.assertEquals( 0,		-5 + (b - 4)		)
+	ut.assertEquals( 5,		(-a) + b			)
+	ut.assertEquals( -17,	-a - b * 2 - c		)
+	ut.assertEquals( 108,	a * 3 * b			)
+	ut.assertEquals( 4,		a * 9 / b			)
+	ut.assertEquals( 9,		a * 0 + b % 10		)
+	ut.assertEquals( 29,	a * b + c - (-3 - c))
 	
-	ut.printResult();
+	ut.printResult()
 }
 
 func testConcatenation() {
-	ut = UnitTest("Test Concatenation");
+	ut = UnitTest("Test Concatenation")
 	
-	ut.assertEquals( "abcdef",	"abc" + "def"	);
-	ut.assertEquals( "abc123",	"abc" + 123		);
-	ut.assertEquals( "abc123",	"abc" + 12 + 3	);
-	ut.assertEquals( "abc15",	"abc" + (12 + 3));
-	ut.assertEquals( "123abc",	123 + "abc"		);
-	ut.assertEquals( "3abc",	1 + 2 + "abc"	);
-	ut.assertEquals( "12abc",	1 + (2 + "abc")	);
+	ut.assertEquals( "abcdef",	"abc" + "def"	)
+	ut.assertEquals( "abc123",	"abc" + 123		)
+	ut.assertEquals( "abc123",	"abc" + 12 + 3	)
+	ut.assertEquals( "abc15",	"abc" + (12 + 3))
+	ut.assertEquals( "123abc",	123 + "abc"		)
+	ut.assertEquals( "3abc",	1 + 2 + "abc"	)
+	ut.assertEquals( "12abc",	1 + (2 + "abc")	)
 	
-	ut.assertEquals( "-2abc",	-2+"abc"		);
-	ut.assertEquals( "abc-2",	"abc"+(-2)		);
+	ut.assertEquals( "-2abc",	-2+"abc"		)
+	ut.assertEquals( "abc-2",	"abc"+(-2)		)
 	
-	ut.printResult();
+	ut.printResult()
 }
 
 func testComparision() {
-	ut = UnitTest("Test Comparision");
+	ut = UnitTest("Test Comparision")
 	
-	ut.assertTrue( 5 == 5 );
-	ut.assertTrue( 5 > 4 );
-	ut.assertTrue( 3 + 2 > 4 );
-	ut.assertTrue( 2 + 2 >= 4 );
-	ut.assertTrue( 2 * 3 >= 4 );
-	ut.assertTrue( 0 < 9 );
-	ut.assertTrue( -6 < (-5) );
-	ut.assertTrue( 5 <= 5 );
-	ut.assertTrue( -5 <= 5 );
+	ut.assertTrue( 5 == 5 )
+	ut.assertTrue( 5 > 4 )
+	ut.assertTrue( 3 + 2 > 4 )
+	ut.assertTrue( 2 + 2 >= 4 )
+	ut.assertTrue( 2 * 3 >= 4 )
+	ut.assertTrue( 0 < 9 )
+	ut.assertTrue( -6 < (-5) )
+	ut.assertTrue( 5 <= 5 )
+	ut.assertTrue( -5 <= 5 )
 	
-	ut.assertTrue( (5 == 5) == true );
-	ut.assertTrue( (5 == 6) == false );
-	ut.assertFalse( (5 == 6) == true );
+	ut.assertTrue( (5 == 5) == true )
+	ut.assertTrue( (5 == 6) == false )
+	ut.assertFalse( (5 == 6) == true )
 	
-	ut.assertFalse( 5 < 1 + 2 );
-	ut.assertFalse( -5 <= (-9) );
-	ut.assertFalse( 9 > 10 );
-	ut.assertFalse( 2 * 5 > 10 );
-	ut.assertFalse( -8 > (-2) );
-	ut.assertFalse( 3 ** 2 >= 10 );
-	ut.assertFalse( 9 == 10 );
+	ut.assertFalse( 5 < 1 + 2 )
+	ut.assertFalse( -5 <= (-9) )
+	ut.assertFalse( 9 > 10 )
+	ut.assertFalse( 2 * 5 > 10 )
+	ut.assertFalse( -8 > (-2) )
+	ut.assertFalse( 3 ** 2 >= 10 )
+	ut.assertFalse( 9 == 10 )
 	
-	ut.printResult();
+	ut.printResult()
 }
 
 func testAssignment() {
-	ut = UnitTest("Test Assignment");
+	ut = UnitTest("Test Assignment")
 	
-	var a = 5*6;
-	ut.assertEquals(a, 30);
-	a += 5;
-	ut.assertEquals(a, 35);
-	a -= 15;
-	ut.assertEquals(a, 20);
-	a /= 6;
-	ut.assertEquals(a, 3);
-	a /.= 5;
-	ut.assertEquals(a, 0.6);
-	a *= 10;
-	ut.assertEquals(a, 6);
-	a %= 4;
-	ut.assertEquals(a, 2);
-	a **= 3;
-	ut.assertEquals(a, 8);
-	a++;
-	ut.assertEquals(a, 9);
-	a--;
-	ut.assertEquals(a, 8);
+	a := 5 * 6
+	ut.assertEquals(a, 30)
+	a += 5
+	ut.assertEquals(a, 35)
+	a -= 15
+	ut.assertEquals(a, 20)
+	a /= 6
+	ut.assertEquals(a, 3)
+	a /.= 5
+	ut.assertEquals(a, 0.6)
+	a *= 10
+	ut.assertEquals(a, 6)
+	a %= 4
+	ut.assertEquals(a, 2)
+	a **= 3
+	ut.assertEquals(a, 8)
+	a++
+	ut.assertEquals(a, 9)
+	a--
+	ut.assertEquals(a, 8)
 	
-	ut.printResult();
+	ut.printResult()
 }
 
 func main() {
-	testArithmetic();
-	testConcatenation();
-	testComparision();
-	testAssignment();
-	print();
+	testArithmetic()
+	testConcatenation()
+	testComparision()
+	testAssignment()
+	print()
 	
-	print(ut.all_pass?"[Success]":"[Failed]");
+	print(ut.all_pass?"[Success]":"[Failed]")
 }
-var ut = null;
-main();
+ut := null
+main()
