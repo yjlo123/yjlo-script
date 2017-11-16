@@ -3,66 +3,69 @@
  * A hash map implemented using heap
  */
 
-import Heap;
+import Heap
 
-func HashMap(capacity) extends Heap {
+class HashMap (Heap) {
 	
 	/* for building heap */
 	// Override
-	func _Node() {
-		var entry = [];
-		var left = null;
-		var right = null;
+	class _Node {
+		var entry = []
+		var left = null
+		var right = null
 		func toString() {
-			var str = "";
-			var tempEntry = entry;
+			var str = ""
+			var tempEntry = entry
 			for e in tempEntry {
-				str += e.toString();
+				str += e.toString()
 			}
-			return str;
+			return str
 		}
-		return func(){};
 	}
 	
 	/* for storing key value pairs */
-	func _Entry(k, v) {
-		var key = k;
-		var value = v;
+	class _Entry {
+		var key, value
+		
+		@(k, v) {
+			key = k
+			value = v
+		}
+		
 		func toString() {
-			return "("+key+", "+value+")";
+			return "("+key+", "+value+")"
 		}
-		return func(){};
 	}
 	
-	var _CAPACITY = 63;
+	var _CAPACITY
+	var _size = 0
+	var _root 
 	
-	// Override
-	var _root = _Node();
-	
-	var _size = 0;
-	
-	/* initialization */
-	func _init() {
+	@(capacity) {
 		if capacity {
-			_CAPACITY = capacity;
+			_CAPACITY = capacity
+		} else {
+			_CAPACITY = 63
 		}
+		
+		// Override
+		_root = _Node()
 	}
-	_init();
 
 	func hashCode(str) {
-		var hash = 0;
-		var chars = $string_to_char_list(str);
-		if $is_empty(chars) { return hash; }
+		var hash = 0
+		var chars = $string_to_char_list(str)
+		if $is_empty(chars) { return hash }
 		for chr in chars {
-			hash = ((hash << 5) - hash) + $char_code(chr);
-			hash = hash & hash; // Convert to 32bit integer
+			hash = ((hash << 5) - hash) + $char_code(chr)
+			hash = hash & hash // Convert to 32bit integer
 		}
-		return hash % _CAPACITY;
+		return hash % _CAPACITY
 	}
 	
 	func clear() {
-		_root = _Node();
-		_size = 0;
+		_root = _Node()
+		_size = 0
 	}
 
 	/**
@@ -74,79 +77,77 @@ func HashMap(capacity) extends Heap {
 	 *     or null if it did not have one
 	 */
 	func put(key, value) {
-		var index = hashCode(key);
-		var target = _getNodeByPath(_getPathByIndex(index), true);
-		var entries = target.entry;
+		var index = hashCode(key)
+		var target = _getNodeByPath(_getPathByIndex(index), true)
+		var entries = target.entry
 		for entry in entries {
 			if entry.key == key {
 				// found existing key
-				var prev_value = entry.value;
-				entry.value = value;
-				return prev_value;
+				var prev_value = entry.value
+				entry.value = value
+				return prev_value
 			}
 		}
 		// new key
-		target.entry = $pair(_Entry(key, value), target.entry);
-		_size++;
-		return null;
+		target.entry = $pair(_Entry(key, value), target.entry)
+		_size++
+		return null
 	}
 
 	func get(key) {
-		var index = hashCode(key);
-		var target = _getNodeByPath(_getPathByIndex(index), false);
+		var index = hashCode(key)
+		var target = _getNodeByPath(_getPathByIndex(index), false)
 		if target {
-			var list = target.entry;
+			var list = target.entry
 			for e in list {
 				if e.key == key {
-					return e.value;
+					return e.value
 				}
 			}
-			return null;
+			return null
 		}
-		return null;
+		return null
 	}
 	
 	func remove(key) {
 		func deleteFromList(list, key) {
-			if $is_empty(list) { return list; }
+			if $is_empty(list) { return list }
 			if $head(list).key == key {
-				_size--;
-				return deleteFromList($tail(list), key);
+				_size--
+				return deleteFromList($tail(list), key)
 			} else {
-				return $pair($head(list), deleteFromList($tail(list), key));
+				return $pair($head(list), deleteFromList($tail(list), key))
 			}
 		}
-		var index = hashCode(key);
-		var target = _getNodeByPath(_getPathByIndex(index), false);
+		var index = hashCode(key)
+		var target = _getNodeByPath(_getPathByIndex(index), false)
 		if target {
-			var list = target.entry;
-			var foundEntry = null;
+			var list = target.entry
+			var foundEntry = null
 			for e in list {
 				if e.key == key {
-					foundEntry = e;
-					target.entry = deleteFromList(target.entry, key);
-					return foundEntry.value;
+					foundEntry = e
+					target.entry = deleteFromList(target.entry, key)
+					return foundEntry.value
 				}
 			}
-			return null;
+			return null
 		}
-		return null;
+		return null
 	}
 	
 	func size() {
-		return _size;
+		return _size
 	}
 	
 	func toString() {
-		var str = "";
+		var str = ""
 		for i in 0..<_CAPACITY {
-			var node = _getNodeByPath(_getPathByIndex(i), false);
+			var node = _getNodeByPath(_getPathByIndex(i), false)
 			if node != null && !$is_empty(node.entry) {
-				str += (i + ": " + node.toString() + "\n");
+				str += (i + ": " + node.toString() + "\n")
 			}
 		}
-		return str;
+		return str
 	}
-
-	return func(){};
 }
