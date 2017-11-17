@@ -765,8 +765,13 @@ var primitive_functions = {
 				return _create_array.apply(this, arguments);
 			}
 		},
-		'[': (arr, index) => arr[index],
-		
+		'[': (arr, index) => {
+			if (index >= 0){
+				return arr[index];
+			} else {
+				return arr[arr.length + index];
+			}
+		},
 		'_-': (x) => -x, // negative
 		'**': (x,y) => Math.pow(x,y), // power 
 		'+': (x,y) => x + y,
