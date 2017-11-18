@@ -341,6 +341,7 @@ function evaluate_do_while_statement(stmt, env) {
 	}
 }
 
+// ========================== FOR ==========================
 function evaluate_for_statement(stmt, env) {
 	let extented_env = extend_environment([], [], env);
 	let range = for_range(stmt);
@@ -358,10 +359,15 @@ function evaluate_for_statement(stmt, env) {
 							extented_env);
 	} else if (range.tag === 'variable' || range.tag === 'application') {
 		// list
-		let list_value = evaluate(range, env);
-		if (!_is_list(list_value)) throwError(stmt.line, 'Invalid range.');
+		let range_value = evaluate(range, env);
 		define_variable(for_variable(stmt).name, null, extented_env);
-		return evaluate_for_statement_list_clause(stmt, list_value, extented_env);
+		if (_is_list(range_value)) {
+			return evaluate_for_statement_list_clause(stmt, range_value, extented_env);
+		} else if (_is_array(range_value)) {
+			return evaluate_for_statement_array_clause(stmt, range_value, 0, extented_env);
+		} else {
+			throwError(stmt.line, 'Invalid range.');
+		}
 	} else {
 		throwError(stmt.line, 'Invalid range.');
 	}
@@ -406,6 +412,22 @@ function evaluate_for_statement_list_clause(stmt, range_list, env) {
 	return evaluate_for_statement_list_clause(stmt, _tail(range_list), env);
 }
 
+function evaluate_for_statement_array_clause(stmt, range_arr, index, env) {
+	if (range_arr.length === index) return;
+	// set list head as the current variable value
+	set_variable_value(stmt, for_variable(stmt).name, range_arr[index], env);
+	// evaluate consequent
+	let result = evaluate(for_consequent(stmt), env);
+	if (result instanceof ReturnValue) {
+		return result;
+	}
+	if (result instanceof BreakValue) {
+		return null;
+	}
+	return evaluate_for_statement_array_clause(stmt, range_arr, index+1, env);
+}
+
+// ========================== FUNC ==========================
 function function_definition_name(stmt) {
 	return stmt.name;
 }
