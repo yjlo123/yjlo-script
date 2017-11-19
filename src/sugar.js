@@ -223,7 +223,7 @@ function tokenizeAndDesugaring(source){
 						desugared_tokens.push(new Token('name', decorated_func.value, decorator.line));
 						if (has_args) {
 							desugared_tokens.push(new Token('operator', ',', decorator.line));
-							desugared_tokens = desugared_tokens.concat(decorator_args);
+							desugared_tokens = desugared_tokens.concat(decorator_args.slice(1, decorator_args.length - 1));
 						}
 						desugared_tokens.push(new Token('operator', ')', decorator.line));
 						desugared_tokens.push(new Token('newline', '', decorator.line));
