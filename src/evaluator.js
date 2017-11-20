@@ -550,13 +550,13 @@ function apply_primitive_function(fun,argument_list) {
 }
 
 function extend_environment(vars, vals, base_env, line) {
-	first_frame(base_env)['_args_'] = vals;
+	first_frame(base_env)['$args'] = vals;
 	return enclose_by(make_frame(vars, vals), base_env);
 }
 
 function update_environment(vars, vals, base_env) {
-	// _args_
-	first_frame(base_env)['_args_'] = vals;
+	// $args
+	first_frame(base_env)['$args'] = vals;
 	
 	if (!_is_empty(vars) && _length(vars) >= _length(vals)){
 		// add var-val pair to env
@@ -695,7 +695,7 @@ function refer(fun, member) {
 	
 	let types = ['isList', 'isPair', 'isArray', 'isString', 'isNumber', 'isBoolean', 'isNull'];
 	if (is_compound_function_value(fun)) {
-		if (member === '_name_') {
+		if (member === '$name') {
 			return fun.name;
 		}
 		let func_env = extend_environment([],[],function_value_environment(fun));
@@ -908,7 +908,7 @@ function evaluate(stmt, env) {
 			if (member instanceof ApplicationNode) {
 				// reference function member func
 				let member_func_name = operator(member).name;
-				if (member_func_name === '_apply_') {
+				if (member_func_name === '$apply') {
 					return apply(evaluate(fun, env), _head(list_of_values(operands(member), env)), stmt.line);
 				}
 				return apply(refer(evaluate(fun, env), member_func_name),
