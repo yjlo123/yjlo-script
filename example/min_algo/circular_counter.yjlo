@@ -9,26 +9,26 @@ Output: 369485271
 */
 
 import Queue
-import ListUtil
 
-func circularCount(list, skip){
+func circularCount(arr, skip){
 	queue := Queue()
-	result := []
+	result := Array(arr.len)
 	
-	// add list to queue
-	for item in list {
+	// add arr to queue
+	for item in arr {
 		queue.offer(item)
 	}
 	
+	i := 0
 	while !queue.isEmpty() {
 		for i in 0..<skip - 1 {
 			queue.offer(queue.poll())
 		}
-		result = (queue.poll(), result)
+		result[i++] = queue.poll()
 	}
 	
-	return ListUtil.reverse(result)
+	return result
 }
 
-a := ['1','2','3','4','5','6','7','8','9']
+a := Array(['1','2','3','4','5','6','7','8','9'])
 print( circularCount(a, 3) )
