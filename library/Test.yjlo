@@ -44,7 +44,7 @@ class Test {
 			}
 			recursion(func_list.tail)
 			f := func_list.head
-			_current_set_name = f._name_
+			_current_set_name = f.$name
 			_current_set_pass = true
 			f()
 			if _current_set_pass {
