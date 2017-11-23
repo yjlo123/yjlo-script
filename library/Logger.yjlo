@@ -1,25 +1,25 @@
 class Logger {
 
 	func before(f) {
-		content := _args_.tail.head
+		content := $args.tail.head
 		return func() {
 			print(content)
-			f._apply_(_args_)
+			f.$apply($args)
 		}
 	}
 	
 	func after(f) {
-		content := _args_.tail.head
+		content := $args.tail.head
 		return func() {
-			f._apply_(_args_)
+			f.$apply($args)
 			print(content)
 		}
 	}
 	
 	func params(f) {
 		return func() {
-			print(_args_)
-			f._apply_(_args_)
+			print($args)
+			f.$apply($args)
 		}
 	}
 }
