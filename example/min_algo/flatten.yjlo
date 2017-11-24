@@ -4,28 +4,28 @@ Given an list that may contain nested lists,
 give a single resultant list.
 
 Example:
-Input: [2, 1, [3, [4, 5], 6], 7, [8]];
+Input: [2, 1, [3, [4, 5], 6], 7, [8]]
 Output: [2, 1, 3, 4, 5, 6, 7, 8]
 */
 
 func flatten(list, res) {
-	if !$is_list(list) { return $pair(list, res); }
-	if $is_empty(list) { return res; }
-	if $is_empty($tail(list)) {
-		return flatten($head(list), res);
+	if !list.isList { return (list, res) }
+	if list.isEmpty { return res }
+	if list.tail.isEmpty {
+		return flatten(list.head, res)
 	}
-	return flatten($head(list), flatten($tail(list), res));
+	return flatten(list.head, flatten(list.tail, res))
 }
 
-var nested_list = [2,1,[3,[4,5],6],7,[8]];
-print(nested_list);
-print(flatten(nested_list, []));
+nested_list := [2,1,[3,[4,5],6],7,[8]]
+print(nested_list)
+print(flatten(nested_list, []))
 
 // reversed order flatten
 func flatten_rev(list, res) {
-	if $is_empty(list) { return res; }
-	if $is_list($head(list)) {
-		return flatten_rev($tail(list), flatten_rev($head(list), res));
+	if list.isEmpty { return res }
+	if list.head.isList {
+		return flatten_rev(list.tail, flatten_rev(list.head, res))
 	}
-	return flatten_rev($tail(list), $pair($head(list), res));
+	return flatten_rev(list.tail, (list.head, res))
 }
