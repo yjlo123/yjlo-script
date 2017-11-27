@@ -3,52 +3,48 @@
  * A hash set implemented using HashMap
  */
 
-import HashMap;
+import HashMap
 
-func HashSet(capacity) {
+class HashSet {
 	
-	var _CAPACITY = 63;
-	var _map = null;
+	var _CAPACITY = 63
+	var _map = null
 	
 	// Dummy value to associate with an Object in the backing Map
-	func _Dummy() { return func(){}; }
-	var _PRESENT = _Dummy();
+	func _Dummy() { return func(){} }
+	var _PRESENT = _Dummy()
 	
-	/* initialization */
-	func _init() {
+	@(capacity) {
 		if capacity {
-			_CAPACITY = capacity;
+			_CAPACITY = capacity
 		}
-		_map = HashMap(_CAPACITY);
+		_map = HashMap(_CAPACITY)
 	}
-	_init();
 
 	func add(e) {
-		return _map.put(e, _PRESENT) == null;
+		return _map.put(e, _PRESENT) == null
 	}
 	
 	func clear() {
-		_map.clear();
+		_map.clear()
 	}
 	
 	func size() {
-		return _map.size();
+		return _map.size()
 	}
 	
 	func remove(o) {
-		return _map.remove(o) == _PRESENT;
+		return _map.remove(o) == _PRESENT
 	}
 	
 	func toString() {
-		var str = "";
+		var str = ""
 		for i in 0..<_CAPACITY {
-			var node = _getNodeByPath(_getPathByIndex(i), false);
+			var node = _getNodeByPath(_getPathByIndex(i), false)
 			if node != null && !$is_empty(node.entry) {
-				str += (i + ": " + node.toString() + "\n");
+				str += (i + ": " + node.toString() + "\n")
 			}
 		}
-		return str;
+		return str
 	}
-
-	return func(){};
 }
