@@ -645,6 +645,8 @@ function list_method(list, method) {
 			return _is_empty(list);
 		case 'len':
 			return _length(list);
+		case 'reversed':
+			return _reverse_list(list);
 		default:
 			throwError('?', 'Unknown list method: ' + method);
 	}

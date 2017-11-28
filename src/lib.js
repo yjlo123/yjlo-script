@@ -38,6 +38,12 @@ function _is_list(xs) {
 	return xs && (_is_empty(xs) || (_tail(xs) !== undefined && _is_list(_tail(xs))));
 }
 
+function _reverse_list(list, result) {
+	result = result || [];
+	if (_is_empty(list)) return result;
+	return _reverse_list(_tail(list), _pair(_head(list), result));
+}
+
 function _is_in_list(x, xs) {
 	if (_is_empty(xs)) return false;
 	if (x === _head(xs)) return true;
