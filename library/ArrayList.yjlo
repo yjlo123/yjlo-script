@@ -66,6 +66,16 @@ class ArrayList (Iterator) {
 		return elementData[index]
 	}
 	
+	func toString() {
+		str := "["
+		for i in 0..<_size {
+			str += elementData[i]
+			if i < _size - 1 {
+				str += ", "
+			}
+		}
+		return str + "]"
+	}
 	
 	func iterator() {
 		it := Iterator(0)
