@@ -1,34 +1,29 @@
 /*
-Given a sorted integer list without duplicates,
+Given a sorted integer array without duplicates,
 return the summary of its ranges.
 For example, given [0,1,2,4,5,7], return ["0->2","4->5","7"].
 */
 
-import ListUtil;
-
-lget := ListUtil.get;
-lappend := ListUtil.append;
+import ArrayList
 
 func summary_ranges(nums) {
-	res := [];
-	len := ListUtil.len(nums);
-	if len == 1 {
-		return nums;
-	}
-	i := 0;
+	res := ArrayList()
+	len := nums.len
+	if len == 1 { return nums }
+	i := 0
 	while i < len {
-		num := lget(nums, i);
-		while i+1 < len && lget(nums, i+1) - lget(nums, i) == 1 {
-			i += 1;
+		num := nums[i]
+		while i+1 < len && nums[i+1] - nums[i] == 1 {
+			i += 1
 		}
-		if lget(nums, i) != num {
-			res = lappend(res, num + "->" + lget(nums, i));
+		if nums[i] != num {
+			res.add(num + "->" + nums[i])
 		} else {
-			res = lappend(res, num + "");
+			res.add(num + "")
 		}
-		i += 1;
+		i += 1
 	}
-	return res;
+	return res
 }
 
-print(summary_ranges([0,1,2,4,5,7]));
+print(summary_ranges(Array([0,1,2,4,5,7])))
