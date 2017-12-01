@@ -1,0 +1,11 @@
+import Tokenizer
+
+tokenizer := Tokenizer()
+tokenizer.tokenize("12*34-78/(12+4)")
+
+tokens := tokenizer.tokens
+
+while !tokens.isEmpty {
+	print(tokens.head.type, " ", tokens.head.value)
+	tokens = tokens.tail
+}
