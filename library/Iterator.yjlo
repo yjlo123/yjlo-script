@@ -9,7 +9,7 @@ class Iterator {
 	
 	
 	class Iterator {
-		_index := 0
+		_index := -1
 		var _current
 		var _next
 		
