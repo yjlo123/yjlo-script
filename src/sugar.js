@@ -7,6 +7,7 @@ function tokenizeAndDesugaring(source){
 		}
 		return t.type === 'name';
 	};
+	var isStringToken = t => t && t.type === 'string';
 	var isOperatorToken = t => t && t.type === 'operator';
 	var isOperatorTokenWithValue = (t, v) => isOperatorToken(t) && t.value === v;
 	var isOpeningBracketToken = t => isOperatorTokenWithValue(t, '(');
@@ -45,7 +46,10 @@ function tokenizeAndDesugaring(source){
 						// ...[x][x]
 						isOperatorTokenWithValue(original_tokens[i-1], ']') ||
 						// application[x]
-						isOperatorTokenWithValue(original_tokens[i-1], ')'))) {
+						isOperatorTokenWithValue(original_tokens[i-1], ')')
+					) ||
+					// string[x]
+					(isStringToken(original_tokens[i-1]))) {
 					desugared_tokens.push(original_tokens[i]); // '['
 				} else {
 					// list
