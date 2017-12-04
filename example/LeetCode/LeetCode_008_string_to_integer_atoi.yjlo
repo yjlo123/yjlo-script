@@ -13,20 +13,22 @@ to gather all the input requirements up front.
 import Math
 
 func atoi(str) {
-	var chars = $string_to_char_list(str)
-	var sign = 1, base = 0, i = 0
+	chars := str.toCharList
+	sign := 1
+	base := 0
+	i := 0
 
 	// discards all leading whitespaces
-	while $head(chars) == ' ' { chars = $tail(chars) }
+	while chars.head == ' ' { chars = chars.tail }
 
-	if $head(chars) == '-' || $head(chars) == '+' {
-		sign = $head(chars) == '-' ? -1 : 1 
-		chars = $tail(chars)
+	if chars.head == '-' || chars.head == '+' {
+		sign = chars.head == '-' ? -1 : 1 
+		chars = chars.tail
 	}
 
-	while $head(chars) >= '0' && $head(chars) <= '9' {
-		var digit = $head(chars) - '0'
-		var prev_base = base
+	while chars.head >= '0' && chars.head <= '9' {
+		digit := chars.head - '0'
+		prev_base := base
 		base = 10 * base + digit
 		
 		// overflow
@@ -35,7 +37,7 @@ func atoi(str) {
 			else { return Math.MIN_INT }
 		}
 		
-		chars = $tail(chars)
+		chars = chars.tail
 	}
 	return base * sign
 }
