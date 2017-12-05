@@ -8,10 +8,11 @@ print(arr.toList());
 print(arr.size());
 print(arr.get(5));
 
+print("========")
 
 /* test iterator */
 it := arr.iterator()
-print(it.hasNext())
-print(it.next())
-print(it.next())
-print(it.next())
+
+while it.hasNext() {
+	print(it.next())
+}

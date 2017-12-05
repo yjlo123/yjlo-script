@@ -29,3 +29,14 @@ print(it.next())
 print(it.next())
 print(it.next())
 print(it.hasNext())
+
+
+al := ArrayList()
+al.add("a")
+al.add('3')
+it := al.iterator()
+
+while it.hasNext() {
+	print(it.next())
+}
+print(it.hasNext())
