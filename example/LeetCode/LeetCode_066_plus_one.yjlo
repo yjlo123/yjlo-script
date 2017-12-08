@@ -7,24 +7,23 @@ Input: [1, 4, 9]
 Output: [1, 5, 0]
 */
 
-import HeapList
+import ArrayList
 
 func plusOne(num) {
-	var digits = HeapList()
-	digits.init(num)
-	
+	digits := ArrayList(num)
+
 	for i in digits.size()-1...0 by -1 {
 		if(digits.get(i) < 9) {
-			digits.put(i, digits.get(i) + 1)
+			digits.set(i, digits.get(i) + 1)
 			return digits.toList()
 		}
-		digits.put(i, 0)
+		digits.set(i, 0)
 	}
 	
-	var newNumber = HeapList()
-	newNumber.put(0, 1)
+	var newNumber = ArrayList(num.len + 1)
+	newNumber.add(1)
 	for i in 0..<digits.size() {
-		newNumber.put(i + 1, 0)
+		newNumber.add(0)
 	}
 	
 	return newNumber.toList()
