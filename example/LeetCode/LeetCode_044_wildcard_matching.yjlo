@@ -20,8 +20,8 @@ isMatch("aab", "c*a*b") → false
 */
 
 func isMatch(str, pattern) {
-	str = $string_to_char_list(str)
-	pattern = $string_to_char_list(pattern)
+	str = str.toCharList
+	pattern = pattern.toCharList
 	var star_pattern, star_str
 	while !str.isEmpty {
 		// advancing both pointers
