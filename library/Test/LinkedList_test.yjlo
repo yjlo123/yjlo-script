@@ -9,9 +9,6 @@ ll.add(6)
 
 it := ll.iterator()
 
-print(it.hasNext())
-print(it.next())
-print(it.next())
-print(it.next())
-print(it.next())
-print(it.hasNext())
+while it.hasNext() {
+	print(it.next())
+}
