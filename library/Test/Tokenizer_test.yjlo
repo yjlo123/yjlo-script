@@ -1,11 +1,20 @@
 import Tokenizer
+import Test
 
-tokenizer := Tokenizer()
-tokenizer.tokenize("12*34-78/(12+4)")
+#run_test
+class StackTest (Test) {
+	
+	#test
+	func test1() {
+		tokenizer := Tokenizer()
+		tokenizer.tokenize("12*34-78/(12+4)")
+		tokens := tokenizer.tokens
+		
+		for token in tokens {
+			print(token.type, " ", token.value)
+		}
 
-tokens := tokenizer.tokens
+		assertEqual(11, tokens.len)
+	}
 
-while !tokens.isEmpty {
-	print(tokens.head.type, " ", tokens.head.value)
-	tokens = tokens.tail
 }
