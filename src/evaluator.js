@@ -811,7 +811,13 @@ var primitive_functions = {
 				return x === y;
 			}
 		},
-		'!=': (x,y) => x !== y,
+		'!=': function (x,y) {
+			if (_is_array(x) && _is_array(y)) {
+				return !array_equal(x, y);
+			} else {
+				return x !== y;
+			}
+		},
 		'<': (x,y) => x < y,
 		'<=': (x,y) => x <= y,
 		'>': (x,y) => x > y,
