@@ -26,7 +26,15 @@ class LinkedList(Iterator) {
 	
 	/* Pointer to last node. */
 	var _last = null
-
+	
+	@(list) {
+		if list != null && list.isList {
+			for i in list {
+				add(i)
+			}
+		}
+	}
+	
 	/* Returns the number of elements in this list. */
 	func size() {
 		return _size
