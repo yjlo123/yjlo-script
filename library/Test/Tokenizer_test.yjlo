@@ -2,7 +2,7 @@ import Tokenizer
 import Test
 
 #run_test
-class StackTest (Test) {
+class TokenizerTest (Test) {
 	
 	#test
 	func test1() {
