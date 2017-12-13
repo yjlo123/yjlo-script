@@ -1,14 +1,40 @@
 import LinkedList
+import Test
 
-/* test iterator */
-ll := LinkedList()
-ll.add(3)
-ll.add(2)
-ll.add(8)
-ll.add(6)
+#run_test
+class LinkedListTest (Test) {
+	
+	#test
+	func test1() {
+		items := [3, 2, 8, 6]
+		
+		ll := LinkedList()
+		
+		for i in items {
+			ll.add(i)
+		}
+		
+		assertEqual(4, ll.size())
+		
+		actual := []
+		expect := items.reversed
+		it := ll.iterator()
+		while it.hasNext() {
+			actual = (it.next().item, actual)
+		}
+		
+		assertEqual(expect.len, actual.len)
+		assertEqual(expect, actual)
+	}
+	
+	#test
+	func test2() {
+		items := [3, 2, 8, 6]
+		
+		ll := LinkedList(items)
+		assertEqual(4, ll.size())
+		assertEqual(3, ll.getFirst())
+		assertEqual(6, ll.getLast())
+	}
 
-it := ll.iterator()
-
-while it.hasNext() {
-	print(it.next())
 }
