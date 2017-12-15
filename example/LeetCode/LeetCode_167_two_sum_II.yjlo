@@ -10,15 +10,15 @@ Input: numbers={2, 7, 11, 15}, target=9
 Output: [0, 1]
 */
 
-import HeapList
+import ArrayList
 
 func twoSum(nums, target) {
-	var indice = []
+	indice := []
 	if nums == null || nums.size() < 2 { return indice }
-	var left = 0
-	var right = nums.size() - 1
+	left := 0
+	right := nums.size() - 1
 	while left < right {
-		var v = nums.get(left) + nums.get(right)
+		v := nums.get(left) + nums.get(right)
 		if v == target {
 			indice = [left, right]
 			break
@@ -31,11 +31,11 @@ func twoSum(nums, target) {
 	return indice
 }
 
-var arrayList = HeapList()
+arrayList := ArrayList()
 print(twoSum(arrayList, 9))	// invalid nums size
-arrayList.init([2, 7, 11, 15]) 
+arrayList = ArrayList([2, 7, 11, 15])
 print(twoSum(arrayList, 9))	// 2 + 7
 print(twoSum(arrayList, 22))	// 7 + 15
 
-arrayList.init([3, 6, 13, 15, 22, 46, 51, 73, 99]) 
+arrayList = ArrayList([3, 6, 13, 15, 22, 46, 51, 73, 99]) 
 print(twoSum(arrayList, 35))	// 13 + 22
