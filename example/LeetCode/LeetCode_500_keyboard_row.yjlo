@@ -11,28 +11,26 @@ Input: ["Hello", "Alaska", "Dad", "Peace"]
 Output: ["Alaska", "Dad"]
 */
 
-import HeapList
-import LinkedList
+import ArrayList
 
 // keyboard row numbers for 26 English letters
-var map = HeapList()
-map.init([2,3,3,2,1,2,2,2,1,2,2,2,3,3,1,1,1,1,2,1,1,3,1,3,1,3])
+map := ArrayList([2,3,3,2,1,2,2,2,1,2,2,2,3,3,1,1,1,1,2,1,1,3,1,3,1,3])
 
 func letterToRowNumber(char) {
-	var code = $char_code(char)
+	code := char.charCode
 	// to lower case
 	if code < 97 { code += 32 }
 	return map.get(code - 97)
 }
 
 func findWords(words) {
-	var result = LinkedList()
+	result := ArrayList()
 	for word in words {
-		var letters = $string_to_char_list(word)
+		letters := word.toCharList
 		// previous letter row number
-		var row = letterToRowNumber($head(letters))
-		letters = $tail(letters)
-		var same = true
+		row := letterToRowNumber(letters.head)
+		letters = letters.tail
+		same := true
 		for letter in letters {
 			if letterToRowNumber(letter) != row {
 				same = false
@@ -46,5 +44,5 @@ func findWords(words) {
 	return result
 }
 
-var words = findWords(["Hello", "Alaska", "Dad", "Peace"])
+words := findWords(["Hello", "Alaska", "Dad", "Peace"])
 print(words.toList())
