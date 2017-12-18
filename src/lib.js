@@ -50,6 +50,15 @@ function _is_in_list(x, xs) {
 	return _is_in_list(x, _tail(xs));
 }
 
+function _index_in_list(x, xs) {
+	function index(x, xs, i) {
+		if (_is_empty(xs)) return -1;
+		if (x === _head(xs)) return i;
+		return index(x, _tail(xs), i+1);
+	}
+	return index(x, xs, 0);
+}
+
 function _list() {
 	var the_list = [];
 	for (var i = arguments.length - 1; i >= 0; i--)
