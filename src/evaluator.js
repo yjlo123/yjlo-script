@@ -647,6 +647,14 @@ function list_method(list, method) {
 			return _length(list);
 		case 'reversed':
 			return _reverse_list(list);
+		case 'has':
+			return function(args) {
+				return _is_in_list(args[0], list);
+			};
+		case 'index':
+			return function(args) {
+				return _index_in_list(args[0], list);
+			};
 		default:
 			throwError('?', 'Unknown list method: ' + method);
 	}
@@ -683,7 +691,20 @@ function pair_method(pair, method) {
 		case 'tail':
 			return _tail(pair);
 		default:
-			throwError('?', 'Unknown pair method: ' + member);
+			throwError('?', 'Unknown pair method: ' + method);
+	}
+}
+
+function array_method(array, method) {
+	switch (method) {
+		case 'len':
+			return array.length;
+		case 'index':
+			return function(args) {
+				return array.indexOf(args[0]);
+			};
+		default:
+		throwError('?', 'Unknown array method: ' + method);
 	}
 }
 
@@ -730,16 +751,7 @@ function refer(fun, member) {
 	} else if (_is_pair(fun)) {
 		return pair_method(fun, member);
 	} else if (fun instanceof Array) {
-		switch (member) {
-			case 'len':
-				return fun.length;
-			case 'index':
-				return function(args) {
-					return fun.indexOf(args[0]);
-				};
-			default:
-			throwError('?', 'Unknown array method: ' + fun);
-		}
+		return array_method(fun, member);
 	} else {
 		throwError('?', 'Unknown function type - REFER: ' + fun);
 	}
