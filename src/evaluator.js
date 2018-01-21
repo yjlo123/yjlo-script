@@ -679,6 +679,10 @@ function string_method(str, method) {
 				return char_list;
 			}
 			return null;
+		case 'substring':
+			return function(args) {
+				return str.substring(args[0], args[1]);
+			};
 		default:
 			throwError('?', 'Unknown string method: ' + method);
 	}
