@@ -288,7 +288,7 @@ function evaluate_switch_statement(stmt, env) {
 		cases = _tail(cases);
 	}
 	if (!found_case && switch_default(stmt)) {
-		evaluate(switch_default(stmt), env);
+		return evaluate(switch_default(stmt), extend_environment([], [], env));
 	}
 }
 
@@ -538,10 +538,6 @@ function apply_in_underlying_javascript(prim, argument_list) {
 		argument_list = _tail(argument_list);
 	}
 	return prim.apply(prim, argument_array);
-}
-
-function primitive_implementation(fun) {
-	return fun.implementation;
 }
 
 function apply_primitive_function(fun,argument_list) {
