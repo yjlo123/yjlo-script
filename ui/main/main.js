@@ -79,6 +79,9 @@ $(document).ready(function () {
 					case ':tree':
 						printSyntaxTree(myCodeMirror.getValue(), current_parser);
 						break;
+					case ':dl-ast':
+						downloadAST(myCodeMirror.getValue(), current_parser);
+						break;
 					default:
 						driver_loop(input, current_parser, get_console_environment(), function (result) {
 							jqconsole.Write('=> ' + _process_output([result]) + '\n', 'console-arrow');
@@ -167,16 +170,11 @@ function run() {
 	}
 }
 
-function printSyntaxTree(program_string, program_parser) {
+function parseToAst(program_string, program_parser, callback, import_lib=false) {
 	try {
 		program_parser(program_string, function (syntax_tree) {
-			if (debug) {
-				// console.log(JSON.stringify(syntax_tree, null, 4));
-			}
-			syntaxTreeStr = '';
-			printSyntaxTreeNode(syntax_tree, '');
-			jqconsole.Write(syntaxTreeStr + `\n`, 'console-default');
-		}, tokenizeAndDesugaring, false);
+			callback(syntax_tree);
+		}, tokenizeAndDesugaring, import_lib);
 	} catch (error) {
 		if (debug) {
 			console.error(error);
@@ -184,6 +182,45 @@ function printSyntaxTree(program_string, program_parser) {
 			jqconsole.Write(error.message + '\n', 'console-error');
 		}
 	}
+}
+
+function simplifyAst(ast) {
+	if (_is_list(ast)) {
+		return _list_to_array(ast).map(x => simplifyAst(x));
+	} else if (typeof ast === 'object' && !(ast instanceof Array)) {
+		for (let key in ast) {
+			ast[key] = simplifyAst(ast[key]);
+		}
+		return ast;
+	} else {
+		return ast;
+	}
+}
+
+function downloadAST(program_string, program_parser) {
+	parseToAst(program_string, program_parser, function(ast) {
+		downloadJson(simplifyAst(ast), 'ast');
+	}, true);
+}
+
+function downloadJson(jsonObj, fileName) {
+	var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonObj, null, 4));
+	var downloadAnchorNode = document.createElement('a');
+	downloadAnchorNode.setAttribute("href",     dataStr);
+	downloadAnchorNode.setAttribute("download", fileName+".json");
+	downloadAnchorNode.click();
+	downloadAnchorNode.remove();
+}
+
+function printSyntaxTree(program_string, program_parser) {
+	parseToAst(program_string, program_parser, function(syntax_tree) {
+		if (debug) {
+			// console.log(JSON.stringify(syntax_tree, null, 4));
+		}
+		syntaxTreeStr = '';
+		printSyntaxTreeNode(syntax_tree, '');
+		jqconsole.Write(syntaxTreeStr + `\n`, 'console-default');
+	});
 }
 
 function printSyntaxTreeNode(node, indent) {
