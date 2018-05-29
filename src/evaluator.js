@@ -847,7 +847,26 @@ var primitive_functions = {
 		'>>>': (x,y) => x >>> y,
 		
 		',': (x,y) => _pair(x, y),
-		
+
+		'int': function (x) {
+			if (typeof x === 'string') {
+				return parseInt(x);
+			} else if (typeof x === 'number') {
+				return Math.round(x);
+			} else {
+				throw Error(`Cannot convert ${x} to int.`);
+			}
+		},
+		'round':function (number, precision) {
+			if (!precision) {
+				return Math.round(number);
+			}
+			let shift = function (number, exponent) {
+				let numArray = ("" + number).split("e");
+				return +(numArray[0] + "e" + (numArray[1] ? (+numArray[1] + exponent) : exponent));
+			};
+			return shift(Math.round(shift(number, +precision)), -precision);
+		},
 		'throw': (x) => { throw Error(x); }
 };
 
