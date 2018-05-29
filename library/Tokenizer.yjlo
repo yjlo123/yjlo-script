@@ -20,7 +20,7 @@ class Tokenizer {
 	func _strToNum(str) {
 		func help(lst, num){
 			if lst.isEmpty { return num }
-			var d = lst.head - "0"
+			var d = $char_code(lst.head) - $char_code("0")
 			return help(lst.tail, num*10+d)
 		}
 
@@ -34,8 +34,7 @@ class Tokenizer {
 
 		var current = ""
 		while !chars.isEmpty {
-			var c = $head(chars)
-
+			var c = chars.head
 			// Ignore whitespace.
 			if c == " " {
 				chars = chars.tail
@@ -45,7 +44,7 @@ class Tokenizer {
 				current = c
 				chars = chars.tail
 				c = chars.head
-				while c >= '0' && c <= '9' {
+				while !chars.isEmpty && c >= '0' && c <= '9' {
 					current += c
 					chars = chars.tail
 					c = chars.head
