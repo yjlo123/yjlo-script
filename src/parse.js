@@ -268,7 +268,7 @@
 			for (let i = 0; i < expression_nodes_infix.length; i++) {
 				let prevNode = i > 0 ? expression_nodes_infix[i - 1] : null;
 				let thisNode = expression_nodes_infix[i];
-				if (thisNode.name === '(') {
+				if (thisNode.type === 'operator' && thisNode.name === '(') {
 					temp_stack.push(thisNode);
 				} else if (thisNode.type === 'variable' ||
 						thisNode instanceof ApplicationNode ||
@@ -276,8 +276,8 @@
 					expression_nodes_postfix.push(thisNode);
 				} else if (thisNode.tag === 'constant') {
 					expression_nodes_postfix.push(thisNode.value);
-				} else if (thisNode.name === ')') {
-					while (temp_stack.length > 0 && temp_stack[temp_stack.length - 1].name !== '(') {
+				} else if (thisNode.type === 'operator' && thisNode.name === ')') {
+					while (temp_stack.length > 0 && !(temp_stack[temp_stack.length - 1].type === 'operator' && temp_stack[temp_stack.length - 1].name === '(')) {
 						expression_nodes_postfix.push(temp_stack.pop());
 					}
 					if (temp_stack.length > 0) {
