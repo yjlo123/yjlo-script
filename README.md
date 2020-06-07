@@ -41,10 +41,7 @@ Hello YJLO!
 - online IDE and REPL
 
 ## Online Demo
-* Latest
-  * <https://yjlo123.github.io/yjlo-script/>
-* Stable
-  * <https://yjlo.xyz/script>
+* <https://yjlo123.github.io/yjlo-script/>
 
 ## Documentation
   * [YJLO Script Wiki](https://github.com/yjlo123/yjlo-script/wiki)
